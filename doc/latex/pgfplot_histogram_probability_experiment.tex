@@ -1,0 +1,39 @@
+% compiling:
+% pdflatex test.tex
+% Gallery:
+% http://pgfplots.sourceforge.net/gallery.html
+
+\documentclass{article}
+
+\usepackage{pgfplots}
+
+\pgfplotsset{compat=newest}
+
+\pagestyle{empty}
+
+\pgfplotstableread[
+        col sep=comma,
+            ]{histogram.csv}\datatable
+
+\begin{document}
+\begin{tikzpicture}
+  \begin{axis}[
+	ybar,
+	enlargelimits=0.9,
+	/pgf/bar width=15pt,
+	title={Experiment \#1000},
+	xlabel={\#Probability},
+	ylabel={\#Outcomes},
+	xticklabels from table={\datatable}{probability},
+	xtick=data,
+	scaled ticks=false,
+	nodes near coords,
+	ymajorgrids=true,
+	grid style=dashed,
+	scaled ticks=false,
+    ]
+    % \addplot coordinates {(0.3,300) (0.5,500) (0.2,200) };
+	\addplot table [x=probability, y=outcome, col sep=comma] {\datatable};
+  \end{axis}
+\end{tikzpicture}
+\end{document}

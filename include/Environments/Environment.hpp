@@ -1,0 +1,72 @@
+/*
+ * environment.hpp
+ *
+ *  Created on: Mar 7, 2017
+ *      Author: farabiahmed
+ */
+
+#ifndef ENVIRONMENT_ENVIRONMENT_HPP_
+#define ENVIRONMENT_ENVIRONMENT_HPP_
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include "Miscellaneous/SmartVector.hpp"
+//#include "Representations/Representation.hpp"
+
+using namespace std;
+
+/// The learner and decision-maker is called the agent.
+/// The thing it interacts with, comprising everything outside the agent, is called the environment.
+/// A complete specification of an environment defines a task.
+
+class Representation;
+
+
+/*! \class Environment
+    \brief An abstract Environment class
+
+    This abstract class will provide a base for more
+    general classes like Gridworld etc.
+*/
+class Environment {
+public:
+
+	/// Create a constructor
+	Environment();
+
+	/// Create a virtual destructor
+	virtual ~Environment();
+
+	virtual double Get_Reward(SmartVector currentState, SmartVector action, SmartVector nextState) = 0;
+
+	virtual vector<pair<SmartVector,double>> Get_Transition_Probability(const SmartVector& currentState, const SmartVector& action) = 0;
+
+	virtual vector<SmartVector> Get_All_Possible_States() const = 0;
+
+	virtual vector<SmartVector> Get_Action_List(SmartVector state) const = 0;
+
+	virtual SmartVector Get_Initial_State() = 0;
+
+	virtual bool Check_Terminal_State(const SmartVector& state) = 0;
+
+	virtual bool Check_Blocked_State(const SmartVector& state) const = 0;
+
+	virtual SmartVector Get_Next_State(const SmartVector& state, const SmartVector& action) = 0;
+
+	virtual void Display_State(const SmartVector& state) const = 0;
+
+	virtual void Display_Action(const SmartVector& action) const = 0;
+
+	virtual void Display_Policy(const Representation& rep) const = 0;
+
+	virtual void Test(void) = 0;
+
+	string Name;	///< It stores the name of environment to increase readability and awareness.
+    				///< Such as GridWorld, Inverted Pendulum etc.
+
+	int number_of_states;
+	int number_of_actions;
+};
+
+#endif /* ENVIRONMENT_ENVIRONMENT_HPP_ */

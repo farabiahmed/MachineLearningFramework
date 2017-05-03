@@ -1,0 +1,19 @@
+# Ignore the build and lib dirs
+build/*
+lib/*.so
+lib/*.dll
+
+# Ignore any executables
+bin/*.out
+bin/*
+
+# Ignore backup files
+*~
+
+# CDT-specific (C/C++ Development Tooling)
+.cproject
+.project
+.settings/
+
+# Ignore Mac specific files
+.DS_Store
