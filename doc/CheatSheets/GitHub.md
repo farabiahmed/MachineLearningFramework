@@ -25,3 +25,17 @@ Commit the files that you staged in your local repo:
 git commit -m "First commit"
 ```
 
+Set the new remote:
+```sh
+ git remote add origin https://github.com/farabiahmed/MachineLearningFramework.git
+```
+
+Verify the new remote url
+```sh
+git remote -v
+```
+
+Push the changes in your local repo up to remote that you specified as the origin
+```sh
+git push origin master
+```
