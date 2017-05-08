@@ -37,6 +37,8 @@ public:
 	void Print_Value();
 
 private:
+	// State and Action Pairs
+	vector< vector<double> > Qvalue;
 };
 
 #endif /* REPRESENTATIONS_STATEACTIONVALUE_HPP_ */

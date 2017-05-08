@@ -36,9 +36,6 @@ public:
 
 	virtual void Print_Value() = 0;
 
-	//virtual list<double> Get_Value(SmartVector state) = 0;
-	//double** Qvalue; // State and Action Pairs
-	vector< vector<double> > Qvalue;
 };
 
 #endif /* REPRESENTATIONS_REPRESENTATION_HPP_ */
