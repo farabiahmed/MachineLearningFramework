@@ -27,9 +27,9 @@ Gridworld::Gridworld(const ConfigParser& cfg) {
 
 	number_of_rows = cfg.GetValueOfKey<int>("NUMBER_OF_ROWS");
 
-	number_of_states = cfg.GetValueOfKey<int>("NUMBER_OF_STATES");
+	number_of_states = number_of_columns * number_of_rows;
 
-	number_of_actions = cfg.GetValueOfKey<int>("NUMBER_OF_ACTIONS");
+	number_of_actions = 4;
 }
 
 Gridworld::~Gridworld() {
