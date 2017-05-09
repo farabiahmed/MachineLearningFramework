@@ -28,6 +28,7 @@
 #include "Representations/StateActionValue.hpp"
 #include <Representations/FunctionApproximatorBinaryBasis.hpp>
 #include <Representations/FunctionApproximatorGaussianRadialBasis.hpp>
+#include <Representations/FunctionApproximatorNeuralNetwork.hpp>
 
 #include "Agents/Agent.hpp"
 #include "Agents/QIteration.hpp"
@@ -46,7 +47,8 @@ void help_menu(void)
 	cout << "2- Grid World with Trajectory Based Q-Value Iteration and QTable Representation	"<<endl;
 	cout << "3- Grid World with Trajectory Based Q-Value Iteration and Binary BF Representation	"<<endl;
 	cout << "4- Grid World with Trajectory Based Q-Value Iteration and GRBF Representation		"<<endl;
-	cout << "5- Blocks World with Qiteration													"<<endl;
+	cout << "5- Grid World with Trajectory Based Q-Value Iteration and NeuralNetworks Rep.		"<<endl;
+	cout << "6- Blocks World with Qiteration													"<<endl;
 	cout << "***********************************************************************************"<<endl;
 	cout << "Enter your choice and press return: ";
 
@@ -147,6 +149,23 @@ int main()
 		}break;
 		case 5:
 		{
+			// Trajectory Based Value Iteration with Neural Network Representation Example for GridWorld
+
+			// Get parameters from file
+			ConfigParser cfg = ConfigParser("config/config_gridworld.cfg");
+
+			// Initialize Environment
+			environment 	= new Gridworld(cfg);
+
+			// Initialize Representation Function
+			value 			= new FunctionApproximatorNeuralNetwork(*environment,cfg);
+
+			// Initialize Solver
+			agent 			= new TrajectoryBasedValueIteration(environment, value, cfg);
+
+		}break;
+		case 6:
+		{
 			// Qiteration Example for BlocksWorld
 
 			// Get parameters from file
@@ -164,7 +183,7 @@ int main()
 
 		}break;
 		default:
-			cout<< "You have entered an invalid input."<<endl;
+			cout<<endl<< "You have entered an invalid input, terminating..." <<endl<<endl;
 			return 0;
 			break;
 	}
