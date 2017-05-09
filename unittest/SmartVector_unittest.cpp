@@ -75,6 +75,66 @@ int main()
 	else
 		cout<<endl<<"Comparison Result: Not Equal"<<endl;
 
+	/*******************************************************************************************************/
+	/* Substraction							 													 		   */
+	/*******************************************************************************************************/
+	test_id++;
+	print_test_information("Substraction:");
+
+	SmartVector vec5(2);
+	SmartVector vec6(2);
+	SmartVector vec7;
+
+	vec5.elements[0] = 5;
+	vec5.elements[1] = -5;
+
+	vec6.elements[0] = 6;
+	vec6.elements[1] = -6;
+
+	vec5.Print();
+
+	vec6.Print();
+
+
+	vec7 = vec5-vec6;
+
+	vec5.Print();
+
+	vec6.Print();
+
+	vec7.Print();
+
+	/*******************************************************************************************************/
+	/* Addition and multiplication							 													 		   */
+	/*******************************************************************************************************/
+	test_id++;
+	print_test_information("Addition and multiplication	:");
+
+	SmartVector vec8(2);
+	SmartVector vec9(2);
+	SmartVector vec10;
+
+	vec8.elements[0] = 5;
+	vec8.elements[1] = -5;
+
+	vec9.elements[0] = 6;
+	vec9.elements[1] = -6;
+
+	vec8.Print();
+
+	vec9.Print();
+
+
+	vec10 = vec8+vec9*2;
+
+	vec8.Print();
+
+	vec9.Print();
+
+	vec10.Print();
+
+
+
 	cout<<endl<<"End Of Test Program"<<endl;
 
 	return 0;
