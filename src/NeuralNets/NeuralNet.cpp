@@ -32,13 +32,11 @@ NeuralNet::NeuralNet(const vector<unsigned> &topology) {
 			// vector.back() is used to get latest layer.
 			layers.back().push_back(Neuron(numOutputs,neuronNum));
 
-			cout<<"A neuron created"<<endl;
+			//cout<<"A neuron created"<<endl;
 		}
-
 
         // Force the bias node's output to 1.0 (it was the last neuron pushed in this layer):
         layers.back().back().setOutputVal(1.0);
-
 	}
 
 	recentAverageError = 0;
@@ -136,8 +134,8 @@ void NeuralNet::backPropagation(const vector<double> &targetVals)
 		Layer &currentLayer = layers[layerNum];
 		Layer &prevLayer = layers[layerNum - 1];
 
-		// Loop through each neurons of that layer
-		for (unsigned neuronNum = 0; neuronNum < currentLayer.size(); ++neuronNum) {
+		// Loop through each neurons of that layer except bias neuron
+		for (unsigned neuronNum = 0; neuronNum < currentLayer.size()-1; ++neuronNum) {
 			currentLayer[neuronNum].updateInputWeights(prevLayer);
 		}
 
@@ -152,4 +150,14 @@ void NeuralNet::getResults(vector<double> &resultVals) const
 	for (unsigned neuronNum = 0; neuronNum < layers.back().size()-1; ++neuronNum) {
 		resultVals.push_back(layers.back()[neuronNum].getOutputVal());
 	}
+}
+
+int NeuralNet::GetSizeOfInputLayer() const
+{
+	return layers[0].size()-1;
+}
+
+int NeuralNet::GetSizeOfOutputLayer() const
+{
+	return layers.back().size()-1;
 }
