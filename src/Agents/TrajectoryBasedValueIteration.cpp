@@ -149,7 +149,7 @@ SmartVector TrajectoryBasedValueIteration::Epsilon_Greedy_Policy(const SmartVect
 	if(outcomes[0])
 	{
 		// Run new probability experiment with uniform parameters.
-		cout<<"Exploration"<<endl;
+		//cout<<"Exploration"<<endl;
 
 		// Get the number of candidate actions
 		int count = actions.size();
@@ -182,7 +182,7 @@ SmartVector TrajectoryBasedValueIteration::Epsilon_Greedy_Policy(const SmartVect
 	// Select an action greedily with respect to QValue.
 	else
 	{
-		cout<<"Exploitation"<<endl;
+		//cout<<"Exploitation"<<endl;
 
 		int argMax = valueFunction->Get_Greedy_Pair(state).first;
 		//policy.push_back(actions[argMax]);
