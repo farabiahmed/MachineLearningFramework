@@ -6,6 +6,7 @@
 - Visual Debugger: Eclipse
 - UML Drawings: graphviz, doxygen-gui
 - Plotting: matplotlib
+- Memory Leak Check: valgrind 
 
 
 ## Useful snippets:
@@ -18,6 +19,12 @@
 
 ### Saving terminal output via colors to html
   ./bin/Blocksworld_unittest --color=always | aha  > output.html
+
+### Valgrind
+  valgrind --leak-check=full --show-reachable=yes --track-origins=yes -v ./bin/main
+* --track-origins: to find uninitialized data
+* --show-reachable: shows where the first leaked memory was allocated
+
 
 ## Folder Structure
 
