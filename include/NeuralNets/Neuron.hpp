@@ -12,6 +12,7 @@
 #include <iostream>
 #include <cstdlib> 		//rand
 #include <cmath> 		//tanh
+#include <cassert>  	//assert
 
 using namespace std;
 

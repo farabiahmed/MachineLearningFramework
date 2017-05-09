@@ -10,7 +10,9 @@
 double Neuron::eta = 0.15; // Overall net learning rate, [0.0 ... 1.0]
 double Neuron::alpha = 0.5; // Momentum, multiplier of last deltaWeight, [0.0 ... n]
 
-Neuron::Neuron(unsigned numOutputs,unsigned index) {
+Neuron::Neuron(unsigned numOutputs,unsigned index)
+:myIndex(index)
+{
 
 	for (unsigned c = 0; c < numOutputs; ++c) {
 		outputWeights.push_back(Connection());
@@ -18,7 +20,6 @@ Neuron::Neuron(unsigned numOutputs,unsigned index) {
 		outputWeights.back().deltaWeight = 0;
 	}
 
-	this->myIndex = index;
 }
 
 Neuron::~Neuron() {
@@ -65,9 +66,11 @@ void Neuron::updateInputWeights(Layer &prevLayer)
 {
 	// It will update the weights of the neurons of the previous layer
 	// Weights are stored in Connection container.
-	for (unsigned neuronNum = 0; neuronNum < prevLayer.size(); ++neuronNum) {
-
+	for (unsigned neuronNum = 0; neuronNum < prevLayer.size(); ++neuronNum)
+	{
 		Neuron &neuron = prevLayer[neuronNum];
+
+		assert(myIndex>=0 && myIndex < neuron.outputWeights.size());
 
 		double oldDeltaWeight = neuron.outputWeights[myIndex].deltaWeight;
 
@@ -88,6 +91,7 @@ void Neuron::updateInputWeights(Layer &prevLayer)
 				// Also add momentum = a fraction of the previous delta weight
 				+ alpha
 				* oldDeltaWeight;
+
 
 		neuron.outputWeights[myIndex].weight += newDeltaWeight;
 
