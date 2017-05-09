@@ -8,10 +8,10 @@
 #include "ProbabilityDistributions/DiscreteDistribution.hpp"
 
 
-DiscreteDistribution::DiscreteDistribution(vector<double> probabilities) {
-
+DiscreteDistribution::DiscreteDistribution(vector<double> prob)
+:probabilities(prob)
+{
 	Name = "Discrete Probability Distribution";
-	this->probabilities = probabilities;
 }
 
 DiscreteDistribution::~DiscreteDistribution() {

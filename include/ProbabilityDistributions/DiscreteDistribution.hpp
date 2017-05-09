@@ -40,7 +40,7 @@ using namespace std;
 class DiscreteDistribution : public ProbabilityDistribution {
 public:
 	//Constructor
-	DiscreteDistribution(vector<double>);
+	DiscreteDistribution(vector<double> prob);
 
 	//Destructor
 	virtual ~DiscreteDistribution();
