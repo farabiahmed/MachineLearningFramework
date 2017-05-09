@@ -56,7 +56,7 @@ int main()
 //	myNet.getResults(resultVals);
 
 
-	TrainingData trainData("/home/farabiahmed/Documents/workspace/MachineLearningFramework/config/trainingData.txt");
+	TrainingData trainData("config/trainingData.txt");
 
 	// e.g., { 3, 2, 1 }
 	vector<unsigned> topology;
