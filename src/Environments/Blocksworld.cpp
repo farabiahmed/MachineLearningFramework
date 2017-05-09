@@ -26,7 +26,7 @@ Blocksworld::~Blocksworld() {
 	// TODO Auto-generated destructor stub
 }
 
-double Blocksworld::Get_Reward(SmartVector currentState, SmartVector action, SmartVector nextState)
+double Blocksworld::Get_Reward(const SmartVector& currentState, const SmartVector& action, const SmartVector& nextState)
 {
 	if(action.elements[0]!=0)
 	{
@@ -197,7 +197,7 @@ vector<SmartVector> Blocksworld::Get_All_Possible_States() const
 	return states;
 }
 
-vector<SmartVector> Blocksworld::Get_Action_List(SmartVector state) const
+vector<SmartVector> Blocksworld::Get_Action_List(const SmartVector& state) const
 {
 	// Vector of action is 2 by 1 vector.
 	// For a given state, there are three different cases;
@@ -653,7 +653,7 @@ void Blocksworld::Display_Policy(const Representation& rep)  const
 			if(action.elements[0] > 0)
 				cout << "Move Block #"<<  block_id << " to Slot #" << slot_id+1 << "\t";
 
-			cout << " Value: " << std::right <<setfill(' ') << setw(8) << setprecision(5) << rep.Qvalue[state.index][action.index] <<"\033[0m"<< endl;
+			cout << " Value: " << std::right <<setfill(' ') << setw(8) << setprecision(5) << rep.Get_Value(state,action) <<"\033[0m"<< endl;
 		}
 		cout << endl;
 	}

@@ -27,15 +27,15 @@ public:
 
 	~Gridworld();
 
-	double Get_Reward(SmartVector, SmartVector, SmartVector);
+	double Get_Reward(const SmartVector&, const SmartVector&, const SmartVector&);
 
 	vector<pair<SmartVector,double>> Get_Transition_Probability(const SmartVector& currentState, const SmartVector& action);
 
 	vector<SmartVector> Get_All_Possible_States() const;
 
-	vector<SmartVector> Get_Action_List(SmartVector) const;
+	vector<SmartVector> Get_Action_List(const SmartVector&) const;
 
-	bool Get_Feasibility_Of_Action(SmartVector state, SmartVector action);
+	bool Get_Feasibility_Of_Action(const SmartVector& state, const SmartVector& action) const;
 
 	SmartVector Get_Initial_State();
 
@@ -44,6 +44,8 @@ public:
 	bool Check_Blocked_State(const SmartVector& state) const;
 
 	SmartVector Get_Next_State(const SmartVector& state, const SmartVector& action);
+
+	int Get_State_Index(const SmartVector& state) const;
 
 	void Display_State(const SmartVector& state) const;
 

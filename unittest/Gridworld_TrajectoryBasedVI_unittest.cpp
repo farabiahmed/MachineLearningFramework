@@ -47,7 +47,7 @@ int main()
 	help_menu();
 
 	// Get parameters from file
-	ConfigParser cfg("../config/config_gridworld.cfg");
+	ConfigParser cfg("config/config_gridworld.cfg");
 
 	// Class Pointers
 	Environment* environment 	= new Gridworld(cfg);

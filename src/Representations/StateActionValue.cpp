@@ -61,7 +61,7 @@ StateActionValue::~StateActionValue() {
 	*/
 }
 
-pair<int,double> StateActionValue::Get_Greedy_Pair(SmartVector state)
+pair<int,double> StateActionValue::Get_Greedy_Pair(const SmartVector& state) const
 {
 	assert(state.index	>=0 	&& state.index	< (int)Qvalue.size());
 
@@ -92,16 +92,7 @@ void StateActionValue::Set_Value(const SmartVector& state, const SmartVector& ac
 	Qvalue[state.index][action.index] = val;
 }
 
-list<double> StateActionValue::Get_Value(SmartVector state)
-{
-	list<double> vecList;
-
-	cout<<endl<<"NOT IMPLEMENTED YET"<<endl<<endl;
-
-	return vecList;
-}
-
-double StateActionValue::Get_Value(const SmartVector& state, const SmartVector& action)
+double StateActionValue::Get_Value(const SmartVector& state, const SmartVector& action) const
 {
 	// Avoid the indexes that are out of limits.
 	assert(state.index	>=0 	&& state.index	< (int)Qvalue.size());
@@ -110,7 +101,7 @@ double StateActionValue::Get_Value(const SmartVector& state, const SmartVector& 
 	return Qvalue[state.index][action.index];
 }
 
-SmartVector StateActionValue::Get_Policy(SmartVector state)
+SmartVector StateActionValue::Get_Policy(const SmartVector& state) const
 {
 	SmartVector vec;
 

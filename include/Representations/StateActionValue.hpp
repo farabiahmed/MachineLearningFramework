@@ -24,15 +24,13 @@ public:
 
 	virtual ~StateActionValue();
 
-	pair<int,double> Get_Greedy_Pair(SmartVector state) const ;
+	pair<int,double> Get_Greedy_Pair(const SmartVector& state) const ;
 
-	list<double> Get_Value(SmartVector state);
-
-	double Get_Value(const SmartVector& state, const SmartVector& action);
+	double Get_Value(const SmartVector& state, const SmartVector& action) const;
 
 	void Set_Value(const SmartVector& state, const SmartVector& action, double value);
 
-	SmartVector Get_Policy(SmartVector state);
+	SmartVector Get_Policy(const SmartVector& state) const;
 
 	void Print_Value();
 

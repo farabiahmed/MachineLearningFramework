@@ -54,9 +54,6 @@ int main()
 	Representation* value 		= new StateActionValue(*environment,cfg);
 	Agent* agent 				= new QIteration(environment, value, cfg);
 
-	SmartVector feature_centers(6);
-	feature_centers = cfg.GetValueOfKey< SmartVector >("FEATURE_LOCATIONS");
-
 	//Start Calculation
 	agent->Start_Execution();
 

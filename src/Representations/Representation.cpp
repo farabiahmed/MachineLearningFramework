@@ -10,6 +10,8 @@
 Representation::Representation(const Environment& env) {
 	// TODO Auto-generated constructor stub
 
+	environment = &env;
+
 }
 
 Representation::~Representation() {
