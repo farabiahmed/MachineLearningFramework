@@ -32,15 +32,9 @@ public:
 	bool Start_Execution();
 
 	// Policy Selector
-	SmartVector Epsilon_Greedy_Policy(const SmartVector& state);
+	SmartVector Epsilon_Greedy_Policy(const SmartVector& state) const;
 
 	void Test(void);
-
-
-	// MUST BE REMOVED TO ANOTHER REPRESENTATION CLASS
-	SmartVector Get_Phi(const SmartVector& state,const SmartVector& action);
-
-	double Get_Greedy_Value(const SmartVector& state,const vector<SmartVector>& actions);
 
 private:
 
@@ -56,17 +50,6 @@ private:
 
 	unsigned int length_of_trajectory; 	/// Trajectory Length
 										/// It will be used to determine the trajectory that the algorithm will follow for each iteration.
-
-	double alpha; 						/// Gradient Descent Learning Rate
-										/// Parameter denotes the learning rate of gradient descent optimization algorithm
-
-	int numberOfActions;
-
-	int numberOfFeatures;
-
-	SmartVector phi;
-
-	SmartVector theta;
 };
 
 #endif /* AGENTS_TRAJECTORYBASEDVALUEITERATION_HPP_ */

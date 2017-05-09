@@ -29,10 +29,6 @@ TrajectoryBasedValueIteration::TrajectoryBasedValueIteration(const Environment* 
 	// Probability that balances exploration and exploitation
 	epsilonProbability = cfg.GetValueOfKey<double>("EPSILON_PROBABILITY",0.8);
 
-	// Gradient Descent Learning Rate
-	// Parameter denotes the learning rate of gradient descent optimization algorithm
-	alpha = cfg.GetValueOfKey<double>("ALPHA",0.8);
-
 	// Number of next state samples
 	// It will be used to approximate the expectations on the next state.
 	sample_length_L1 = cfg.GetValueOfKey<int>("SAMPLE_LENGTH_L1",100);
@@ -40,21 +36,6 @@ TrajectoryBasedValueIteration::TrajectoryBasedValueIteration(const Environment* 
 	// Trajectory Length
 	// It will be used to determine the trajectory that the algorithm will follow for each iteration.
 	length_of_trajectory = cfg.GetValueOfKey<int>("LENGTH_OF_TRAJECTORY",100);
-
-	// Get the total number of actions
-	// Total number of actions are needed to form phi and theata vectors.
-	numberOfActions = cfg.GetValueOfKey<int>("NUMBER_OF_ACTIONS",4);
-
-	// Get the total number of features
-	// Total number of features are needed to form phi and theata vectors.
-	numberOfFeatures = cfg.GetValueOfKey<int>("NUMBER_OF_FEATURES",6);
-
-	phi = SmartVector(numberOfFeatures*numberOfActions);
-	phi.Initialize();
-
-	// Theta (48x1)
-	theta = SmartVector(numberOfFeatures*numberOfActions);
-	theta.Initialize();
 }
 
 TrajectoryBasedValueIteration::~TrajectoryBasedValueIteration() {
@@ -75,8 +56,6 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 		// Determine state and action trajectory
 		for (unsigned int i = 0; i < length_of_trajectory; ++i) {
 
-			// cout<<"State/Acton: "<<state.index<<" - "<<action.index<<endl;
-
 			// Get next action to apply (Exploitation-Exploration)
 			action  = Epsilon_Greedy_Policy(state);
 
@@ -85,9 +64,8 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 
 			// Get next state by iterating previous state and action.
 			state = environment->Get_Next_State(state,action);
+
 		}
-
-
 
 		for (unsigned int i = 0; i < trajectory.size(); ++i) {
 
@@ -120,60 +98,24 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 					double reward = environment->Get_Reward(state,action,nextState);
 
 					// Get max Q value for next state.
-					double maxQvalue 	= Get_Greedy_Value(nextState,environment->Get_Action_List(state));
+					//double maxQvalue 	= Get_Greedy_Value(nextState,environment->Get_Action_List(state));
+					double maxQvalue 	= valueFunction->Get_Greedy_Pair(nextState).second;
 
 					// Update Q_plus
 					Q_plus += (1.0/(double)sample_length_L1) * ( reward + gamma * maxQvalue ) ;
-
 				}
 
-				// Get Phi(s,a) Vector
-				phi = Get_Phi(state,action);
-
-				// Calculate estimated Q Value
-				double Qvalue = SmartVector::InnerProduct(theta,phi);; // (phi')*(theta)
-
-				// Set Delta (Error)
-				double delta = Q_plus - Qvalue;
-
-				// Update Theta
-				//SmartVector temp = alpha * delta * phi;
-				theta = theta + alpha * delta * phi;
-
-
-				/*
-				cout<<"State:"<<state.index<<endl;
-				cout<<"Action:"<<action.index<<endl;
-
-				for (unsigned int i = 0; i < nextStates.size(); ++i) {
-					cout<<nextStates[i].index<<endl;
-				}
-				*/
+				// Update Value
+				valueFunction->Set_Value(state,action,Q_plus);
 			}
 		}// Trajectory Loop
-
-
-		/*
-		// Loop through all states
-		for(unsigned int index_state=0; index_state < 1states.size(); index_state++)
-		{
-			// Get Current State
-			SmartVector currentState = states[index_state];
-
-			// Acquire all available action space
-			vector<SmartVector> actions = environment->Get_Action_List(currentState);
-
-			unsigned int sample = 100;
-			Epsilon_Greedy_Policy(currentState,actions[0],sample);
-		}
-		*/
 	}// End of iterations loop
 
 	return false;
 }
 
 
-SmartVector TrajectoryBasedValueIteration::Epsilon_Greedy_Policy(const SmartVector& state)
+SmartVector TrajectoryBasedValueIteration::Epsilon_Greedy_Policy(const SmartVector& state) const
 {
 	// Create return parameter.
 	//vector<SmartVector> policy;
@@ -207,7 +149,7 @@ SmartVector TrajectoryBasedValueIteration::Epsilon_Greedy_Policy(const SmartVect
 	if(outcomes[0])
 	{
 		// Run new probability experiment with uniform parameters.
-		//cout<<"Exploration"<<endl;
+		cout<<"Exploration"<<endl;
 
 		// Get the number of candidate actions
 		int count = actions.size();
@@ -240,13 +182,13 @@ SmartVector TrajectoryBasedValueIteration::Epsilon_Greedy_Policy(const SmartVect
 	// Select an action greedily with respect to QValue.
 	else
 	{
-		//cout<<"Exploitation"<<endl;
+		cout<<"Exploitation"<<endl;
 
 		int argMax = valueFunction->Get_Greedy_Pair(state).first;
 		//policy.push_back(actions[argMax]);
+
 		action = actions[argMax];
 	}
-	//}
 
 	// Release Memory
 	delete p;
@@ -255,65 +197,10 @@ SmartVector TrajectoryBasedValueIteration::Epsilon_Greedy_Policy(const SmartVect
 	//return policy;
 }
 
-// Get Phi Using Radial Basis Functions (RBFs)
-SmartVector TrajectoryBasedValueIteration::Get_Phi(const SmartVector& state,const SmartVector& action)
-{
-	// Create a local phi variable to return when we are OK.
-	SmartVector phi(numberOfFeatures*numberOfActions);
-
-	// Set whole vector to zero
-	phi.Initialize();
-
-	// Get the right feature_index to start to load
-	int feature_start_index = (numberOfFeatures * action.index);
-
-	// Centers of radial basis functions
-	double feature_centers[numberOfFeatures];
-	feature_centers[0] = 0;
-	feature_centers[1] = 2;
-	feature_centers[2] = 6;
-	feature_centers[3] = 4;
-	feature_centers[4] = 10;
-	feature_centers[5] = 11;
-
-	// Container that holds the values of RBFs.
-	double feature_values[numberOfFeatures];
-
-	for (int i = 0; i < numberOfFeatures; ++i) {
-
-		double x = state.index;
-		double c = feature_centers[i];
-
-		feature_values [i] = exp( -1 * pow((x-c),2.0));
-
-		// Set the related feature
-		phi.elements[feature_start_index + i] = feature_values [i];
-	}
-
-	return phi;
-}
-
-/*
- // Binary Phi
-SmartVector TrajectoryBasedValueIteration::Get_Phi(const SmartVector& state,const SmartVector& action)
-{
-	SmartVector phi(numberOfStates*numberOfActions);
-
-	// Set whole vector to zero
-	phi.Initialize();
-
-	// Get the right feature_index to set
-	int feature_index = state.index + (numberOfStates * action.index);
-
-	// Set the related feature
-	phi.elements[feature_index] = 1;
-
-	return phi;
-}
-*/
 void TrajectoryBasedValueIteration::Test(void)
 {
 	cout<<"THIS IS TEST FUNCTION CALL:"<<endl;
+
 
 	/*
 	SmartVector action;
@@ -324,6 +211,8 @@ void TrajectoryBasedValueIteration::Test(void)
 		action.Print();
 	}
 	*/
+
+	/*
 
 	vector<SmartVector> states = environment->Get_All_Possible_States();
 	vector<SmartVector> actions = environment->Get_Action_List(states[0]);
@@ -336,9 +225,7 @@ void TrajectoryBasedValueIteration::Test(void)
 		maxQValue = -99;
 		for (unsigned int j = 0; j < actions.size(); ++j) {
 
-			phi = Get_Phi(states[i],actions[j]);
-
-			QValue = SmartVector::InnerProduct(theta,phi);
+			QValue = valueFunction->Get_Value(states[i],actions[j]);
 
 			if(QValue>maxQValue)
 			{
@@ -369,23 +256,8 @@ void TrajectoryBasedValueIteration::Test(void)
 	}
 
 	//theta.Print();
-}
+	 *
+	 *
+	 */
 
-double TrajectoryBasedValueIteration::Get_Greedy_Value(const SmartVector& state,const vector<SmartVector>& actions)
-{
-	double value = std::numeric_limits<double>::min();
-	double temp = 0;
-
-	for (unsigned int i = 0; i < actions.size(); ++i) {
-
-		SmartVector action = actions[i];
-
-		phi = Get_Phi(state,action);
-		temp = SmartVector::InnerProduct(theta,phi); // (phi')*(theta)
-
-		if( temp > value)
-			value = temp;
-	}
-
-	return value;
 }
