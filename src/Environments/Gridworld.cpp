@@ -303,6 +303,7 @@ SmartVector Gridworld::Get_Next_State(const SmartVector& state, const SmartVecto
 
 	vec.index = Get_State_Index(vec);
 
+	delete p;
 	return vec;
 }
 
