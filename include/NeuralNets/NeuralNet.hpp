@@ -32,6 +32,8 @@ public:
 	void backPropagation(const vector<double> &targetVals);
 	void getResults(vector<double> &resultVals) const;
 	double getRecentAverageError(void) const { return recentAverageError; }
+	int GetSizeOfInputLayer() const;
+	int GetSizeOfOutputLayer() const;
 
 private:
 	vector<Layer> layers; // layers[layerNum][neuronNum]
