@@ -6,6 +6,7 @@
 // Description : C++, Ansi-style
 //============================================================================
 
+
 #include <iostream>
 #include <unordered_map>
 #include <fstream>
@@ -25,7 +26,8 @@
 
 #include "Representations/Representation.hpp"
 #include "Representations/StateActionValue.hpp"
-#include "Representations/GaussianRadialBasisFunctionApproximator.hpp"
+#include <Representations/FunctionApproximatorBinaryBasis.hpp>
+#include <Representations/FunctionApproximatorGaussianRadialBasis.hpp>
 
 #include "Agents/Agent.hpp"
 #include "Agents/QIteration.hpp"
@@ -42,8 +44,9 @@ void help_menu(void)
 	cout << "***********************************************************************************"<<endl;
 	cout << "1- Grid World with Qiteration														"<<endl;
 	cout << "2- Grid World with Trajectory Based Q-Value Iteration and QTable Representation	"<<endl;
-	cout << "3- Grid World with Trajectory Based Q-Value Iteration and RBF Representation		"<<endl;
-	cout << "4- Blocks World with Qiteration													"<<endl;
+	cout << "3- Grid World with Trajectory Based Q-Value Iteration and Binary BF Representation	"<<endl;
+	cout << "4- Grid World with Trajectory Based Q-Value Iteration and GRBF Representation		"<<endl;
+	cout << "5- Blocks World with Qiteration													"<<endl;
 	cout << "***********************************************************************************"<<endl;
 	cout << "Enter your choice and press return: ";
 
@@ -90,14 +93,6 @@ int main()
 			// Initialize Solver
 			agent 			= new QIteration(environment, value, cfg);
 
-			//Start Calculation
-			agent->Start_Execution();
-
-			//Show Q-Values
-			value->Print_Value();
-
-			//Show Policy
-			environment->Display_Policy(*value);
 		}break;
 		case 2:
 		{
@@ -115,17 +110,25 @@ int main()
 			// Initialize Solver
 			agent 			= new TrajectoryBasedValueIteration(environment, value, cfg);
 
-			//Start Calculation
-			agent->Start_Execution();
-
-			//Show Q-Values
-			value->Print_Value();
-
-			//Show Policy
-			environment->Display_Policy(*value);
-
 		}break;
 		case 3:
+		{
+			// Trajectory Based Value Iteration with BinaryBF Representation Example for GridWorld
+
+			// Get parameters from file
+			ConfigParser cfg = ConfigParser("config/config_gridworld.cfg");
+
+			// Initialize Environment
+			environment 	= new Gridworld(cfg);
+
+			// Initialize Representation Function
+			value 			= new FunctionApproximatorBinaryBasis(*environment,cfg);
+
+			// Initialize Solver
+			agent 			= new TrajectoryBasedValueIteration(environment, value, cfg);
+
+		}break;
+		case 4:
 		{
 			// Trajectory Based Value Iteration with RBF Representation Example for GridWorld
 
@@ -136,22 +139,13 @@ int main()
 			environment 	= new Gridworld(cfg);
 
 			// Initialize Representation Function
-			value 			= new GaussianRadialBasisFunctionApproximator(*environment,cfg);
+			value 			= new FunctionApproximatorGaussianRadialBasis(*environment,cfg);
 
 			// Initialize Solver
 			agent 			= new TrajectoryBasedValueIteration(environment, value, cfg);
 
-			//Start Calculation
-			agent->Start_Execution();
-
-			//Show Q-Values
-			value->Print_Value();
-
-			//Show Policy
-			environment->Display_Policy(*value);
-
 		}break;
-		case 4:
+		case 5:
 		{
 			// Qiteration Example for BlocksWorld
 
@@ -167,20 +161,23 @@ int main()
 			// Initialize Solver
 			agent 			= new QIteration(environment, value, cfg);
 
-			//Start Calculation
-			agent->Start_Execution();
-
-			//Show Q-Values
-			value->Print_Value();
-
-			//Show Policy
-			environment->Display_Policy(*value);
 
 		}break;
 		default:
 			cout<< "You have entered an invalid input."<<endl;
+			return 0;
 			break;
 	}
+
+
+	//Start Calculation
+	agent->Start_Execution();
+
+	//Show Q-Values
+	value->Print_Value();
+
+	//Show Policy
+	environment->Display_Policy(*value);
 
 	delete agent;
 	delete environment;
