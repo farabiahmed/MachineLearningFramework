@@ -35,21 +35,25 @@ SmartVector::SmartVector(const SmartVector& other) :
 // Assignment Operator (Rule Of Three #3)
 SmartVector& SmartVector::operator=(const SmartVector& other)
 {
-	// release memory first
-	delete[] elements;
-	elements = nullptr;
+	// Check for self-assignment
+	if (this != &other)
+	{
+		// release memory first
+		delete[] elements;
+		elements = nullptr;
 
-	this->dimension = other.dimension;
+		// Start To Copy
+		this->dimension = other.dimension;
 
-	this->index = other.index;
+		this->index = other.index;
 
-	elements = new double[dimension];
+		elements = new double[dimension];
 
-	// copy element by element
-	for (int var = 0; var < dimension; ++var) {
-		elements[var] = other.elements[var];
+		// copy element by element
+		for (int var = 0; var < dimension; ++var) {
+			elements[var] = other.elements[var];
+		}
 	}
-
 	return *this;
 }
 
@@ -60,7 +64,7 @@ const bool SmartVector::operator==(const SmartVector& other) const
 
 	if(dimension!=other.dimension)
 	{
-		throw std::invalid_argument( "vector dimensions mismatched." );
+		throw std::invalid_argument( "SmartVector operator== vector dimensions mismatched." );
 	}
 
 	for (int i = 0; i < dimension; ++i) {
@@ -72,27 +76,47 @@ const bool SmartVector::operator==(const SmartVector& other) const
 }
 
 
-const SmartVector& SmartVector::operator+(const SmartVector& other) const
+const SmartVector SmartVector::operator+(const SmartVector& other) const
 {
 	if(dimension!=other.dimension)
 	{
 		throw std::invalid_argument( "vector dimensions mismatched." );
 	}
 
+	SmartVector vec(dimension);
+
 	for (int i = 0; i < dimension; ++i) {
-		elements[i] += other.elements[i];
+		vec.elements[i] = elements[i] + other.elements[i];
 	}
 
-	return *this;
+	return vec;
 }
 
-const SmartVector& SmartVector::operator*(double scalar) const
+const SmartVector SmartVector::operator-(const SmartVector& other) const
 {
-	for (int i = 0; i < dimension; ++i) {
-		elements[i] *= scalar;
+	if(dimension!=other.dimension)
+	{
+		throw std::invalid_argument( "vector dimensions mismatched." );
 	}
 
-	return *this;
+	SmartVector vec(dimension);
+
+	for (int i = 0; i < dimension; ++i) {
+		vec.elements[i] = elements[i] - other.elements[i];
+	}
+
+	return vec;
+}
+
+const SmartVector SmartVector::operator*(double scalar) const
+{
+	SmartVector result(dimension);
+
+	for (int i = 0; i < dimension; ++i) {
+		result.elements[i] = elements[i] * scalar;
+	}
+
+	return result;
 }
 
 // Non-Member Function to handle left-hand-side multiplication

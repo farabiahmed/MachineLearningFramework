@@ -63,10 +63,13 @@ public:
 	const bool operator==(const SmartVector& other) const;
 
 	// Sum Operator
-	const SmartVector& operator+(const SmartVector& other) const;
+	const SmartVector operator+(const SmartVector& other) const;
+
+	// Subtraction Operator
+	const SmartVector operator-(const SmartVector& other) const;
 
 	// Scalar Multiplier Operator
-	const SmartVector& operator*(double scalar) const;
+	const SmartVector operator*(double scalar) const;
 
 	// Scalar Multiplier Operator for left-hand-side operations
 	// Friend because this non-member function should access the private members.
@@ -91,7 +94,6 @@ public:
 
 	// Sum Operator
 	static SmartVector Plus(const SmartVector& v1, const SmartVector& v2);
-
 
 	// Caution!: If you add or remove any property,
 	// you need to modify constructors and assignment
