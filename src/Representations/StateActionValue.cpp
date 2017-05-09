@@ -15,10 +15,6 @@ StateActionValue::StateActionValue(const Environment& env, const ConfigParser& c
 	vector<SmartVector> states = env.Get_All_Possible_States();
 	vector<SmartVector> actions;
 
-
-	// Get the total number of actions
-	// Total number of actions are needed to form Q-Value (state-action pair) container.
-
 	// Form Q-Value regarding to states and actions.
 	// Then initialize it with zeros.
 
@@ -32,33 +28,10 @@ StateActionValue::StateActionValue(const Environment& env, const ConfigParser& c
 		actions = env.Get_Action_List(states[i]);
 		Qvalue[i] = vector<double>(actions.size());
 	}
-
-	/*
-	// Create states
-	Qvalue = new double* [numberOfStates];
-
-	// Loop through each states to assign the required number of actions.
-	for (int state = 0; state < numberOfStates; ++state)
-	{
-		// Assign actions to each state.
-		Qvalue[state] = new double[numberOfActions];
-
-		// Initialize them.
-		for (int action = 0; action < numberOfActions; ++action)
-			Qvalue[state][action] = 0;
-	}
-	*/
 }
 
 StateActionValue::~StateActionValue() {
 	// Delete Pointer
-
-	/*
-	for (int row = 0; row < numberOfStates; ++row)
-	  delete[] Qvalue[row];
-
-	delete[] Qvalue;
-	*/
 }
 
 pair<int,double> StateActionValue::Get_Greedy_Pair(const SmartVector& state) const
