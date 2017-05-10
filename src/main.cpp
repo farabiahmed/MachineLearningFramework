@@ -8,21 +8,14 @@
 
 
 #include <iostream>
-#include <unordered_map>
-#include <fstream>
 
 #include "Environments/Environment.hpp"
 #include "Environments/Gridworld.hpp"
 #include "Environments/Blocksworld.hpp"
 
-#include "QIteration/CleaningRobotDeterministic.hpp"
-#include "QIteration/GridWorld.hpp"
-
-#include "ProbabilityDistributions/ProbabilityDistribution.hpp"
-#include "ProbabilityDistributions/DiscreteDistribution.hpp"
-
-#include "Miscellaneous/SmartVector.hpp"
-#include "Miscellaneous/ConfigParser.hpp"
+#include "Agents/Agent.hpp"
+#include "Agents/QIteration.hpp"
+#include "Agents/TrajectoryBasedValueIteration.hpp"
 
 #include "Representations/Representation.hpp"
 #include "Representations/StateActionValue.hpp"
@@ -30,25 +23,22 @@
 #include <Representations/FunctionApproximatorGaussianRadialBasis.hpp>
 #include <Representations/FunctionApproximatorNeuralNetwork.hpp>
 
-#include "Agents/Agent.hpp"
-#include "Agents/QIteration.hpp"
-#include "Agents/TrajectoryBasedValueIteration.hpp"
-
-
 using namespace std;
 
 
 void help_menu(void)
 {
 	cout << "***********************************************************************************"<<endl;
-	cout << "Deep Reinfocement Learning	Framework Main Routine									"<<endl;
+	cout << "Deep Reinfocement Learning Framework Main Routine									"<<endl;
 	cout << "***********************************************************************************"<<endl;
 	cout << "1- Grid World with Qiteration														"<<endl;
 	cout << "2- Grid World with Trajectory Based Q-Value Iteration and QTable Representation	"<<endl;
 	cout << "3- Grid World with Trajectory Based Q-Value Iteration and Binary BF Representation	"<<endl;
 	cout << "4- Grid World with Trajectory Based Q-Value Iteration and GRBF Representation		"<<endl;
-	cout << "5- Grid World with Trajectory Based Q-Value Iteration and NeuralNetworks Rep.		"<<endl;
-	cout << "6- Blocks World with Qiteration													"<<endl;
+	cout << "5- Grid World with Q-Iteration and Gaussian Radial Basis Function Representation	"<<endl;
+	cout << "6- Grid World with Q-Iteration and NeuralNetworks Representation					"<<endl;
+	cout << "7- Grid World with Trajectory Based Q-Value Iteration and NeuralNetworks Rep.		"<<endl;
+	cout << "8- Blocks World with Qiteration													"<<endl;
 	cout << "***********************************************************************************"<<endl;
 	cout << "Enter your choice and press return: ";
 
@@ -149,6 +139,40 @@ int main()
 		}break;
 		case 5:
 		{
+			// Q-Iteration with Gaussian Radial Basis Function Representation Example for GridWorld
+
+			// Get parameters from file
+			ConfigParser cfg = ConfigParser("config/config_gridworld.cfg");
+
+			// Initialize Environment
+			environment 	= new Gridworld(cfg);
+
+			// Initialize Representation Function
+			value 			= new FunctionApproximatorGaussianRadialBasis(*environment,cfg);
+
+			// Initialize Solver
+			agent 			= new QIteration(environment, value, cfg);
+
+		}break;
+		case 6:
+		{
+			// Q-Iteration with Neural Network Representation Example for GridWorld
+
+			// Get parameters from file
+			ConfigParser cfg = ConfigParser("config/config_gridworld.cfg");
+
+			// Initialize Environment
+			environment 	= new Gridworld(cfg);
+
+			// Initialize Representation Function
+			value 			= new FunctionApproximatorNeuralNetwork(*environment,cfg);
+
+			// Initialize Solver
+			agent 			= new QIteration(environment, value, cfg);
+
+		}break;
+		case 7:
+		{
 			// Trajectory Based Value Iteration with Neural Network Representation Example for GridWorld
 
 			// Get parameters from file
@@ -164,7 +188,7 @@ int main()
 			agent 			= new TrajectoryBasedValueIteration(environment, value, cfg);
 
 		}break;
-		case 6:
+		case 8:
 		{
 			// Qiteration Example for BlocksWorld
 
