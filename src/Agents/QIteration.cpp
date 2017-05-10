@@ -88,11 +88,12 @@ bool QIteration::Start_Execution()
 						expectedValue += probability * (reward + gamma * maxQvalue);
 					}
 
-					// Update Q Value and difference between new and old value.
-					if( abs( valueFunction->Get_Value(currentState,currentAction) - expectedValue ) > diff)
+					double currentQValue = valueFunction->Get_Value(currentState,currentAction);
+
+					// Update the difference value between new and old value if the current one is bigger than old one.
+					if( abs( currentQValue - expectedValue ) > diff)
 					{
-						//cout << "difference: " << abs(valueFunction->Get_Value(currentState.index,currentAction.index)-expectedValue) << endl;
-						diff = abs( valueFunction->Get_Value(currentState,currentAction) - expectedValue);
+						diff = abs( currentQValue - expectedValue);
 					}
 
 					// Update Q Value by newest estimate.
