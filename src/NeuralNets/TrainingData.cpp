@@ -17,7 +17,7 @@ TrainingData::~TrainingData() {
 }
 
 
-void TrainingData::getTopology(vector<unsigned> &topology)
+void TrainingData::getConfig(vector<unsigned> &topology, int& numIterations)
 {
     string line;
     string label;
@@ -34,6 +34,21 @@ void TrainingData::getTopology(vector<unsigned> &topology)
         unsigned n;
         ss >> n;
         topology.push_back(n);
+    }
+
+    getline(m_trainingDataFile, line);
+    ss.clear();
+    ss.str(line);
+    ss >> label;
+    if (this->isEof() || label.compare("iteration:") != 0) {
+    	cout<<endl<<"Controlled Abort..."<<endl;
+        abort();
+    }
+
+    while (!ss.eof()) {
+        unsigned n;
+        ss >> n;
+        numIterations = n;
     }
 
     return;

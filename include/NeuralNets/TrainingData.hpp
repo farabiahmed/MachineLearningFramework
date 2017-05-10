@@ -26,7 +26,7 @@ public:
     TrainingData(const string filename);
     virtual ~TrainingData();
     bool isEof(void) { return m_trainingDataFile.eof(); }
-    void getTopology(vector<unsigned> &topology);
+    void getConfig(vector<unsigned> &topology, int& numIterations);
 
     // Returns the number of input values read from the file:
     unsigned getNextInputs(vector<double> &inputVals);
