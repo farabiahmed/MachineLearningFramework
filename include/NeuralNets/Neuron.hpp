@@ -54,15 +54,6 @@ public:
 
 	double sumDOW(const Layer &nextLayer) const;
 
-private:
-
-	// Static Methods
-
-	static double randomWeight(void){	return rand() / double(RAND_MAX);	}
-
-	static double transferFunction(double x);
-
-	static double transferFunctionDerivative(double x);
 
 	// Static Members (we want all the neurons can use the same value
 
@@ -76,6 +67,16 @@ private:
 						// alpha: momentum
 						//		0.0 - no momentum
 						// 		0.5 - moderate momentum
+
+private:
+
+	// Static Methods
+
+	static double randomWeight(void){	return rand() / double(RAND_MAX);	}
+
+	static double transferFunction(double x);
+
+	static double transferFunctionDerivative(double x);
 
 	// Class Members
 	double outputVal;
