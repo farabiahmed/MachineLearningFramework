@@ -77,10 +77,10 @@ bool ConfigParser::CheckBlankLine(const std::string &line) const
 void ConfigParser::ParseLine(const string &line, size_t const lineNo)
 {
 	if (line.find('=') == line.npos)
-		exitWithError("Config File Parser: Couldn't find separator on line: " /*+ Convert::T_to_string(lineNo) + "\n"*/);
+		exitWithError("Config File Parser: Couldn't find separator on line: " + Convert::T_to_string(lineNo) + "\n");
 
 	if (!ValidLine(line))
-		exitWithError("Config File Parser: Bad format for line: " /*+ Convert::T_to_string(lineNo) + "\n"*/);
+		exitWithError("Config File Parser: Bad format for line: " + Convert::T_to_string(lineNo) + "\n");
 
 	ExtractContents(line);
 }
