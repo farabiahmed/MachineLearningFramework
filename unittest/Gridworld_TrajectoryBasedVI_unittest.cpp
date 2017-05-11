@@ -23,7 +23,7 @@
 #include "Miscellaneous/ConfigParser.hpp"
 
 #include "Representations/Representation.hpp"
-#include "Representations/StateActionValue.hpp"
+#include "Representations/TabularStateActionPair.hpp"
 
 #include "Agents/Agent.hpp"
 #include "Agents/QIteration.hpp"
@@ -51,7 +51,7 @@ int main()
 
 	// Class Pointers
 	Environment* environment 	= new Gridworld(cfg);
-	Representation* value 		= new StateActionValue(*environment,cfg);
+	Representation* value 		= new TabularStateActionPair(*environment,cfg);
 	Agent* agent 				= new TrajectoryBasedValueIteration(environment, value, cfg);
 
 	// Start Calculation

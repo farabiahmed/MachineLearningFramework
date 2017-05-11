@@ -5,8 +5,8 @@
  *      Author: farabiahmed
  */
 
-#ifndef REPRESENTATIONS_STATEACTIONVALUE_HPP_
-#define REPRESENTATIONS_STATEACTIONVALUE_HPP_
+#ifndef REPRESENTATIONS_TABULARSTATEACTIONPAIR_HPP_
+#define REPRESENTATIONS_TABULARSTATEACTIONPAIR_HPP_
 
 #include <cmath>
 #include <iomanip>
@@ -18,11 +18,11 @@
 /*
  *
  */
-class StateActionValue : public Representation {
+class TabularStateActionPair : public Representation {
 public:
-	StateActionValue(const Environment& env, const ConfigParser& cfg);
+	TabularStateActionPair(const Environment& env, const ConfigParser& cfg);
 
-	virtual ~StateActionValue();
+	virtual ~TabularStateActionPair();
 
 	pair<int,double> Get_Greedy_Pair(const SmartVector& state) const ;
 
@@ -39,4 +39,4 @@ private:
 	vector< vector<double> > Qvalue;
 };
 
-#endif /* REPRESENTATIONS_STATEACTIONVALUE_HPP_ */
+#endif /* REPRESENTATIONS_TABULARSTATEACTIONPAIR_HPP_ */

@@ -18,10 +18,10 @@
 #include "Agents/TrajectoryBasedValueIteration.hpp"
 
 #include "Representations/Representation.hpp"
-#include "Representations/StateActionValue.hpp"
 #include <Representations/FunctionApproximatorBinaryBasis.hpp>
 #include <Representations/FunctionApproximatorGaussianRadialBasis.hpp>
 #include <Representations/FunctionApproximatorNeuralNetwork.hpp>
+#include <Representations/TabularStateActionPair.hpp>
 
 using namespace std;
 
@@ -44,10 +44,18 @@ void help_menu(void)
 
 }
 
-int main()
+int main(int argc, char* argv[])
 {
 	// For Random Number Generator
 	srand(time(0));
+
+	string configFile = "";
+
+	// Check the number of parameters
+	if (argc >= 2)
+	{
+		configFile = string(argv[1]);
+	}
 
 	// Store the user input
 	int choice=0;
@@ -73,14 +81,17 @@ int main()
 		{
 			// QIteration Example for GridWorld
 
+			// Assign the default file if it is not assigned yet.
+			if(configFile.empty()) configFile = "config/config_gridworld.cfg";
+
 			// Get parameters from file
-			ConfigParser cfg = ConfigParser("config/config_gridworld.cfg");
+			ConfigParser cfg = ConfigParser(configFile);
 
 			// Initialize Environment
 			environment 	= new Gridworld(cfg);
 
 			// Initialize Representation Function
-			value 			= new StateActionValue(*environment,cfg);
+			value 			= new TabularStateActionPair(*environment,cfg);
 
 			// Initialize Solver
 			agent 			= new QIteration(environment, value, cfg);
@@ -90,14 +101,17 @@ int main()
 		{
 			// Trajectory Based Value Iteration with QTable Representation Example for GridWorld
 
+			// Assign the default file if it is not assigned yet.
+			if(configFile.empty()) configFile = "config/config_gridworld.cfg";
+
 			// Get parameters from file
-			ConfigParser cfg = ConfigParser("config/config_gridworld.cfg");
+			ConfigParser cfg = ConfigParser(configFile);
 
 			// Initialize Environment
 			environment 	= new Gridworld(cfg);
 
 			// Initialize Representation Function
-			value 			= new StateActionValue(*environment,cfg);
+			value 			= new TabularStateActionPair(*environment,cfg);
 
 			// Initialize Solver
 			agent 			= new TrajectoryBasedValueIteration(environment, value, cfg);
@@ -107,8 +121,11 @@ int main()
 		{
 			// Trajectory Based Value Iteration with BinaryBF Representation Example for GridWorld
 
+			// Assign the default file if it is not assigned yet.
+			if(configFile.empty()) configFile = "config/config_gridworld.cfg";
+
 			// Get parameters from file
-			ConfigParser cfg = ConfigParser("config/config_gridworld.cfg");
+			ConfigParser cfg = ConfigParser(configFile);
 
 			// Initialize Environment
 			environment 	= new Gridworld(cfg);
@@ -124,8 +141,11 @@ int main()
 		{
 			// Trajectory Based Value Iteration with RBF Representation Example for GridWorld
 
+			// Assign the default file if it is not assigned yet.
+			if(configFile.empty()) configFile = "config/config_gridworld.cfg";
+
 			// Get parameters from file
-			ConfigParser cfg = ConfigParser("config/config_gridworld.cfg");
+			ConfigParser cfg = ConfigParser(configFile);
 
 			// Initialize Environment
 			environment 	= new Gridworld(cfg);
@@ -141,8 +161,11 @@ int main()
 		{
 			// Q-Iteration with Gaussian Radial Basis Function Representation Example for GridWorld
 
+			// Assign the default file if it is not assigned yet.
+			if(configFile.empty()) configFile = "config/config_gridworld.cfg";
+
 			// Get parameters from file
-			ConfigParser cfg = ConfigParser("config/config_gridworld.cfg");
+			ConfigParser cfg = ConfigParser(configFile);
 
 			// Initialize Environment
 			environment 	= new Gridworld(cfg);
@@ -158,8 +181,11 @@ int main()
 		{
 			// Q-Iteration with Neural Network Representation Example for GridWorld
 
+			// Assign the default file if it is not assigned yet.
+			if(configFile.empty()) configFile = "config/config_gridworld.cfg";
+
 			// Get parameters from file
-			ConfigParser cfg = ConfigParser("config/config_gridworld.cfg");
+			ConfigParser cfg = ConfigParser(configFile);
 
 			// Initialize Environment
 			environment 	= new Gridworld(cfg);
@@ -175,8 +201,11 @@ int main()
 		{
 			// Trajectory Based Value Iteration with Neural Network Representation Example for GridWorld
 
+			// Assign the default file if it is not assigned yet.
+			if(configFile.empty()) configFile = "config/config_gridworld.cfg";
+
 			// Get parameters from file
-			ConfigParser cfg = ConfigParser("config/config_gridworld.cfg");
+			ConfigParser cfg = ConfigParser(configFile);
 
 			// Initialize Environment
 			environment 	= new Gridworld(cfg);
@@ -192,14 +221,17 @@ int main()
 		{
 			// Qiteration Example for BlocksWorld
 
+			// Assign the default file if it is not assigned yet.
+			if(configFile.empty()) configFile = "config/config_blocksworld.cfg";
+
 			// Get parameters from file
-			ConfigParser cfg = ConfigParser("config/config_blocksworld.cfg");
+			ConfigParser cfg = ConfigParser(configFile);
 
 			// Initialize Environment
 			environment 	= new Blocksworld(cfg);
 
 			// Initialize Representation Function
-			value 			= new StateActionValue(*environment,cfg);
+			value 			= new TabularStateActionPair(*environment,cfg);
 
 			// Initialize Solver
 			agent 			= new QIteration(environment, value, cfg);
