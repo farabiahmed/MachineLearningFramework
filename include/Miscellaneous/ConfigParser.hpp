@@ -36,7 +36,9 @@ public:
 		if (!KeyExists(key))
 			return defaultValue;
 
-		return Convert::string_to_T<ValueType>(contents.find(key)->second);
+		string value = contents.find(key)->second;
+
+		return Convert::string_to_T<ValueType>(value);
 	}
 
 	//

@@ -145,6 +145,7 @@ vector<pair<SmartVector,double>> Gridworld::Get_Transition_Probability(const Sma
 				state_probability.push_back(make_pair(states[currentState.index+number_of_columns],pLeft)) :
 				state_probability.push_back(make_pair(currentState,pLeft));
 	}
+
 	return state_probability;
 }
 
@@ -167,7 +168,6 @@ bool Gridworld::Get_Feasibility_Of_Action(const SmartVector& state, const SmartV
 
 			if ((r==0) || (r==r_blocked+1 && c==c_blocked))
 				return false;
-		    return true;
 		}
 	}
 
@@ -182,7 +182,6 @@ bool Gridworld::Get_Feasibility_Of_Action(const SmartVector& state, const SmartV
 
 			if ((c==number_of_columns-1) || (r==r_blocked && c==c_blocked-1))
 		        return false;
-		    return true;
 		}
 	}
 
@@ -197,7 +196,6 @@ bool Gridworld::Get_Feasibility_Of_Action(const SmartVector& state, const SmartV
 
 			if ((r==number_of_rows-1) || (r==r_blocked-1 && c==c_blocked))
 		        return false;
-		    return true;
 		}
 	}
 
@@ -212,12 +210,11 @@ bool Gridworld::Get_Feasibility_Of_Action(const SmartVector& state, const SmartV
 
 			if ((c==0) || (r==r_blocked && c==c_blocked+1))
 		        return false;
-		    return true;
 		}
 	}
 
 
-	return false;
+	return true;
 }
 
 vector<SmartVector> Gridworld::Get_All_Possible_States() const
@@ -422,7 +419,7 @@ void Gridworld::Display_Policy(const Representation& rep)  const
 			else
 				cout<<ch;
 
-			cout << "    ";
+			cout << " ";
 		}
 		cout << " " << endl;
 	}

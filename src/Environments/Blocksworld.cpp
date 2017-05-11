@@ -19,7 +19,7 @@ Blocksworld::Blocksworld(const ConfigParser& cfg)
 	cost_action = cfg.GetValueOfKey<double>("COST_ACTION",-0.001);
 
 	probability_of_random_action = cfg.GetValueOfKey<double>("PROBABILITY_OF_RANDOM_ACTION",0.20);
-
+	
 }
 
 Blocksworld::~Blocksworld() {
