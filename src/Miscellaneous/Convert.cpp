@@ -11,6 +11,9 @@
 template <>
 SmartVector Convert::string_to_T <SmartVector> (string const &val)
 {
+	if(val=="N/A")
+		return SmartVector();
+
 	vector<string> tokens = Parse_String(val,',');
 	SmartVector ret(tokens.size());
 
@@ -24,6 +27,9 @@ SmartVector Convert::string_to_T <SmartVector> (string const &val)
 template <>
 vector<SmartVector> Convert::string_to_T < vector<SmartVector> > (string const &val)
 {
+	if(val=="N/A")
+		return vector<SmartVector>();
+
 	vector<SmartVector> ret;
 	vector<string> tokens = Parse_String(val,';');
 
@@ -37,6 +43,9 @@ vector<SmartVector> Convert::string_to_T < vector<SmartVector> > (string const &
 template <>
 vector<double> Convert::string_to_T <vector<double>> (string const &val)
 {
+	if(val=="N/A")
+		return vector<double>();
+
 	vector<double> ret;
 	vector<string> tokens = Parse_String(val,',');
 
