@@ -36,6 +36,9 @@ public:
 
 	virtual void Print_Value() = 0;
 
+	string Name;	///< It stores the name of representation to increase readability and awareness.
+    				///< Such as StateActionValue, GaussianRBF etc.
+
 protected:
 	const Environment* environment;
 };

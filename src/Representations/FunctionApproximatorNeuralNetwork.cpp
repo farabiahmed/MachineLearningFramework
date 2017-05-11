@@ -10,6 +10,8 @@
 FunctionApproximatorNeuralNetwork::FunctionApproximatorNeuralNetwork(const Environment& env, const ConfigParser& cfg)
 :Representation(env)
 {
+	Name = "Neural Network Function Approximator";
+
 	// Get the total number of states
 	vector<SmartVector> states = env.Get_All_Possible_States();
 
@@ -18,6 +20,9 @@ FunctionApproximatorNeuralNetwork::FunctionApproximatorNeuralNetwork(const Envir
 
 	// Get the hidden layer information
 	vector<SmartVector> hidden_layers = cfg.GetValueOfKey< vector<SmartVector> >("HIDDEN_LAYERS");
+
+	// Get the learning rate for neural network
+	Neuron::eta = cfg.GetValueOfKey<double>("ETA_LEARNING_RATE",0.15);
 
 	// e.g., { 3, 2, 1 }
 	vector<unsigned> topology;
@@ -51,10 +56,10 @@ FunctionApproximatorNeuralNetwork::~FunctionApproximatorNeuralNetwork() {
 pair<int,double> FunctionApproximatorNeuralNetwork::Get_Greedy_Pair(const SmartVector& state) const
 {
 	// Form the input vector.
-	vector<double> inputVals(network->GetSizeOfInputLayer());
+	vector<double> inputVals(network->GetSizeOfInputLayer(),0);
 
 	// Form the output vector.
-	vector<double> resultVals(network->GetSizeOfOutputLayer());
+	vector<double> resultVals(network->GetSizeOfOutputLayer(),0);
 
 	// Avoid the indexes that are out of limits.
 	assert(state.index	>=0 	&& 		state.index	< (int)inputVals.size());
@@ -65,13 +70,7 @@ pair<int,double> FunctionApproximatorNeuralNetwork::Get_Greedy_Pair(const SmartV
 	// where 	n is the size of states,
 	//			input_i is 1 if it is belong to that state,
 	//			input_i is 0 otherwise.
-
-	for (unsigned i = 0; i < inputVals.size(); ++i) {
-		if( (int)i == state.index )
-			inputVals[i] = 1.0;
-		else
-			inputVals[i] = 0.0;
-	}
+	inputVals[state.index] = 1.0;
 
 	// Feed forward the input:
 	network->feedForward(inputVals);
@@ -98,33 +97,45 @@ pair<int,double> FunctionApproximatorNeuralNetwork::Get_Greedy_Pair(const SmartV
 void FunctionApproximatorNeuralNetwork::Set_Value(const SmartVector& state, const SmartVector& action, double val)
 {
 	// Form the target/label vector.
-	vector<double> targetVals(network->GetSizeOfOutputLayer());
+	vector<double> targetVals(network->GetSizeOfOutputLayer(),0);
+
+	// Form the input vector.
+	vector<double> inputVals(network->GetSizeOfInputLayer(),0);
+	inputVals[state.index] = 1.0;
 
 	// Initialize training vector
 	// Our training vector is formed as follows:
 	// target = {target_1, target_2, ..., target_n}
 	// where 	n is the size of actions,
-	//			target_i is given-value 	if it is belong to given action,
-	//			target_i is 0 				otherwise.
+	//			target_i is given-value 	:if it is belong to given action,
+	//			target_i is existing-value	:otherwise.
 
-	for (unsigned i = 0; i < targetVals.size(); ++i) {
-		if( (int)i == action.index)
-			targetVals[i] = val;
-		else
-			targetVals[i] = 0;
-	}
+	// In order to get the existing-value we need to feed-forward current
+	// input to get other actions' QValue.
+
+	// Feed forward the input:
+	network->feedForward(inputVals);
+
+	// Collect the net's actual output results to our targetVals variable:
+	network->getResults(targetVals);
+
+	// Modify the target with given new Q Value.
+	targetVals[action.index] = val;
 
 	// Train the net what the outputs should have been:
 	network->backPropagation(targetVals);
+
+	// Report how well the training is working, average over recent samples:
+	//cout << endl<< "Error: " << network->getRecentAverageError() << endl;
 }
 
 double FunctionApproximatorNeuralNetwork::Get_Value(const SmartVector& state, const SmartVector& action) const
 {
 	// Form the input vector.
-	vector<double> inputVals(network->GetSizeOfInputLayer());
+	vector<double> inputVals(network->GetSizeOfInputLayer(),0);
 
 	// Form the output vector.
-	vector<double> resultVals(network->GetSizeOfOutputLayer());
+	vector<double> resultVals(network->GetSizeOfOutputLayer(),0);
 
 	// Avoid the indexes that are out of limits.
 	assert(state.index	>=0 	&& 		state.index	< (int)inputVals.size());
@@ -136,13 +147,7 @@ double FunctionApproximatorNeuralNetwork::Get_Value(const SmartVector& state, co
 	// where 	n is the size of states,
 	//			input_i is 1 if it is belong to that state,
 	//			input_i is 0 otherwise.
-
-	for (unsigned i = 0; i < inputVals.size(); ++i) {
-		if( (int)i == state.index )
-			inputVals[i] = 1.0;
-		else
-			inputVals[i] = 0.0;
-	}
+	inputVals[state.index] = 1.0;
 
 	// Feed forward the input:
 	network->feedForward(inputVals);
@@ -193,6 +198,7 @@ void FunctionApproximatorNeuralNetwork::Print_Value()
 
 			cout <<  setw(10) << setprecision(5) << QValue << "   ";
 		}
-		cout<<endl<<endl;
+		cout<<endl;
 	}
+	cout<<endl;
 }

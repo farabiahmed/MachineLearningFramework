@@ -9,14 +9,13 @@
 
 QIteration::QIteration(const Environment* env, const Representation* rep, const ConfigParser& cfg) {
 
+	Name = "Q-Iteration Agent";
+
 	// Dependency Injection Pattern, constructor style
 	environment = (Environment*)env;
 
 	// Dependency Injection Pattern, constructor style
 	valueFunction = (Representation*)rep;
-
-	// Inform the user about environment name.
-	cout << "Environment Name: " << environment->Name << endl;
 
 	// Get the epsilon value.
 	// If the total update is less than epsilon, we will terminate that iteration.
@@ -77,6 +76,9 @@ bool QIteration::Start_Execution()
 
 						// Get max Q value for next state. <maxArg,maxVal>
 						double maxQvalue 	= valueFunction->Get_Greedy_Pair(nextState).second;
+
+						if(nextState.index==5)
+							nextState.index=-1;
 
 						// Get Reward for tuple (state,action,state')
 						double reward 		= environment->Get_Reward(currentState,currentAction,nextState);

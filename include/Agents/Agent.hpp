@@ -25,6 +25,10 @@ public:
 
 	int max_number_of_iterations;
 
+	string Name;	///< It stores the name of agent to increase readability and awareness.
+    				///< Such as Qiteration, TrajectoryBased etc.
+
+
 
 protected:
 	Environment* environment;

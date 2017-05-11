@@ -10,8 +10,7 @@
 FunctionApproximatorGaussianRadialBasis::FunctionApproximatorGaussianRadialBasis(const Environment& env, const ConfigParser& cfg)
 :FunctionApproximatorBinaryBasis(env,cfg)
 {
-	// TODO Auto-generated constructor stub
-
+	Name = "Gaussian Radial Basis Function Approximator";
 }
 
 FunctionApproximatorGaussianRadialBasis::~FunctionApproximatorGaussianRadialBasis() {

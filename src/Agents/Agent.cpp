@@ -9,6 +9,16 @@
 
 Agent::Agent() {
 
+	/*
+	// Inform the user about environment name.
+	cout << "Environment Name: " << environment->Name << endl;
+
+	// Inform the user about representation name.
+	cout << "Representation Name: " << valueFunction->Name << endl;
+
+	// Inform the user about representation name.
+	cout << "Agent Name: " << Name << endl;
+	*/
 }
 
 Agent::~Agent() {

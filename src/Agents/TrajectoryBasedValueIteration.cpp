@@ -13,6 +13,8 @@ TrajectoryBasedValueIteration::TrajectoryBasedValueIteration(const Environment* 
 
 	valueFunction = (Representation*)rep;
 
+	Name = "Trajectory Based Value Iteration Agent";
+
 	// Get the epsilon value.
 	// If the total update is less than epsilon, we will terminate that iteration.
 	epsilon = cfg.GetValueOfKey<double>("EPSILON",1e-5f);

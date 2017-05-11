@@ -10,6 +10,8 @@
 FunctionApproximatorBinaryBasis::FunctionApproximatorBinaryBasis(const Environment& env, const ConfigParser& cfg)
 :Representation(env)
 {
+	Name = "Binary Basis Function Approximator";
+
 	// Get the total number of actions
 	// Total number of actions are needed to form phi and theata vectors.
 	numberOfActions = env.number_of_actions;
