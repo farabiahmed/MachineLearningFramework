@@ -12,6 +12,7 @@
 #include "Agents/Agent.hpp"
 #include "Miscellaneous/ConfigParser.hpp"
 
+
 /*
  *
  */
@@ -20,7 +21,6 @@ public:
 	QIteration(const Environment* env, const Representation* rep, const ConfigParser& cfg);
 	virtual ~QIteration();
 	bool Start_Execution();
-	void Test(void);
 
 private:
 

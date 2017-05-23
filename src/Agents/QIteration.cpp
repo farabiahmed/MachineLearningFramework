@@ -29,6 +29,11 @@ QIteration::QIteration(const Environment* env, const Representation* rep, const 
 	// Total number of iteration to find the optimal policy.
 	max_number_of_iterations = cfg.GetValueOfKey<double>("MAX_NUMBER_OF_ITERATION",50);
 
+	// Number of simulations per iteration
+	// It helps us to evaluate the performance of the agent by doing simulations in series.
+	number_of_simulations = cfg.GetValueOfKey<unsigned>("NUMBER_OF_SIMULATIONS",10);
+
+	states = environment->Get_All_Possible_States();
 }
 
 QIteration::~QIteration() {
@@ -39,11 +44,10 @@ bool QIteration::Start_Execution()
 {
 	for (int num_of_iteration = 0; num_of_iteration < max_number_of_iterations; num_of_iteration++)
 	{
-		cout<<"Iteration #: " << num_of_iteration << endl;
+		cout<<"Iteration #: " << num_of_iteration;
 
+		// Q Value Update Value (currentQ-expectedQ)
 		double diff=0;
-
-		vector<SmartVector> states = environment->Get_All_Possible_States();
 
 		// Loop through all states
 		for(unsigned int index_state=0; index_state < states.size(); index_state++)
@@ -77,9 +81,6 @@ bool QIteration::Start_Execution()
 						// Get max Q value for next state. <maxArg,maxVal>
 						double maxQvalue 	= valueFunction->Get_Greedy_Pair(nextState).second;
 
-						if(nextState.index==5)
-							nextState.index=-1;
-
 						// Get Reward for tuple (state,action,state')
 						double reward 		= environment->Get_Reward(currentState,currentAction,nextState);
 
@@ -104,6 +105,11 @@ bool QIteration::Start_Execution()
 			}// End of action loop
 		}// End of state loop
 
+		cout<<" Diff:"<<diff<<endl;
+
+		// Get the cumulative rewards for the current iteration.
+		Get_Cumulative_Rewards();
+
 		// Check whether stopping criteria reached.
 		if(diff<epsilon)
 		{
@@ -114,9 +120,4 @@ bool QIteration::Start_Execution()
 	}// End of iterations loop
 
 	return false;
-}
-
-void QIteration::Test(void)
-{
-
 }
