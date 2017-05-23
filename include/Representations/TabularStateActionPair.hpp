@@ -11,6 +11,8 @@
 #include <cmath>
 #include <iomanip>
 #include <cassert>
+#include <fstream>
+#include <iostream>
 #include "Environments/Environment.hpp"
 #include "Representations/Representation.hpp"
 #include "Miscellaneous/ConfigParser.hpp"
