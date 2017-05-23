@@ -38,6 +38,15 @@ void help_menu(void)
 	cout << "Gridworld with Trajectory Based Value Iteration Unit Test Program							"<<endl;
 }
 
+string Get_TimeStamp(void)
+{
+	time_t now = time(NULL);
+	tm * timeinfo = localtime(&now);
+	char buffer[80];
+	strftime(buffer, 80, "%Y%m%d_%H%M%S", timeinfo);
+	return string(buffer);
+}
+
 int main()
 {
 	// For Random Number Generator
@@ -57,10 +66,14 @@ int main()
 	// Start Calculation
 	agent->Start_Execution();
 
-	// Show Q-Values
-	//value->Print_Value();
-	agent->Test();
+	//Show Q-Values
+	value->Print_Value();
 
+	//Show Policy
+	environment->Display_Policy(*value);
+
+	//Get Report
+	agent->Get_Report("log/"+Get_TimeStamp(),"agentReport.csv");
 
 	delete agent;
 	delete environment;

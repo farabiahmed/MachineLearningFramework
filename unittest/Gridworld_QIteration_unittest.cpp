@@ -6,9 +6,10 @@
 // Description : C++, Ansi-style
 //============================================================================
 
+#include <ctime>
 #include <iostream>
 #include <unordered_map>
-#include <fstream>
+
 
 #include "Environments/Environment.hpp"
 #include "Environments/Gridworld.hpp"
@@ -38,6 +39,15 @@ void help_menu(void)
 	cout << "Gridworld with QIteration Unit Test Program							"<<endl;
 }
 
+string Get_TimeStamp(void)
+{
+	time_t now = time(NULL);
+	tm * timeinfo = localtime(&now);
+	char buffer[80];
+	strftime(buffer, 80, "%Y%m%d_%H%M%S", timeinfo);
+	return string(buffer);
+}
+
 int main()
 {
 	// For Random Number Generator
@@ -62,6 +72,9 @@ int main()
 
 	//Show Policy
 	environment->Display_Policy(*value);
+
+	//Get Report
+	agent->Get_Report("log/"+Get_TimeStamp(),"agentReport.csv");
 
 	delete agent;
 	delete environment;
