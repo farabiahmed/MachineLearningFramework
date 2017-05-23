@@ -34,8 +34,6 @@ public:
 	// Policy Selector
 	SmartVector Epsilon_Greedy_Policy(const SmartVector& state) const;
 
-	void Test(void);
-
 private:
 
 	double gamma;

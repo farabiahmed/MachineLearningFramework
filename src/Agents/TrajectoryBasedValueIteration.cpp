@@ -38,6 +38,12 @@ TrajectoryBasedValueIteration::TrajectoryBasedValueIteration(const Environment* 
 	// Trajectory Length
 	// It will be used to determine the trajectory that the algorithm will follow for each iteration.
 	length_of_trajectory = cfg.GetValueOfKey<int>("LENGTH_OF_TRAJECTORY",100);
+
+	// Number of simulations per iteration
+	// It helps us to evaluate the performance of the agent by doing simulations in series.
+	number_of_simulations = cfg.GetValueOfKey<unsigned>("NUMBER_OF_SIMULATIONS",10);
+
+	states = environment->Get_All_Possible_States();
 }
 
 TrajectoryBasedValueIteration::~TrajectoryBasedValueIteration() {
@@ -46,13 +52,15 @@ TrajectoryBasedValueIteration::~TrajectoryBasedValueIteration() {
 
 bool TrajectoryBasedValueIteration::Start_Execution()
 {
-
 	for (int num_of_iteration = 0; num_of_iteration < max_number_of_iterations; num_of_iteration++)
 	{
-		cout<<"Iteration #: " << num_of_iteration << endl;
+		cout<<"Iteration #: " << num_of_iteration;
+
+		// Q Value Update Value (currentQ-expectedQ)
+		double diff=0;
 
 		vector<pair<SmartVector,SmartVector>> trajectory;
-		SmartVector state = environment->Get_Initial_State();
+		SmartVector state = environment->Get_Random_State();
 		SmartVector action;
 
 		// Determine state and action trajectory
@@ -69,20 +77,11 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 
 		}
 
-		for (unsigned int i = 0; i < trajectory.size(); ++i) {
-
-			// Create an instance for next states of
-			// current trajectory[i] = <state,action> pair.
-			//vector<SmartVector> nextStates;
-
+		for (unsigned int i = 0; i < trajectory.size(); ++i)
+		{
 			// Get current pair
 			state = trajectory[i].first;
 			action  = trajectory[i].second;
-
-			// Print Out Visited States
-			//cout<<state.index<<"-"<<action.index<<endl;
-
-			//Test();
 
 			if(environment->Check_Terminal_State(state)){}
 			else if (environment->Check_Blocked_State(state)){}
@@ -107,12 +106,33 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 					Q_plus += (1.0/(double)sample_length_L1) * ( reward + gamma * maxQvalue ) ;
 				}
 
+				double currentQValue = valueFunction->Get_Value(state,action);
+
+				// Update the difference value between new and old value
+				// if the current one is bigger than old one.
+				if( abs( currentQValue - Q_plus ) > diff)
+				{
+					diff = abs( currentQValue - Q_plus);
+				}
+
 				// Update Value
 				valueFunction->Set_Value(state,action,Q_plus);
 			}
 		}// Trajectory Loop
-	}// End of iterations loop
 
+		cout<<" Diff:"<<diff<<endl;
+
+		// Get the cumulative rewards for the current iteration.
+		Get_Cumulative_Rewards();
+
+		// Check whether stopping criteria reached.
+		if(diff<epsilon)
+		{
+			cout << "Stopping Iterations. Diff: " << diff <<endl;
+			return true;
+		}
+
+	}// End of iterations loop
 	return false;
 }
 
@@ -199,11 +219,6 @@ SmartVector TrajectoryBasedValueIteration::Epsilon_Greedy_Policy(const SmartVect
 	//return policy;
 }
 
-void TrajectoryBasedValueIteration::Test(void)
-{
-	cout<<"THIS IS TEST FUNCTION CALL:"<<endl;
-
-
 	/*
 	SmartVector action;
 	SmartVector state = environment->Get_Initial_State();
@@ -262,4 +277,3 @@ void TrajectoryBasedValueIteration::Test(void)
 	 *
 	 */
 
-}
