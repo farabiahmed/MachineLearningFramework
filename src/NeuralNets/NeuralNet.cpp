@@ -39,7 +39,7 @@ NeuralNet::NeuralNet(const vector<unsigned> &topology) {
         layers.back().back().setOutputVal(1.0);
 	}
 
-	recentAverageError = 0;
+	recentAverageError = -1;
 	error = 0;
 }
 
@@ -96,9 +96,14 @@ void NeuralNet::backPropagation(const vector<double> &targetVals)
 	error = sqrt(error); // RMS
 
 	// Implement a recent average measurement
-	recentAverageError =
-			(recentAverageError * recentAverageSmoothingFactor + error)
-			/ (recentAverageSmoothingFactor + 1.0);
+
+	// Initialize with first error.
+	if( recentAverageError < 0)
+		recentAverageError = error;
+	else
+		recentAverageError =
+				(recentAverageError * recentAverageSmoothingFactor + error)
+				/ (recentAverageSmoothingFactor + 1.0);
 
 	// Calculate output layer gradients
 	// Loop through all the neurons in the output layer non including the bias neuron.
@@ -160,4 +165,26 @@ int NeuralNet::GetSizeOfInputLayer() const
 int NeuralNet::GetSizeOfOutputLayer() const
 {
 	return layers.back().size()-1;
+}
+
+double NeuralNet::GetWeight(int layer, int neuron, int connection) const
+{
+	return layers[layer][neuron].outputWeights[connection].weight;
+}
+void NeuralNet::Print()const
+{
+	for (unsigned l = 0; l < layers.size(); ++l) {
+		cout<<endl<<"  Layer "<<l<<endl;
+
+		for (unsigned n = 0; n < layers[l].size(); ++n) {
+
+			Neuron neuron = layers[l][n];
+
+			cout<<"    Neuron " << n << endl;
+
+			for (unsigned c = 0; c < neuron.outputWeights.size(); ++c) {
+				cout<<"       Weight: " << c << " : "<< neuron.outputWeights[c].weight<<endl;
+			}
+		}
+	}
 }

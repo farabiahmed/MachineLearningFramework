@@ -34,6 +34,8 @@ public:
 	double getRecentAverageError(void) const { return recentAverageError; }
 	int GetSizeOfInputLayer() const;
 	int GetSizeOfOutputLayer() const;
+	double GetWeight(int layer, int neuron, int connection) const;
+	void Print() const;
 
 private:
 	vector<Layer> layers; // layers[layerNum][neuronNum]
