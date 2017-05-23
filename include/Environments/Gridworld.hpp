@@ -9,8 +9,6 @@
 #define GRIDWORLD_HPP_
 
 #include "Environments/Environment.hpp"
-#include "ProbabilityDistributions/ProbabilityDistribution.hpp"
-#include "ProbabilityDistributions/DiscreteDistribution.hpp"
 #include "Miscellaneous/ConfigParser.hpp"
 #include "Representations/Representation.hpp"
 

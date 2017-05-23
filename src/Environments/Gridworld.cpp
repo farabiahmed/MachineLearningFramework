@@ -27,6 +27,12 @@ Gridworld::Gridworld(const ConfigParser& cfg) {
 
 	number_of_rows = cfg.GetValueOfKey<int>("NUMBER_OF_ROWS");
 
+	// Normalization factor first element of state.
+	state_normalization_factors.push_back( 1.0/(double)(number_of_rows-1) );
+
+	// Normalization factor second element of state.
+	state_normalization_factors.push_back( 1.0/(double)(number_of_columns-1) );
+
 	number_of_states = number_of_columns * number_of_rows;
 
 	number_of_actions = 4;
@@ -80,10 +86,10 @@ vector<pair<SmartVector,double>> Gridworld::Get_Transition_Probability(const Sma
 	// North
 	if(action.elements[0]==0)
 	{
+
 		if ( Get_Feasibility_Of_Action(currentState,actions[0]) )
 		{
 			tempPair = make_pair(states[currentState.index-number_of_columns],pDes);
-
 			state_probability.push_back(tempPair);
 		}
 		else
@@ -92,6 +98,11 @@ vector<pair<SmartVector,double>> Gridworld::Get_Transition_Probability(const Sma
 			state_probability.push_back(tempPair);
 		}
 
+		/*
+		Get_Feasibility_Of_Action(currentState,actions[0]) ?
+				state_probability.push_back(make_pair(states[currentState.index-number_of_columns],pDes)) :
+				state_probability.push_back(make_pair(currentState,pDes));
+		*/
 		Get_Feasibility_Of_Action(currentState,actions[1]) ?
 				state_probability.push_back(make_pair(states[currentState.index+1],pRight)) :
 				state_probability.push_back(make_pair(currentState,pRight));
@@ -99,6 +110,7 @@ vector<pair<SmartVector,double>> Gridworld::Get_Transition_Probability(const Sma
 		Get_Feasibility_Of_Action(currentState,actions[3]) ?
 				state_probability.push_back(make_pair(states[currentState.index-1],pLeft)) :
 				state_probability.push_back(make_pair(currentState,pLeft));
+
 	}
 	// East
 	else if (action.elements[0]==1)
@@ -144,6 +156,10 @@ vector<pair<SmartVector,double>> Gridworld::Get_Transition_Probability(const Sma
 		Get_Feasibility_Of_Action(currentState,actions[2]) ?
 				state_probability.push_back(make_pair(states[currentState.index+number_of_columns],pLeft)) :
 				state_probability.push_back(make_pair(currentState,pLeft));
+	}
+
+	for (unsigned i = 0; i < state_probability.size(); ++i) {
+		state_probability[i].first.index = Get_State_Index(state_probability[i].first);
 	}
 
 	return state_probability;
@@ -298,7 +314,7 @@ SmartVector Gridworld::Get_Next_State(const SmartVector& state, const SmartVecto
 		}
 	}
 
-	vec.index = Get_State_Index(vec);
+	//vec.index = Get_State_Index(vec);
 
 	delete p;
 	return vec;
@@ -435,6 +451,9 @@ int Gridworld::Get_State_Index(const SmartVector& state) const
 	}
 
 	cout<<endl<<endl<<"INVALID STATE!"<<endl<<endl;
+
+	cout<<"Controlled Abort..."<<endl;
+	abort();
 	return -1;
 }
 
