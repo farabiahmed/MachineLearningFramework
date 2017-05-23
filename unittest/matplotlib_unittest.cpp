@@ -29,8 +29,13 @@ int main()
     // Enable legend.
     plt::legend();
     // Save the image (file format is determined by the extension)
-    plt::save("./basic.png");
-    //plt::show();
+    //plt::save("./basic.png");
+    plt::show();
+
+    plt::figure();
+    plt::named_plot("log(x)", x, z);
+    plt::show();
+
 }
 
 // g++ basic.cpp -lpython2.7
