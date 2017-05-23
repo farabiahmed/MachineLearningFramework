@@ -20,6 +20,12 @@ Blocksworld::Blocksworld(const ConfigParser& cfg)
 
 	probability_of_random_action = cfg.GetValueOfKey<double>("PROBABILITY_OF_RANDOM_ACTION",0.20);
 	
+	// Normalization factor for ith element of state.
+	for (unsigned i = 0; i < number_of_blocks; ++i) {
+		state_normalization_factors.push_back( 1.0/(double)number_of_blocks );
+	}
+
+
 }
 
 Blocksworld::~Blocksworld() {
