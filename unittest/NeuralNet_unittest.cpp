@@ -57,6 +57,12 @@ int main(int argc, char* argv[])
 
 	NeuralNet myNet(topology);
 
+
+
+	Neuron::alpha = 0.0;
+	Neuron::eta = 0.01;
+	Neuron::activation_function = Neuron::ACTIVATION_FUNCTION_LRELU;
+
 	vector<vector<double>> inputContainer, targetContainer;
 	vector<double> inputVals, targetVals, resultVals;
 
