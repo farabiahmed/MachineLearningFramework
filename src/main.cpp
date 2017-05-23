@@ -23,6 +23,9 @@
 #include <Representations/FunctionApproximatorNeuralNetwork.hpp>
 #include <Representations/TabularStateActionPair.hpp>
 
+
+#define __cplusplus 201103L
+
 using namespace std;
 
 
@@ -73,6 +76,11 @@ int main(int argc, char* argv[])
 	Environment* environment;
 	Representation* value;
 	Agent* agent;
+
+	Neuron::alpha = 0.0;
+	Neuron::eta = 0.01;
+	Neuron::activation_function = Neuron::ACTIVATION_FUNCTION_LRELU;
+
 
 	// Select Application
 	switch (choice)
