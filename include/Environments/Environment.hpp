@@ -12,6 +12,8 @@
 #include <string>
 #include <vector>
 #include "Miscellaneous/SmartVector.hpp"
+#include "ProbabilityDistributions/ProbabilityDistribution.hpp"
+#include "ProbabilityDistributions/DiscreteDistribution.hpp"
 //#include "Representations/Representation.hpp"
 
 using namespace std;
@@ -48,6 +50,8 @@ public:
 
 	virtual SmartVector Get_Initial_State() = 0;
 
+	virtual SmartVector Get_Random_State();
+
 	virtual bool Check_Terminal_State(const SmartVector& state) = 0;
 
 	virtual bool Check_Blocked_State(const SmartVector& state) const = 0;
@@ -65,8 +69,12 @@ public:
 	string Name;	///< It stores the name of environment to increase readability and awareness.
     				///< Such as GridWorld, Inverted Pendulum etc.
 
-	int number_of_states;
-	int number_of_actions;
+	int number_of_states; 	/// Stores the total number of states.
+
+	int number_of_actions;	/// Stores the total number of actions.
+
+	vector<double> state_normalization_factors; 	/// Stores the normalization factors for each state element.
+	 	 	 	 	 	 	 	 	 	 	 	 	/// Ex: state=[2 4] will be normalized to state_norm=[0.5 1] etc.
 };
 
 #endif /* ENVIRONMENT_ENVIRONMENT_HPP_ */
