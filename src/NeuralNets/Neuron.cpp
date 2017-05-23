@@ -7,8 +7,11 @@
 
 #include <NeuralNets/Neuron.hpp>
 
+
+
 double Neuron::eta = 0.15; // Overall net learning rate, [0.0 ... 1.0] default: 0.15
 double Neuron::alpha = 0.5; // Momentum, multiplier of last deltaWeight, [0.0 ... n]
+Neuron::ACTIVATION_FUNCTION_TYPE Neuron::activation_function = Neuron::ACTIVATION_FUNCTION_DEFAULT;
 
 Neuron::Neuron(unsigned numOutputs,unsigned index)
 :myIndex(index)
@@ -16,7 +19,8 @@ Neuron::Neuron(unsigned numOutputs,unsigned index)
 
 	for (unsigned c = 0; c < numOutputs; ++c) {
 		outputWeights.push_back(Connection());
-		outputWeights.back().weight = randomWeight();
+		double temp = randomWeight();
+		outputWeights.back().weight = temp;
 		outputWeights.back().deltaWeight = 0;
 	}
 
@@ -40,14 +44,46 @@ void Neuron::feedForward(const Layer &prevLayer)
 
 double Neuron::transferFunction(double x)
 {
-	// tanh - output range [-1 ... 1]
-	return tanh(x);
+	if(activation_function==ACTIVATION_FUNCTION_TANH || activation_function==ACTIVATION_FUNCTION_DEFAULT)
+	{
+		// tanh - output range [-1 ... 1]
+		return tanh(x);
+	}
+	else if(activation_function==ACTIVATION_FUNCTION_LRELU)
+	{
+		// reLu - output range [0 ... x]
+		return (x<=0.0)?(0.5*x):x;
+	}
+	else if(activation_function==ACTIVATION_FUNCTION_SIGMOID)
+	{
+		// sigmoid
+		return (1.0 / (1.0 + exp(-x)));
+	}
+	return 0;
 }
 
 double Neuron::transferFunctionDerivative(double x)
 {
-	// tanh derivative approximation
-	return 1.0 - x * x;
+	if(activation_function==ACTIVATION_FUNCTION_TANH || activation_function==ACTIVATION_FUNCTION_DEFAULT)
+	{
+		// tanh derivative approximation
+		// return 1.0 - x * x;
+		double temp = tanh(x);
+		return 1-temp*temp;
+
+	}
+	else if(activation_function==ACTIVATION_FUNCTION_LRELU)
+	{
+		// reLu - output range [0 ... 1]
+		return (x<=0.0)?0.5:1.0;
+	}
+	else if(activation_function==ACTIVATION_FUNCTION_SIGMOID)
+	{
+		// sigmoid
+		double temp = (1.0 / (1.0 + exp(-x)));
+		return (temp * (1 - temp));
+	}
+	return 0;
 }
 
 void Neuron::calcOutputGradients(double targetVal)

@@ -54,6 +54,7 @@ public:
 
 	double sumDOW(const Layer &nextLayer) const;
 
+	vector<Connection> outputWeights; // Private!!
 
 	// Static Members (we want all the neurons can use the same value
 
@@ -68,6 +69,17 @@ public:
 						//		0.0 - no momentum
 						// 		0.5 - moderate momentum
 
+
+	enum ACTIVATION_FUNCTION_TYPE
+	{
+		ACTIVATION_FUNCTION_DEFAULT,
+		ACTIVATION_FUNCTION_TANH,
+		ACTIVATION_FUNCTION_LRELU,
+		ACTIVATION_FUNCTION_SIGMOID
+	};
+
+	static ACTIVATION_FUNCTION_TYPE activation_function;
+
 private:
 
 	// Static Methods
@@ -81,7 +93,7 @@ private:
 	// Class Members
 	double outputVal;
 
-	vector<Connection> outputWeights;
+
 
 	unsigned myIndex;
 
