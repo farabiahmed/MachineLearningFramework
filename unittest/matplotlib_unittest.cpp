@@ -29,7 +29,7 @@ int main()
     // Enable legend.
     plt::legend();
     // Save the image (file format is determined by the extension)
-    //plt::save("./basic.png");
+    plt::save("./log/basic.png");
     plt::show();
 
     plt::figure();
