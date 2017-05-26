@@ -7,6 +7,7 @@
 
 #include <Representations/FunctionApproximatorNeuralNetwork.hpp>
 
+
 FunctionApproximatorNeuralNetwork::FunctionApproximatorNeuralNetwork(const Environment& env, const ConfigParser& cfg)
 :Representation(env)
 {
@@ -28,7 +29,7 @@ FunctionApproximatorNeuralNetwork::FunctionApproximatorNeuralNetwork(const Envir
 	vector<unsigned> topology;
 
 	// Input Layer: Total number of states are the number of input neurons.
-	topology.push_back(states.size());
+	topology.push_back(states[0].dimension);
 
 	// Hidden Layers
 	for (unsigned i = 0; i < hidden_layers.size(); ++i) {
@@ -62,15 +63,18 @@ pair<int,double> FunctionApproximatorNeuralNetwork::Get_Greedy_Pair(const SmartV
 	vector<double> resultVals(network->GetSizeOfOutputLayer(),0);
 
 	// Avoid the indexes that are out of limits.
-	assert(state.index	>=0 	&& 		state.index	< (int)inputVals.size());
+	assert(state.dimension == (int)inputVals.size());
 
+	// TODO: Edit the comment according to new topology.
 	// Fill the input data:
 	// Our input vector is formed as follows:
 	// input = {input_1, input_2, ..., input_n}
 	// where 	n is the size of states,
 	//			input_i is 1 if it is belong to that state,
 	//			input_i is 0 otherwise.
-	inputVals[state.index] = 1.0;
+	for (int i = 0; i < state.dimension; ++i) {
+		inputVals[i] = (state.elements[i]  - environment->state_mean[i]) * environment->state_scalar[i] ;
+	}
 
 	// Feed forward the input:
 	network->feedForward(inputVals);
@@ -101,7 +105,10 @@ void FunctionApproximatorNeuralNetwork::Set_Value(const SmartVector& state, cons
 
 	// Form the input vector.
 	vector<double> inputVals(network->GetSizeOfInputLayer(),0);
-	inputVals[state.index] = 1.0;
+	for (int i = 0; i < state.dimension; ++i) {
+		inputVals[i] = (state.elements[i]  - environment->state_mean[i]) * environment->state_scalar[i];
+	}
+
 
 	// Initialize training vector
 	// Our training vector is formed as follows:
@@ -127,6 +134,7 @@ void FunctionApproximatorNeuralNetwork::Set_Value(const SmartVector& state, cons
 
 	// Report how well the training is working, average over recent samples:
 	//cout << endl<< "Error: " << network->getRecentAverageError() << endl;
+	errorList.push_back(network->getRecentAverageError() );
 }
 
 double FunctionApproximatorNeuralNetwork::Get_Value(const SmartVector& state, const SmartVector& action) const
@@ -138,16 +146,20 @@ double FunctionApproximatorNeuralNetwork::Get_Value(const SmartVector& state, co
 	vector<double> resultVals(network->GetSizeOfOutputLayer(),0);
 
 	// Avoid the indexes that are out of limits.
-	assert(state.index	>=0 	&& 		state.index	< (int)inputVals.size());
+	assert(state.dimension == (int)inputVals.size());
 	assert(action.index	>=0 	&& 		action.index< (int)resultVals.size());
 
+	// TODO: Edit The comment
 	// Fill the input data:
 	// Our input vector is formed as follows:
 	// input = {input_1, input_2, ..., input_n}
 	// where 	n is the size of states,
 	//			input_i is 1 if it is belong to that state,
 	//			input_i is 0 otherwise.
-	inputVals[state.index] = 1.0;
+	for (int i = 0; i < state.dimension; ++i) {
+		inputVals[i] = (state.elements[i]  - environment->state_mean[i]) * environment->state_scalar[i];
+	}
+
 
 	// Feed forward the input:
 	network->feedForward(inputVals);
@@ -178,13 +190,20 @@ void FunctionApproximatorNeuralNetwork::Print_Value()
 	// Form the output vector.
 	vector<double> resultVals(network->GetSizeOfOutputLayer());
 
-	for (unsigned i = 0; i < (unsigned)network->GetSizeOfInputLayer(); ++i) {
+	vector<SmartVector> states = environment->Get_All_Possible_States();
+
+	for (unsigned i = 0; i < states.size(); ++i) {
 
 		cout<<"State #"<<i<< ":";
 
+		// Get the current state
+		SmartVector state = states[i];
+
 		// Initialize the input with zeros than change the related one.
 		inputVals = vector<double>(network->GetSizeOfInputLayer(),0);
-		inputVals[i] = 1;
+		for (int i = 0; i < state.dimension; ++i) {
+			inputVals[i] = (state.elements[i]  - environment->state_mean[i]) * environment->state_scalar[i];
+		}
 
 		// Feed forward the input:
 		network->feedForward(inputVals);
@@ -201,4 +220,16 @@ void FunctionApproximatorNeuralNetwork::Print_Value()
 		cout<<endl;
 	}
 	cout<<endl;
+
+    // Plot a line whose name will show up as "log(x)" in the legend.
+    //plt::named_plot("Recent Average Error", errorList);
+
+    // Set x-axis to interval [0,1000000]
+    //plt::xlim(0, trainingPass);
+
+    // Enable legend.
+    //plt::legend();
+
+    // Show
+    //plt::show();
 }

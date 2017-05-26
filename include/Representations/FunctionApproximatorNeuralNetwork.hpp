@@ -14,7 +14,12 @@
 #include "Environments/Environment.hpp"
 #include "Representations/Representation.hpp"
 #include "Miscellaneous/ConfigParser.hpp"
+//#include "Tools/matplotlibcpp.h"
 #include "NeuralNets/NeuralNet.hpp"
+#include <cmath>
+
+
+//namespace plt = matplotlibcpp;
 
 /*
  *
@@ -34,6 +39,9 @@ public:
 	SmartVector Get_Policy(const SmartVector& state) const;
 
 	void Print_Value();
+
+private:
+	vector<double> errorList;
 
 protected:
 	NeuralNet* network;
