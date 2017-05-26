@@ -27,11 +27,23 @@ Gridworld::Gridworld(const ConfigParser& cfg) {
 
 	number_of_rows = cfg.GetValueOfKey<int>("NUMBER_OF_ROWS");
 
-	// Normalization factor first element of state.
-	state_normalization_factors.push_back( 1.0/(double)(number_of_rows-1) );
+	// Standardization scale first element of state (row).
+	state_scalar.push_back( 1.0/(double)(number_of_rows-1)*2.0 );
 
-	// Normalization factor second element of state.
-	state_normalization_factors.push_back( 1.0/(double)(number_of_columns-1) );
+	// Standardization scale second element of state (column).
+	state_scalar.push_back( 1.0/(double)(number_of_columns-1)*2.0 );
+
+	// Standardization mean first element of state (row).
+	state_mean.push_back( (double)(number_of_rows-1)/2.0 );
+
+	// Standardization mean second element of state (column).
+	state_mean.push_back( (double)(number_of_columns-1)/2.0 );
+
+	// Standardization scale second element of state (column).
+	action_scalar.push_back( 1.0/1.5 );
+
+	// Standardization mean first element of state (row).
+	action_mean.push_back( 1.5);
 
 	number_of_states = number_of_columns * number_of_rows;
 
@@ -330,7 +342,7 @@ SmartVector Gridworld::Get_Initial_State()
 	return vec;
 }
 
-bool Gridworld::Check_Terminal_State(const SmartVector& state)
+bool Gridworld::Check_Terminal_State(const SmartVector& state) const
 {
 	for (unsigned i = 0; i < terminal_states.size(); ++i)
 	{
