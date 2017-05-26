@@ -1,9 +1,8 @@
+# Makefile v1.3
 #
-# TODO: - Add more comments
-#		- Edit clean to remove unittest outs
-#		- Edit unittest section more subtly
+# TODO: - Add dependency to files. Currently all .o files must be created to link.
 #
-
+#
 # make       -> compile the shared library "libfoo.so"
 # make clean -> remove the library file and all object files (.o)
 # make all   -> clean and compile
@@ -16,6 +15,9 @@
 #
 # A Common Rule Structure:
 # target : prequisite1 prequisite2
+#    $@  :    $<
+#          |_______________________|
+#                     $^
 #
 # Dictionary:
 # dependency = prequisite
@@ -40,36 +42,30 @@
 #		output: foo.c hacks
 #
 #
+
 CC 	:= g++ # This is the main compiler
-# LD 	:= g++
-
-SRCDIR			:= src
-BUILDDIR		:= build
-BINDIR			:= bin
-TARGET 			:= bin/main
-
-SRCEXT 			:= cpp
-SOURCES 		:= $(shell find $(SRCDIR)/* -type f -name *.$(SRCEXT))
 
 
-UNITTESTDIR 	:= unittest
-UNITTESTSRC 	:= $(shell find $(UNITTESTDIR)/* -type f -name *.$(SRCEXT))
-UNITTESTBINS 	:= $(notdir $(basename $(UNITTESTSRC)))
-
-# src/Letters/A.cpp
-# src/main.cpp
-
-
-OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 CFLAGS 	:= -g -O0 -std=c++11 -Wall
 LIB 	:= -pthread -lpython2.7
 INC 	:= -I include -I /usr/include/python2.7/ 
 
-# All Target
-all: $(TARGET) unittest
+SRCDIR			:= src
+SRCEXT 			:= cpp
+BUILDDIR		:= build
+BINDIR			:= bin
+SOURCES 		:= $(shell find $(SRCDIR)/* -type f -name *.$(SRCEXT))				# src/Representations/Representation.cpp src/Representations/TabularStateActionPair.cpp src/main.cpp
+OBJECTS 		:= $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o)) 	# build/Representations/Representation.o build/Representations/TabularStateActionPair.o build/main.o
+TARGET 			:= bin/main
 
-# Print Internal Variables for Debug
-verbose: 
+UNITTESTDIR 	:= unittest
+UNITTESTSRC 	:= $(shell find $(UNITTESTDIR)/* -type f -name *.$(SRCEXT))			# unittest/Vector_Permutation.cpp unittest/matplotlib_unittest.cpp
+UNITTESTBINS 	:= $(notdir $(basename $(UNITTESTSRC))) 							# Vector_Permutation matplotlib_unittest
+UNITTESTOBJS	:= $(UNITTESTSRC:.cpp=.o) 											# unittest/Vector_Permutation.o unittest/matplotlib_unittest.o
+
+OBJECTSFULL 	:= $(addprefix $(BUILDDIR)/,$(UNITTESTOBJS)) $(OBJECTS)
+
+verbose print:
 	@echo "CC:\t"		$(CC)
 	@echo "CFLAGS:\t" 	$(CFLAGS)
 	@echo "LIB: \t"		$(LIB)
@@ -79,14 +75,16 @@ verbose:
 	@echo "UNITTESTBINS: " 	$(UNITTESTBINS)
 	@echo "UNITTESTSRC: "	$(UNITESTSRC)	
 	@echo "SOURCES: " 		$(SOURCES)
-	@echo "OBJECTS: " 		$(OBJECTS)
+	@echo "OBJECTS: " 		$(OBJECTS)	
+
+# All Target
+all: $(TARGET) $(addprefix $(UNITTESTDIR)/,$(UNITTESTBINS))
 
 # Main Linkage
 $(TARGET): $(OBJECTS)
 	@echo "Linking..." $@;	
 	@mkdir -p $(BINDIR)
-	@$(CC) $^ -o $(TARGET) $(LIB)
-
+	@$(CC) $^ -o $@ $(LIB)
 
 # Main Compilation
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
@@ -94,41 +92,44 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
-# Tests
-#tester:  $(filter-out build/main.o, $(OBJECTS))
-#	@mkdir -p $(dir $(BINDIR))	
-#	$(CC) $(CFLAGS) $^ unittest/SmartVector_unittest.cpp $(INC) $(LIB) -o $(BINDIR)/SmartVector_unittest
-#	$(CC) $(CFLAGS) $^ unittest/Probabilities_unittest.cpp $(INC) $(LIB) -o bin/Probabilities_unittest
-#	$(CC) $(CFLAGS) $^ unittest/Hastable_unittest.cpp $(INC) $(LIB) -o bin/Hastable_unittest
-#	$(CC) $(CFLAGS) $^ unittest/String_unittest.cpp $(INC) $(LIB) -o bin/String_unittest
-#	$(CC) $(CFLAGS) $^ unittest/ConfigParser_unittest.cpp $(INC) $(LIB) -o bin/ConfigParser_unittest
-#	$(CC) $(CFLAGS) $^ unittest/NeuralNet_unittest.cpp $(INC) $(LIB) -o bin/NeuralNet_unittest
-#	$(CC) $(CFLAGS) $^ unittest/matplotlib_unittest.cpp $(INC) $(LIB) -o bin/matplotlib_unittest
-	
-unittest: $(filter-out build/main.o, $(OBJECTS))
-	@mkdir -p $(dir $(BINDIR))	
-#	Example: $(CC) $(CFLAGS) $^ unittest/matplotlib_unittest.cpp $(INC) $(LIB) -o bin/matplotlib_unittest
-#	$(foreach f,$(UNITTESTBINS), $(CC) $(CFLAGS) $^ $(UNITTESTDIR)/$(addsuffix .cpp,$(f)) $(INC) $(LIB) -o $(BINDIR)/$(f);)
-	@for f in $(UNITTESTBINS) ; do \
-	    echo "Linking: " $$f ; \
-	    $(CC) $(CFLAGS) $^ $(UNITTESTDIR)/$(addsuffix .cpp,$$f) $(INC) $(LIB) -o $(BINDIR)/$$f; \
-	done
 
+# Unittest Linkage
+# Ex: 
+# unittest/String_unittest : build/unittest/String_unittest.o
+$(addprefix $(UNITTESTDIR)/,$(UNITTESTBINS)) : $(OBJECTSFULL) 
+	@echo "Linking..." $@;	
+	@mkdir -p $(BINDIR)
+	@$(eval TMP := build/$@.o)		
+	@$(CC) $(filter-out build/main.o, $(OBJECTS)) $(TMP) -o $(BINDIR)/$(notdir $@) $(LIB) 
+
+# Unittest Compilation
+# Ex:
+# $(BUILDDIR)/unittest/String_unittest.o: unittest/String_unittest.cpp
+$(addprefix $(BUILDDIR)/,$(UNITTESTOBJS)) : $(UNITTESTSRC)
+	@echo "Compiling..." $@;	
+	@mkdir -p $(dir $@)
+	@$(eval TMP := $(notdir $@))	 												# Get file part of target Ex: build/unittest/String_unittest.o -> String_unittest.o
+	@$(eval TMP := $(TMP:.o=.$(SRCEXT)))											# Change .o with .cpp  Ex: String_unittest.o -> String_unittest.cpp
+	@$(CC) $(CFLAGS) $(INC) -c $(UNITTESTDIR)/$(TMP) -o $@
+
+# Testing Make
 test: $(filter-out build/main.o, $(OBJECTS))
 	@for f in 1 2 3 4; do \
 	    echo $$f ; \
 	done
-	
+
+# Clean
 clean:
 	@echo " Cleaning...";
 	@$(RM) -r -v $(BUILDDIR) $(TARGET) $(BINDIR)
 	@mkdir -p $(BINDIR)	
 	@mkdir -p $(BUILDDIR)
 	@echo " Done.";
-	
-	
+
+
 # Rebuild
 rebuild: clean all
+
 
 # What is PHONY?
 # Make assumes its target is a file, and this makes writing Makefiles relatively easy
