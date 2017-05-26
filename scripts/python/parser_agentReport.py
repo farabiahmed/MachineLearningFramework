@@ -34,5 +34,6 @@ plt.plot(np.arange(iteration)+1,np.mean(arr, axis=1))
 plt.title('Performance Of The Agent')
 plt.xlabel('Number of Iteration')
 plt.ylabel('Cumulative Reward')
+plt.savefig('log/'+freshfolder+"/agentReport.svg", format="svg")
 plt.show()
 
