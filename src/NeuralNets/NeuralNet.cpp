@@ -7,7 +7,7 @@
 
 #include "NeuralNets/NeuralNet.hpp"
 
-double NeuralNet::recentAverageSmoothingFactor = 100.0; // Number of training samples to average over
+double NeuralNet::recentAverageSmoothingFactor = 10.0; // Number of training samples to average over
 
 NeuralNet::NeuralNet(const vector<unsigned> &topology) {
 
@@ -173,18 +173,35 @@ double NeuralNet::GetWeight(int layer, int neuron, int connection) const
 }
 void NeuralNet::Print()const
 {
-	for (unsigned l = 0; l < layers.size(); ++l) {
-		cout<<endl<<"  Layer "<<l<<endl;
+	cout<<endl<<endl<<"Net Properties:"<<endl;
+	cout<<"---------------------------------------------"<<endl;
+	cout<<"Learning Rate\t:"<< Neuron::eta <<endl;
+	cout<<"Momentum\t:"<< Neuron::alpha <<endl;
+	cout<<"ActivationFunc\t:"<< Neuron::activation_function <<endl;
+	cout<<"Topology\t:";
+	for (unsigned i = 0; i <  layers.size(); ++i) {
+		cout<<layers[i].size()-1<<" ";
+	}
+	cout<<endl;
+	cout<<endl;
+
+	cout<<"Initial Weights:"<<endl;
+	cout<<"---------------------------------------------"<<endl;
+	for (unsigned l = 0; l < layers.size(); ++l)
+	{
+		cout<<endl<<"Layer: "<<l<<endl;
 
 		for (unsigned n = 0; n < layers[l].size(); ++n) {
 
 			Neuron neuron = layers[l][n];
 
-			cout<<"    Neuron " << n << endl;
+			cout<<"\tNeuron: " << n << "\tWeights: ";
 
 			for (unsigned c = 0; c < neuron.outputWeights.size(); ++c) {
-				cout<<"       Weight: " << c << " : "<< neuron.outputWeights[c].weight<<endl;
+				cout<< neuron.outputWeights[c].weight<<" ";
 			}
+
+			cout<<endl;
 		}
 	}
 }
