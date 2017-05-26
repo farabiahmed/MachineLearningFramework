@@ -54,6 +54,11 @@ double Neuron::transferFunction(double x)
 		// reLu - output range [0 ... x]
 		return (x<=0.0)?(0.5*x):x;
 	}
+	else if(activation_function==ACTIVATION_FUNCTION_RELU)
+	{
+		// reLu - output range [0 ... x]
+		return (x<=0.0)?(0):x;
+	}
 	else if(activation_function==ACTIVATION_FUNCTION_SIGMOID)
 	{
 		// sigmoid
@@ -74,8 +79,13 @@ double Neuron::transferFunctionDerivative(double x)
 	}
 	else if(activation_function==ACTIVATION_FUNCTION_LRELU)
 	{
-		// reLu - output range [0 ... 1]
+		// lreLu - output range [0 ... 1]
 		return (x<=0.0)?0.5:1.0;
+	}
+	else if(activation_function==ACTIVATION_FUNCTION_RELU)
+	{
+		// reLu - output range [0 ... 1]
+		return (x<=0.0)?0:1.0;
 	}
 	else if(activation_function==ACTIVATION_FUNCTION_SIGMOID)
 	{
