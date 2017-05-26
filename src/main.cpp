@@ -28,6 +28,14 @@
 
 using namespace std;
 
+string Get_TimeStamp(void)
+{
+	time_t now = time(NULL);
+	tm * timeinfo = localtime(&now);
+	char buffer[80];
+	strftime(buffer, 80, "%Y%m%d_%H%M%S", timeinfo);
+	return string(buffer);
+}
 
 void help_menu(void)
 {
@@ -53,6 +61,8 @@ int main(int argc, char* argv[])
 	srand(time(0));
 
 	string configFile = "";
+
+	string timeStamp = Get_TimeStamp();
 
 	// Check the number of parameters
 	if (argc >= 2)
@@ -261,6 +271,12 @@ int main(int argc, char* argv[])
 
 	//Show Policy
 	environment->Display_Policy(*value);
+
+	//Get Report
+	agent->Get_Report("log/"+timeStamp,"agentReport.csv");
+
+	//Get Report
+	value->Get_Report("log/"+timeStamp,"representationReport.csv");
 
 	delete agent;
 	delete environment;
