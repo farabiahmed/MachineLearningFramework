@@ -52,7 +52,7 @@ public:
 
 	virtual SmartVector Get_Random_State();
 
-	virtual bool Check_Terminal_State(const SmartVector& state) = 0;
+	virtual bool Check_Terminal_State(const SmartVector& state) const = 0;
 
 	virtual bool Check_Blocked_State(const SmartVector& state) const = 0;
 
@@ -73,8 +73,13 @@ public:
 
 	int number_of_actions;	/// Stores the total number of actions.
 
-	vector<double> state_normalization_factors; 	/// Stores the normalization factors for each state element.
-	 	 	 	 	 	 	 	 	 	 	 	 	/// Ex: state=[2 4] will be normalized to state_norm=[0.5 1] etc.
+	/// Standardization parameters will be used in neural networks.
+	vector<double> state_mean; 		/// Stores the standardization bias for each state element.
+	vector<double> state_scalar; 	/// Stores the standardization factors for each state element.
+	vector<double> action_mean;
+	vector<double> action_scalar;
+
+
 };
 
 #endif /* ENVIRONMENT_ENVIRONMENT_HPP_ */
