@@ -76,6 +76,9 @@ int main()
 	//Get Report
 	agent->Get_Report("log/"+Get_TimeStamp(),"agentReport.csv");
 
+	//Get Report
+	value->Get_Report("log/"+Get_TimeStamp(),"representationReport.csv");
+
 	delete agent;
 	delete environment;
 	delete value;
