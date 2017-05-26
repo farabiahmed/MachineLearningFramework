@@ -56,6 +56,73 @@ vector<double> Convert::string_to_T <vector<double>> (string const &val)
 	return ret;
 }
 
+template <>
+vector<int> Convert::string_to_T <vector<int>> (string const &val)
+{
+	if(val=="N/A")
+		return vector<int>();
+
+	vector<int> ret;
+	vector<string> tokens = Parse_String(val,',');
+
+	for (unsigned i = 0; i < tokens.size(); ++i) {
+		ret.push_back((int)stoi(tokens[i]));
+	}
+
+	return ret;
+}
+
+template <>
+vector<unsigned> Convert::string_to_T <vector<unsigned>> (string const &val)
+{
+	if(val=="N/A")
+		return vector<unsigned>();
+
+	vector<unsigned> ret;
+	vector<string> tokens = Parse_String(val,',');
+
+	for (unsigned i = 0; i < tokens.size(); ++i) {
+		ret.push_back((unsigned)stoi(tokens[i]));
+	}
+
+	return ret;
+}
+
+
+template <>
+vector<vector<int>> Convert::string_to_T < vector<vector<int>> > (string const &val)
+{
+	if(val=="N/A")
+		return vector<vector<int>>();
+
+	vector<vector<int>> ret;
+	vector<string> tokens = Parse_String(val,';');
+
+	for (unsigned i = 0; i < tokens.size(); ++i) {
+		ret.push_back(string_to_T <vector<int>> (tokens[i]));
+	}
+
+	return ret;
+}
+
+
+template <>
+vector<vector<unsigned>> Convert::string_to_T < vector<vector<unsigned>> > (string const &val)
+{
+	if(val=="N/A")
+		return vector<vector<unsigned>>();
+
+	vector<vector<unsigned>> ret;
+	vector<string> tokens = Parse_String(val,';');
+
+	for (unsigned i = 0; i < tokens.size(); ++i) {
+		ret.push_back(string_to_T <vector<unsigned>> (tokens[i]));
+	}
+
+	return ret;
+}
+
+
 vector<string> Convert::Parse_String(const string& val, const char& delimiter)
 {
 	vector<string> str_arr;

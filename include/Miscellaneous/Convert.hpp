@@ -89,5 +89,25 @@ template <> vector<SmartVector> Convert::string_to_T < vector<SmartVector> > (st
 // REWARDS	=	1.0,-1.0
 template <> vector<double> Convert::string_to_T < vector<double> > (string const &val);
 
+// Parsing character separated int values
+// Ex:
+// ACTIVATION_FUNCTIONS	=	2;4
+template <> vector<int> Convert::string_to_T < vector<int> > (string const &val);
+
+// Parsing character separated int values
+// Ex:
+// ACTIVATION_FUNCTIONS	=	2;4
+template <> vector<unsigned> Convert::string_to_T < vector<unsigned> > (string const &val);
+
+// Parsing character separated int-array values
+// Ex:
+// HIDDEN_UNITS	=	2;4;8;4,4
+template <> vector<vector<int>> Convert::string_to_T < vector<vector<int>> > (string const &val);
+
+// Parsing character separated int-array values
+// Ex:
+// HIDDEN_UNITS	=	2;4;8;4,4
+template <> vector<vector<unsigned>> Convert::string_to_T < vector<vector<unsigned>> > (string const &val);
+
 
 #endif /* MISCELLANEOUS_CONVERT_HPP_ */
