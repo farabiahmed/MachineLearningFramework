@@ -22,7 +22,7 @@ Blocksworld::Blocksworld(const ConfigParser& cfg)
 	
 	// Normalization factor for ith element of state.
 	for (unsigned i = 0; i < number_of_blocks; ++i) {
-		state_normalization_factors.push_back( 1.0/(double)number_of_blocks );
+		state_scalar.push_back( 1.0/(double)number_of_blocks );
 	}
 
 
@@ -358,7 +358,7 @@ SmartVector Blocksworld::Get_Goal_State(void) const
 }
 
 
-bool Blocksworld::Check_Terminal_State(const SmartVector& state)
+bool Blocksworld::Check_Terminal_State(const SmartVector& state) const
 {
 	// First of all just check if the first block is on the ground.
 	// If the first block is on the ground then check the others if thay are arranged in order.

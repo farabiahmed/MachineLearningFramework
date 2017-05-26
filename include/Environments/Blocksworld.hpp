@@ -45,7 +45,7 @@ public:
 
 	SmartVector Get_Initial_State();
 
-	bool Check_Terminal_State(const SmartVector& state);
+	bool Check_Terminal_State(const SmartVector& state) const;
 
 	bool Check_Blocked_State(const SmartVector& state) const;
 
