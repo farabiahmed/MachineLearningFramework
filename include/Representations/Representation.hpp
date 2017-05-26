@@ -8,6 +8,8 @@
 #ifndef REPRESENTATIONS_REPRESENTATION_HPP_
 #define REPRESENTATIONS_REPRESENTATION_HPP_
 
+#include <fstream> // file write for datalog
+#include <cstdlib> // system command
 #include <list>
 #include <vector>
 //#include "Environments/Environment.hpp"
@@ -35,6 +37,8 @@ public:
 	virtual void Set_Value(const SmartVector& state, const SmartVector& action, double value) = 0;
 
 	virtual void Print_Value() = 0;
+
+	virtual void Get_Report(string filePath, string fileName);
 
 	string Name;	///< It stores the name of representation to increase readability and awareness.
     				///< Such as StateActionValue, GaussianRBF etc.
