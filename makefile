@@ -56,15 +56,17 @@ BUILDDIR		:= build
 BINDIR			:= bin
 SOURCES 		:= $(shell find $(SRCDIR)/* -type f -name *.$(SRCEXT))				# src/Representations/Representation.cpp src/Representations/TabularStateActionPair.cpp src/main.cpp
 OBJECTS 		:= $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o)) 	# build/Representations/Representation.o build/Representations/TabularStateActionPair.o build/main.o
-TARGET 			:= bin/main
+TARGET 			:= main
 
 UNITTESTDIR 	:= unittest
-UNITTESTSRC 	:= $(shell find $(UNITTESTDIR)/* -type f -name *.$(SRCEXT))			# unittest/Vector_Permutation.cpp unittest/matplotlib_unittest.cpp
-UNITTESTBINS 	:= $(notdir $(basename $(UNITTESTSRC))) 							# Vector_Permutation matplotlib_unittest
-UNITTESTOBJS	:= $(UNITTESTSRC:.cpp=.o) 											# unittest/Vector_Permutation.o unittest/matplotlib_unittest.o
+UNITTESTSRC 	:= $(shell find $(UNITTESTDIR)/* -type f -name *.$(SRCEXT))			# unittest/Vector_Permutation.cpp unittest/matplotlib_unittest.cpp ...
+UNITTESTBINS 	:= $(notdir $(basename $(UNITTESTSRC))) 							# Vector_Permutation matplotlib_unittest ...
+UNITTESTOBJS	:= $(UNITTESTSRC:.cpp=.o) 											# unittest/Vector_Permutation.o unittest/matplotlib_unittest.o ...
 
-OBJECTSFULL 	:= $(addprefix $(BUILDDIR)/,$(UNITTESTOBJS)) $(OBJECTS)
+# All Target
+all: $(TARGET) $(addprefix $(UNITTESTDIR)/,$(UNITTESTBINS))
 
+# Get the variables to debug
 verbose print:
 	@echo "CC:\t"		$(CC)
 	@echo "CFLAGS:\t" 	$(CFLAGS)
@@ -77,14 +79,12 @@ verbose print:
 	@echo "SOURCES: " 		$(SOURCES)
 	@echo "OBJECTS: " 		$(OBJECTS)	
 
-# All Target
-all: $(TARGET) $(addprefix $(UNITTESTDIR)/,$(UNITTESTBINS))
 
 # Main Linkage
 $(TARGET): $(OBJECTS)
-	@echo "Linking..." $@;	
+	@echo "Linking....." $@;	
 	@mkdir -p $(BINDIR)
-	@$(CC) $^ -o $@ $(LIB)
+	@$(CC) $^ -o $(BINDIR)/$@ $(LIB)
 
 # Main Compilation
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
@@ -96,8 +96,8 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 # Unittest Linkage
 # Ex: 
 # unittest/String_unittest : build/unittest/String_unittest.o
-$(addprefix $(UNITTESTDIR)/,$(UNITTESTBINS)) : $(OBJECTSFULL) 
-	@echo "Linking..." $@;	
+$(addprefix $(UNITTESTDIR)/,$(UNITTESTBINS)) : % : %.o $(OBJECTS) 
+	@echo "Linking....." $@;	
 	@mkdir -p $(BINDIR)
 	@$(eval TMP := build/$@.o)		
 	@$(CC) $(filter-out build/main.o, $(OBJECTS)) $(TMP) -o $(BINDIR)/$(notdir $@) $(LIB) 
@@ -105,12 +105,11 @@ $(addprefix $(UNITTESTDIR)/,$(UNITTESTBINS)) : $(OBJECTSFULL)
 # Unittest Compilation
 # Ex:
 # $(BUILDDIR)/unittest/String_unittest.o: unittest/String_unittest.cpp
-$(addprefix $(BUILDDIR)/,$(UNITTESTOBJS)) : $(UNITTESTSRC)
+$(UNITTESTOBJS) : $(UNITTESTSRC)
 	@echo "Compiling..." $@;	
-	@mkdir -p $(dir $@)
-	@$(eval TMP := $(notdir $@))	 												# Get file part of target Ex: build/unittest/String_unittest.o -> String_unittest.o
-	@$(eval TMP := $(TMP:.o=.$(SRCEXT)))											# Change .o with .cpp  Ex: String_unittest.o -> String_unittest.cpp
-	@$(CC) $(CFLAGS) $(INC) -c $(UNITTESTDIR)/$(TMP) -o $@
+	@mkdir -p $(BUILDDIR)/$(UNITTESTDIR)
+	@$(eval TMP := $(@:.o=.$(SRCEXT) ))										# Change .o with .cpp  Ex: String_unittest.o -> String_unittest.cpp
+	@$(CC) $(CFLAGS) $(INC) -c $(TMP) -o $(BUILDDIR)/$@
 
 # Testing Make
 test: $(filter-out build/main.o, $(OBJECTS))
