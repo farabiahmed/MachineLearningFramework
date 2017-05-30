@@ -84,6 +84,11 @@ template <> SmartVector Convert::string_to_T <SmartVector> (string const &val);
 // LOCATION_OF_TERMINALS	= 0,3;1,3
 template <> vector<SmartVector> Convert::string_to_T < vector<SmartVector> > (string const &val);
 
+// Parsing character separated multiple vectors
+// Ex:
+// LOCATION_OF_TERMINALS	= 0,3;1,3
+template <> vector<string> Convert::string_to_T < vector<string> > (string const &val);
+
 // Parsing character separated double values
 // Ex:
 // REWARDS	=	1.0,-1.0
