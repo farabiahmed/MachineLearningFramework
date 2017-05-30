@@ -25,15 +25,19 @@ Agent::~Agent() {
 	// TODO Auto-generated destructor stub
 }
 
-void Agent::Get_Cumulative_Rewards(void)
+void Agent::Get_Cumulative_Rewards(unsigned numberof_bellmanupdate)
 {
-	// Collect the performance of iteration to draw a graphic.
-	vector<double> reward_per_iteration;
+	// Collect the performance of current session to draw a plot.
+	vector<double> rewards;
 	for (unsigned i = 0; i < number_of_simulations; ++i) {
 		double r = Simulate();
-		reward_per_iteration.push_back(r);
+		rewards.push_back(r);
 	}
-	rewards_cumulative.push_back(reward_per_iteration);
+
+	auto pair = make_pair(numberof_bellmanupdate, rewards );
+
+	// pair: <numberof_bellmanupdate, rewards_for_that_bellmanupdate>
+	rewards_cumulative.push_back(pair);
 }
 
 double Agent::Simulate(void)
@@ -74,29 +78,40 @@ double Agent::Simulate(void)
 
 void Agent::Get_Report(string filePath, string fileName)
 {
+	cout<<endl<<"Creating agent report: "<<filePath<<"/"<<fileName<<endl;
+
 	// Create File Directory First
 	system(("mkdir -p " + filePath).c_str());
 
 	//Csv Output for pyton plots
 	ofstream logger(filePath+"/"+fileName);
 
+	// Get the size of size of samples
+	unsigned size_of_samples = rewards_cumulative[0].second.size();
+
 	// Put Header first
-	for (unsigned i = 0; i < rewards_cumulative[0].size(); ++i)
+	logger<<"update,";
+	for (unsigned i = 0; i < size_of_samples; ++i)
 	{
 		logger<<"sample"<<i;
-		if(i<rewards_cumulative[0].size()-1)
+		if(i<size_of_samples-1)
 			logger<<",";
 	}
-
 	logger<<endl;
 
-	// Put datas
-	for (unsigned i = 0; i < rewards_cumulative.size(); ++i) {
+	// Put data
+	for (unsigned i = 0; i < rewards_cumulative.size(); ++i)
+	{
+		auto pair = rewards_cumulative[i];
 
-		for (unsigned j = 0; j < rewards_cumulative[i].size(); ++j) {
-			logger << rewards_cumulative[i][j];
+		// Put the number that shows the bellman update number first
+		logger<<pair.first<<",";
 
-			if( j < rewards_cumulative[i].size()-1)
+		// Then, put the rewards collected from simulation for that bellman update
+		for (unsigned j = 0; j < pair.second.size(); ++j) {
+			logger << pair.second[j];
+
+			if( j < pair.second.size()-1)
 				logger<<",";
 		}
 		logger<<endl;

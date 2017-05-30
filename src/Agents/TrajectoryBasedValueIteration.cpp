@@ -43,6 +43,11 @@ TrajectoryBasedValueIteration::TrajectoryBasedValueIteration(const Environment* 
 	// It helps us to evaluate the performance of the agent by doing simulations in series.
 	number_of_simulations = cfg.GetValueOfKey<unsigned>("NUMBER_OF_SIMULATIONS",10);
 
+	// Defines how many bellman updates should be discarded to make simulation to
+	// plot the performance of agent.
+	bellman_stride_forsimulation = cfg.GetValueOfKey<unsigned>("BELLMAN_STRIDE_FORSIMULATION",50);
+
+
 	states = environment->Get_All_Possible_States();
 }
 
@@ -52,6 +57,8 @@ TrajectoryBasedValueIteration::~TrajectoryBasedValueIteration() {
 
 bool TrajectoryBasedValueIteration::Start_Execution()
 {
+	unsigned numberof_bellmanupdate = 0;
+
 	for (int num_of_iteration = 0; num_of_iteration < max_number_of_iterations; num_of_iteration++)
 	{
 		cout<<"Iteration #: " << num_of_iteration;
@@ -117,13 +124,19 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 
 				// Update Value
 				valueFunction->Set_Value(state,action,Q_plus);
+
+				numberof_bellmanupdate++;
+
+				unsigned mod = (numberof_bellmanupdate % bellman_stride_forsimulation);
+				if(mod == 0)
+				{
+					// Get the cumulative rewards for the current bellman update.
+					Get_Cumulative_Rewards(numberof_bellmanupdate);
+				}
 			}
 		}// Trajectory Loop
 
 		cout<<" Diff:"<<diff<<endl;
-
-		// Get the cumulative rewards for the current iteration.
-		Get_Cumulative_Rewards();
 
 		// Check whether stopping criteria reached.
 		if(diff<epsilon)

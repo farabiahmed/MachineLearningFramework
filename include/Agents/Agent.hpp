@@ -43,18 +43,23 @@ protected:
 
 	Representation* valueFunction;
 
-	void Get_Cumulative_Rewards(void);  ///< It does the simulation for predefined times
-											///< in a loop and fills the "rewards_cumulative".
+	void Get_Cumulative_Rewards(unsigned numberof_bellmanupdate);  	///< It does the simulation for predefined times
+																	///< in a loop and fills the "rewards_cumulative".
 
 	double Simulate(void); 		///< Simulates the agent from an random initial point through
 								///< calculated last policy.
 
-	vector<vector<double>> rewards_cumulative;	///< Stores the rewards that collected during
-												///< each iteration. Then printed out to csv file
-												///< to be shown by python plotting libraries.
+	vector< pair<int,vector<double>> > rewards_cumulative;	///< Stores the rewards that collected during
+															///< each iteration. Then printed out to csv file
+															///< to be shown by python plotting libraries.
+															///< pair: <numberof_bellmanupdate, rewards_for_that_bellmanupdate>
+															///< rewards_cumulative is a list of pairs given above.
 
-	unsigned number_of_simulations;///< Holds the number of simulations that needs to
+	unsigned number_of_simulations;				///< Holds the number of simulations that needs to
 												///< be done for performance evaluation.
+
+	unsigned bellman_stride_forsimulation;			///< Defines how many bellman updates should be discarded to
+											    ///< make simulation to plot the performance of agent.
 };
 
 #endif /* AGENTS_AGENT_HPP_ */
