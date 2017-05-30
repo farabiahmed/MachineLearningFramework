@@ -19,6 +19,9 @@ Representation::~Representation() {
 
 void Representation::Get_Report(string filePath, string fileName)
 {
+
+	cout<<endl<<"Creating representation report: "<<filePath<<"/"<<fileName<<endl;
+
 	// Create File Directory First
 	system(("mkdir -p " + filePath).c_str());
 
