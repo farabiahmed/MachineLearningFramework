@@ -18,6 +18,7 @@
 #include "Agents/TrajectoryBasedValueIteration.hpp"
 
 #include "Representations/Representation.hpp"
+#include "Representations/RepresentationUDP.hpp"
 #include <Representations/FunctionApproximatorBinaryBasis.hpp>
 #include <Representations/FunctionApproximatorGaussianRadialBasis.hpp>
 #include <Representations/FunctionApproximatorNeuralNetwork.hpp>
@@ -50,6 +51,7 @@ void help_menu(void)
 	cout << "6- Grid World with Q-Iteration and NeuralNetworks Representation					"<<endl;
 	cout << "7- Grid World with Trajectory Based Q-Value Iteration and NeuralNetworks Rep.		"<<endl;
 	cout << "8- Blocks World with Qiteration													"<<endl;
+	cout << "9- Grid World with Qiteration and External UDP Representation						"<<endl;
 	cout << "***********************************************************************************"<<endl;
 	cout << "Enter your choice and press return: ";
 
@@ -256,6 +258,26 @@ int main(int argc, char* argv[])
 
 
 		}break;
+		case 9:
+		{
+			// QIteration Example for GridWorld
+
+			// Assign the default file if it is not assigned yet.
+			if(configFile.empty()) configFile = "config/config_gridworld.cfg";
+
+			// Get parameters from file
+			ConfigParser cfg = ConfigParser(configFile);
+
+			// Initialize Environment
+			environment 	= new Gridworld(cfg);
+
+			// Initialize Representation Function
+			value 			= new RepresentationUDP(*environment,cfg);
+
+			// Initialize Solver
+			agent 			= new QIteration(environment, value, cfg);
+
+		}break;
 		default:
 			cout<<endl<< "You have entered an invalid input, terminating..." <<endl<<endl;
 			return 0;
@@ -278,6 +300,7 @@ int main(int argc, char* argv[])
 	//Get Report
 	value->Get_Report("log/"+timeStamp,"representationReport.csv");
 
+	cout<<endl<<"Done."<<endl<<endl;
 	delete agent;
 	delete environment;
 	delete value;
