@@ -7,12 +7,14 @@
 //============================================================================
 
 #include <iostream>
+#include <sstream>
+#include <string>
 
 using namespace std;
 
 void help_menu(void)
 {
-	cout << "String Test...							"<<endl;
+	cout << "String and Stringstream Test...							"<<endl;
 }
 
 int main()
@@ -26,6 +28,17 @@ int main()
 
     line = "aaabcdef";
 	cout<< line.find_first_not_of('a') << endl;
+
+	int i = 51;
+	stringstream ss;
+	ss<<i;
+	string s = ss.str();
+
+	cout<<"Integer Conversion Result: "<< s<<endl;
+
+
+	s = std::to_string(i);
+	cout<<"Integer Conversion Result: "<< s<<endl;
 
 	return 0;
 }
