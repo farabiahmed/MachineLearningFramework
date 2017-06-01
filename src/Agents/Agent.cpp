@@ -7,8 +7,8 @@
 
 #include "Agents/Agent.hpp"
 
-Agent::Agent() {
-
+Agent::Agent(const ConfigParser& cfg) : userControl(UserControl::GetInstance())
+{
 	/*
 	// Inform the user about environment name.
 	cout << "Environment Name: " << environment->Name << endl;
@@ -27,21 +27,28 @@ Agent::~Agent() {
 
 void Agent::Get_Cumulative_Rewards(unsigned numberof_bellmanupdate)
 {
+	cout<<endl<<endl<<"Simulations Started:";
+
 	// Collect the performance of current session to draw a plot.
 	vector<double> rewards;
 	for (unsigned i = 0; i < number_of_simulations; ++i) {
 		double r = Simulate();
 		rewards.push_back(r);
+
+		cout<<".";
 	}
 
 	auto pair = make_pair(numberof_bellmanupdate, rewards );
 
 	// pair: <numberof_bellmanupdate, rewards_for_that_bellmanupdate>
 	rewards_cumulative.push_back(pair);
+
+	cout<<"OK."<<endl<<endl;
 }
 
 double Agent::Simulate(void)
 {
+
 	// Hold the reward that we will return.
 	double reward=0;
 
@@ -55,7 +62,7 @@ double Agent::Simulate(void)
 	SmartVector action;
 
 	// Run the simulation and collect rewards.
-	while( !environment->Check_Terminal_State(state) && number_of_movement<states.size() )
+	while( !environment->Check_Terminal_State(state) && number_of_movement<max_steps_in_simulation )
 	{
 		// Get next action to apply from updated policy
 		action  = valueFunction->Get_Policy(state);
@@ -72,6 +79,9 @@ double Agent::Simulate(void)
 		// Increase total number of movement to be blocked in a loop in case of a bad policy.
 		number_of_movement++;
 	}
+
+	if(number_of_movement>=max_steps_in_simulation)
+		cout<<endl<<"A Simulation step terminated since agent stucked in a loop."<<endl;
 
 	return reward;
 }

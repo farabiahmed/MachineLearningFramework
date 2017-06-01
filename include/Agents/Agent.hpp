@@ -14,6 +14,8 @@
 #include "Representations/Representation.hpp"
 #include "ProbabilityDistributions/ProbabilityDistribution.hpp"
 #include "ProbabilityDistributions/DiscreteDistribution.hpp"
+#include "Miscellaneous/UserControl.hpp"
+#include "Miscellaneous/ConfigParser.hpp"
 
 using namespace std;
 /*
@@ -21,7 +23,7 @@ using namespace std;
  */
 class Agent {
 public:
-	Agent();
+	Agent(const ConfigParser& cfg);
 
 	virtual ~Agent();
 
@@ -43,6 +45,8 @@ protected:
 
 	Representation* valueFunction;
 
+	UserControl& userControl;
+
 	void Get_Cumulative_Rewards(unsigned numberof_bellmanupdate);  	///< It does the simulation for predefined times
 																	///< in a loop and fills the "rewards_cumulative".
 
@@ -57,6 +61,10 @@ protected:
 
 	unsigned number_of_simulations;				///< Holds the number of simulations that needs to
 												///< be done for performance evaluation.
+
+	unsigned max_steps_in_simulation;			///< It prevents the agent to stuck in a loop in the environment
+	 	 	 	 	 	 	 	 	 	 	 	///< It is recommended that to keep it high to know whether it
+	 	 	 	 	 	 	 	 	 	 	 	///< is stucked in the cumulative rewards plot.
 
 	unsigned bellman_stride_forsimulation;			///< Defines how many bellman updates should be discarded to
 											    ///< make simulation to plot the performance of agent.
