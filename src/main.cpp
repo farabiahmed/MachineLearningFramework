@@ -24,6 +24,7 @@
 #include <Representations/FunctionApproximatorNeuralNetwork.hpp>
 #include <Representations/TabularStateActionPair.hpp>
 
+#include <Miscellaneous/UserControl.hpp>
 
 #define __cplusplus 201103L
 
@@ -90,9 +91,13 @@ int main(int argc, char* argv[])
 	Agent* agent;
 
 	Neuron::alpha = 0.0;
-	Neuron::eta = 0.01;
-	Neuron::activation_function = Neuron::ACTIVATION_FUNCTION_LRELU;
+	Neuron::eta = 0.05;
+	Neuron::activation_function = Neuron::ACTIVATION_FUNCTION_TANH;
 
+	// User interrupt added for main thread, to cut the iterations
+	// on the fly and yet to get the reports. 
+	// If you write "stop" to console the agent will stop. 
+	UserControl& userControl = UserControl::GetInstance();
 
 	// Select Application
 	switch (choice)
@@ -284,6 +289,7 @@ int main(int argc, char* argv[])
 			break;
 	}
 
+	cout<<endl<<endl;
 
 	//Start Calculation
 	agent->Start_Execution();
@@ -307,3 +313,4 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
+
