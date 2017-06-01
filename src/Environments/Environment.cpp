@@ -35,7 +35,12 @@ SmartVector Environment::Get_Random_State()
 	while( state_index==-1 || Check_Blocked_State(state) ||  Check_Terminal_State(state))
 	{
 		// Get a random state index.
-		state_index = (int) (p->Generate_Random_Value() * (double)(states.size()-1));
+		double randomval = p->Generate_Random_Value();
+
+		state_index = (int) (randomval * (double)(states.size()-1));
+
+		// Inform user
+		//cout<<endl<<randomval<<"-"<<state_index<<endl;
 
 		// Randomly Select Initial State.
 		state = states[state_index];
