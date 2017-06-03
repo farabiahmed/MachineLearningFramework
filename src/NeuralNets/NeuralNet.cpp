@@ -43,6 +43,63 @@ NeuralNet::NeuralNet(const vector<unsigned> &topology) {
 	error = 0;
 }
 
+NeuralNet::NeuralNet(const vector<unsigned> &topology, const vector<vector<double>> &weights) {
+
+	// Get the number of layers
+	unsigned numLayers = topology.size();
+
+	unsigned weightsBiasOffset = numLayers - 1;
+
+	// Loop through desired number of layers and start to fill "layer" variable.
+	for (unsigned layerNum = 0; layerNum < numLayers; ++layerNum) {
+
+		// Add our new layer
+		layers.push_back(Layer());
+
+		// Get the number of outputs that a neuron should have in this layer
+		// by knowing the neurons of the next layer.
+		unsigned numOutputs = (layerNum < (numLayers - 1)) ? topology[layerNum+1] : 0;
+
+		// Add neurons as indicated in topology[layerNum]
+		// Don't forget to add bias neuron! That is why we used <= in loop.
+		for (unsigned neuronNum = 0; neuronNum <= topology[layerNum]; ++neuronNum) {
+
+			// Add neurons to our last created Layer
+			// vector.back() is used to get latest layer.
+			Neuron *newNeuron;
+
+			// It is output bias neuron. //TODO: Remove it -meaningless.
+			if(neuronNum == topology[layerNum] && layerNum == numLayers-1)
+				newNeuron = new Neuron(numOutputs,neuronNum);
+
+			// It is a bias neuron.
+			else if(neuronNum == topology[layerNum])
+				newNeuron = new Neuron(numOutputs,neuronNum, weights[weightsBiasOffset+layerNum]);
+
+			// It is a weight neuron
+			else
+			{
+				unsigned startIndex = neuronNum * numOutputs;
+				unsigned stopIndex = startIndex + numOutputs;
+
+				vector<double> weight(weights[layerNum].begin()+startIndex,	weights[layerNum].begin()+stopIndex);
+				newNeuron = new Neuron(numOutputs,neuronNum, weight);
+			}
+
+			layers.back().push_back(*newNeuron);
+			delete newNeuron;
+
+			//cout<<"A neuron created"<<endl;
+		}
+
+        // Force the bias node's output to 1.0 (it was the last neuron pushed in this layer):
+        layers.back().back().setOutputVal(1.0);
+	}
+
+	recentAverageError = -1;
+	error = 0;
+}
+
 NeuralNet::~NeuralNet() {
 	// TODO Auto-generated destructor stub
 }
@@ -192,7 +249,7 @@ void NeuralNet::Print()const
 	cout<<"---------------------------------------------"<<endl;
 	for (unsigned l = 0; l < layers.size(); ++l)
 	{
-		cout<<endl<<"Layer: "<<l<<endl;
+		cout<<"Layer: "<<l<<endl;
 
 		for (unsigned n = 0; n < layers[l].size(); ++n) {
 
@@ -200,11 +257,16 @@ void NeuralNet::Print()const
 
 			cout<<"\tNeuron: " << n << "\tWeights: ";
 
-			for (unsigned c = 0; c < neuron.outputWeights.size(); ++c) {
-				cout<< neuron.outputWeights[c].weight<<" ";
-			}
+			if(l==layers.size()-1)
+				cout<<"None";
+			else
+				for (unsigned c = 0; c < neuron.outputWeights.size(); ++c) {
+					cout<< setprecision(5) << neuron.outputWeights[c].weight<<" ";
+				}
 
 			cout<<endl;
 		}
+		cout<<endl;
 	}
+	cout<<endl;
 }
