@@ -16,14 +16,26 @@ Neuron::ACTIVATION_FUNCTION_TYPE Neuron::activation_function = Neuron::ACTIVATIO
 Neuron::Neuron(unsigned numOutputs,unsigned index)
 :myIndex(index)
 {
-
 	for (unsigned c = 0; c < numOutputs; ++c) {
 		outputWeights.push_back(Connection());
 		double temp = randomWeight();
 		outputWeights.back().weight = temp;
 		outputWeights.back().deltaWeight = 0;
 	}
+	outputVal = 0;
+	gradient = 0;
+}
 
+Neuron::Neuron(unsigned numOutputs,unsigned index, vector<double> initialWeight)
+:myIndex(index)
+{
+	for (unsigned c = 0; c < numOutputs; ++c) {
+		outputWeights.push_back(Connection());
+		outputWeights.back().weight = initialWeight[c];
+		outputWeights.back().deltaWeight = 0;
+	}
+	outputVal = 0;
+	gradient = 0;
 }
 
 Neuron::~Neuron() {
@@ -39,7 +51,7 @@ void Neuron::feedForward(const Layer &prevLayer)
 				* prevLayer[neuronNum].outputWeights[myIndex].weight;
 	}
 
-	outputVal = transferFunction(sum);
+	outputVal = Neuron::transferFunction(sum);
 }
 
 double Neuron::transferFunction(double x)
@@ -99,7 +111,7 @@ double Neuron::transferFunctionDerivative(double x)
 void Neuron::calcOutputGradients(double targetVal)
 {
 	double delta = targetVal - outputVal;
-	gradient = delta * Neuron::transferFunctionDerivative(outputVal);
+	gradient = - delta * Neuron::transferFunctionDerivative(outputVal);
 }
 
 void Neuron::calcHiddenGradients(const Layer &nextLayer)
@@ -138,9 +150,10 @@ void Neuron::updateInputWeights(Layer &prevLayer)
 				+ alpha
 				* oldDeltaWeight;
 
+		// Do gradient descent subtraction, so we have updated the weight.
+		neuron.outputWeights[myIndex].weight -= newDeltaWeight;
 
-		neuron.outputWeights[myIndex].weight += newDeltaWeight;
-
+		// Store delta weight to calculate momentum later.
 		neuron.outputWeights[myIndex].deltaWeight = newDeltaWeight;
 	}
 }

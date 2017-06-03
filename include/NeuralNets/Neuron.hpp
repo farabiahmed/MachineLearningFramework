@@ -38,6 +38,8 @@ public:
 
 	Neuron(unsigned numOutputs, unsigned index);
 
+	Neuron(unsigned numOutputs,unsigned index, vector<double> initialWeight);
+
 	virtual ~Neuron();
 
 	void feedForward(const Layer &prevLayer);
@@ -85,7 +87,7 @@ private:
 
 	// Static Methods
 
-	static double randomWeight(void){	return rand() / double(RAND_MAX);	}
+	static double randomWeight(void){	return rand() / double(RAND_MAX) * 2.0 + -1.0;	} // [-1 to 1]
 
 	static double transferFunction(double x);
 
@@ -93,8 +95,6 @@ private:
 
 	// Class Members
 	double outputVal;
-
-
 
 	unsigned myIndex;
 
