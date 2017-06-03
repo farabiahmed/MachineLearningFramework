@@ -27,7 +27,7 @@ Agent::~Agent() {
 
 void Agent::Get_Cumulative_Rewards(unsigned numberof_bellmanupdate)
 {
-	cout<<endl<<endl<<"Simulations Started:";
+	cout<<endl<<endl<<"Cumulative Rewards Collecting: [";
 
 	// Collect the performance of current session to draw a plot.
 	vector<double> rewards;
@@ -43,7 +43,7 @@ void Agent::Get_Cumulative_Rewards(unsigned numberof_bellmanupdate)
 	// pair: <numberof_bellmanupdate, rewards_for_that_bellmanupdate>
 	rewards_cumulative.push_back(pair);
 
-	cout<<"OK."<<endl<<endl;
+	cout<<" OK]"<<endl<<endl;
 }
 
 double Agent::Simulate(void)
@@ -80,8 +80,8 @@ double Agent::Simulate(void)
 		number_of_movement++;
 	}
 
-	if(number_of_movement>=max_steps_in_simulation)
-		cout<<endl<<"A Simulation step terminated since agent stucked in a loop."<<endl;
+	// If simulation stucked and then terminated, warn user.
+	if(number_of_movement>=max_steps_in_simulation) cout<<"x";
 
 	return reward;
 }
