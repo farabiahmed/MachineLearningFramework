@@ -11,6 +11,7 @@
 #include <cmath>
 #include "Agents/Agent.hpp"
 #include "Miscellaneous/ConfigParser.hpp"
+#include "Miscellaneous/UserControl.hpp"
 
 
 /*

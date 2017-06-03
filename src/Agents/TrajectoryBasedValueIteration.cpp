@@ -7,7 +7,9 @@
 
 #include "Agents/TrajectoryBasedValueIteration.hpp"
 
-TrajectoryBasedValueIteration::TrajectoryBasedValueIteration(const Environment* env, const Representation* rep, const ConfigParser& cfg) {
+TrajectoryBasedValueIteration::TrajectoryBasedValueIteration(const Environment* env, const Representation* rep, const ConfigParser& cfg)
+: Agent(cfg)
+{
 
 	environment = (Environment*)env;
 
@@ -43,6 +45,11 @@ TrajectoryBasedValueIteration::TrajectoryBasedValueIteration(const Environment* 
 	// It helps us to evaluate the performance of the agent by doing simulations in series.
 	number_of_simulations = cfg.GetValueOfKey<unsigned>("NUMBER_OF_SIMULATIONS",10);
 
+	// It prevents the agent to stuck in a loop in the environment
+	// It is recommended that to keep it high to know whether it
+	// is stucked in the cumulative rewards plot.
+	max_steps_in_simulation = cfg.GetValueOfKey<unsigned>("MAX_STEPS_IN_SIMULATION",100);
+
 	// Defines how many bellman updates should be discarded to make simulation to
 	// plot the performance of agent.
 	bellman_stride_forsimulation = cfg.GetValueOfKey<unsigned>("BELLMAN_STRIDE_FORSIMULATION",50);
@@ -64,7 +71,7 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 		cout<<"Iteration #: " << num_of_iteration;
 
 		// Q Value Update Value (currentQ-expectedQ)
-		double diff=0;
+		vector<double> diff;
 
 		vector<pair<SmartVector,SmartVector>> trajectory;
 		SmartVector state = environment->Get_Random_State();
@@ -116,19 +123,15 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 				double currentQValue = valueFunction->Get_Value(state,action);
 
 				// Update the difference value between new and old value
-				// if the current one is bigger than old one.
-				if( abs( currentQValue - Q_plus ) > diff)
-				{
-					diff = abs( currentQValue - Q_plus);
-				}
+				diff.push_back(abs( currentQValue - Q_plus));
+
 
 				// Update Value
 				valueFunction->Set_Value(state,action,Q_plus);
 
 				numberof_bellmanupdate++;
 
-				unsigned mod = (numberof_bellmanupdate % bellman_stride_forsimulation);
-				if(mod == 0)
+				if(numberof_bellmanupdate % bellman_stride_forsimulation == 0)
 				{
 					// Get the cumulative rewards for the current bellman update.
 					Get_Cumulative_Rewards(numberof_bellmanupdate);
@@ -136,12 +139,25 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 			}
 		}// Trajectory Loop
 
-		cout<<" Diff:"<<diff<<endl;
+		// Calculate mean diff
+		double sum_diff = 0;
+		double mean_diff = 0;
+		for (unsigned i = 0; i < diff.size(); ++i) {
+			sum_diff += diff[i];
+		}
+		mean_diff = sum_diff / (double) (diff.size());
+		cout<<" Diff: "<< mean_diff <<endl;
 
 		// Check whether stopping criteria reached.
-		if(diff<epsilon)
+		if(mean_diff<epsilon)
 		{
-			cout << "Stopping Iterations. Diff: " << diff <<endl;
+			cout << "Stopping Iterations. Diff: " << mean_diff <<endl;
+
+			// If agent finishes before reaching BELLMAN_STRIDE_FORSIMULATION
+			// run a simulation to evaluate performance.
+			if(!rewards_cumulative.size())
+				Get_Cumulative_Rewards(numberof_bellmanupdate);
+
 			return true;
 		}
 

@@ -7,8 +7,9 @@
 
 #include <Agents/QIteration.hpp>
 
-QIteration::QIteration(const Environment* env, const Representation* rep, const ConfigParser& cfg) {
-
+QIteration::QIteration(const Environment* env, const Representation* rep, const ConfigParser& cfg)
+: Agent(cfg)
+{
 	Name = "Q-Iteration Agent";
 
 	// Dependency Injection Pattern, constructor style
@@ -33,6 +34,11 @@ QIteration::QIteration(const Environment* env, const Representation* rep, const 
 	// It helps us to evaluate the performance of the agent by doing simulations in series.
 	number_of_simulations = cfg.GetValueOfKey<unsigned>("NUMBER_OF_SIMULATIONS",10);
 
+	// It prevents the agent to stuck in a loop in the environment
+	// It is recommended that to keep it high to know whether it
+	// is stucked in the cumulative rewards plot.
+	max_steps_in_simulation = cfg.GetValueOfKey<unsigned>("MAX_STEPS_IN_SIMULATION",100);
+
 	// Defines how many bellman updates should be discarded to make  a series of
 	// simulations to show the performance of agent.
 	bellman_stride_forsimulation = cfg.GetValueOfKey<unsigned>("BELLMAN_STRIDE_FORSIMULATION",50);
@@ -50,10 +56,16 @@ bool QIteration::Start_Execution()
 
 	for (int num_of_iteration = 0; num_of_iteration < max_number_of_iterations; num_of_iteration++)
 	{
+		if(userControl.GetMessage()=="stop")
+		{
+			break;
+		}
+
 		cout<<"Iteration #: " << num_of_iteration;
 
 		// Q Value Update Value (currentQ-expectedQ)
-		double diff=0;
+		// initialize with zero
+		vector<double> diff;
 
 		// Loop through all states
 		for(unsigned int index_state=0; index_state < states.size(); index_state++)
@@ -97,13 +109,11 @@ bool QIteration::Start_Execution()
 						expectedValue += probability * (reward + gamma * maxQvalue);
 					}
 
+					// Get the current Q value from representation object.
 					double currentQValue = valueFunction->Get_Value(currentState,currentAction);
 
-					// Update the difference value between new and old value if the current one is bigger than old one.
-					if( abs( currentQValue - expectedValue ) > diff)
-					{
-						diff = abs( currentQValue - expectedValue);
-					}
+					// Update the difference value between new and old value
+					diff.push_back(abs( currentQValue - expectedValue));
 
 					// Update Q Value by newest estimate.
 					valueFunction->Set_Value(currentState, currentAction, expectedValue);
@@ -118,12 +128,25 @@ bool QIteration::Start_Execution()
 			}// End of action loop
 		}// End of state loop
 
-		cout<<" Diff:"<<diff<<endl;
+		// Calculate mean diff
+		double sum_diff = 0;
+		double mean_diff = 0;
+		for (unsigned i = 0; i < diff.size(); ++i) {
+			sum_diff += diff[i];
+		}
+		mean_diff = sum_diff / (double) diff.size();
+		cout<<" Diff: "<< mean_diff <<endl;
 
 		// Check whether stopping criteria reached.
-		if(diff<epsilon)
+		if(mean_diff<epsilon)
 		{
-			cout << "Stopping Iterations. Diff: " << diff <<endl;
+			cout << "Stopping Iterations. Diff: " << mean_diff <<endl;
+
+			// If agent finishes before reaching BELLMAN_STRIDE_FORSIMULATION
+			// run a simulation to evaluate performance.
+			if(!rewards_cumulative.size())
+				Get_Cumulative_Rewards(numberof_bellmanupdate);
+
 			return true;
 		}
 
