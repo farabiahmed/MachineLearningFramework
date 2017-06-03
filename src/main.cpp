@@ -90,8 +90,8 @@ int main(int argc, char* argv[])
 	Representation* value;
 	Agent* agent;
 
-	Neuron::alpha = 0.0;
-	Neuron::eta = 0.05;
+	Neuron::alpha = 0.5;
+	Neuron::eta = 0.1;
 	Neuron::activation_function = Neuron::ACTIVATION_FUNCTION_TANH;
 
 	// User interrupt added for main thread, to cut the iterations
