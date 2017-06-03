@@ -25,11 +25,17 @@ FunctionApproximatorNeuralNetwork::FunctionApproximatorNeuralNetwork(const Envir
 	// Get the learning rate for neural network
 	Neuron::eta = cfg.GetValueOfKey<double>("ETA_LEARNING_RATE",0.15);
 
+	// Batch size for learning multiple samples at a time for neural networks
+	int batch_size = cfg.GetValueOfKey< int >("BATCH_SIZE",10);
+
+	// Batch size for learning multiple samples at a time for neural networks
+	numberof_training_pass = cfg.GetValueOfKey< int >("TRAINING_PASS_PER_BATCH",100);
+
 	// e.g., { 3, 2, 1 }
 	vector<unsigned> topology;
 
 	// Input Layer: Total number of states are the number of input neurons.
-	topology.push_back(states[0].dimension);
+	topology.push_back(states[0].dimension + actions[0].dimension);
 
 	// Hidden Layers
 	for (unsigned i = 0; i < hidden_layers.size(); ++i) {
@@ -42,10 +48,27 @@ FunctionApproximatorNeuralNetwork::FunctionApproximatorNeuralNetwork(const Envir
 	}
 
 	// Output Layer: is the actions.
-	topology.push_back(actions.size());
+	topology.push_back(1);
 
 	// Create network model
 	network = new NeuralNet(topology);
+
+	// Create batch container, it will be loaded when set_value method called.
+	batch_features = vector<vector<double>>(batch_size);
+	for (unsigned i = 0; i < batch_features.size(); ++i)
+	{
+		// Each sample contains features first, then labels.
+		batch_features[i] = vector<double>(network->GetSizeOfInputLayer());
+	}
+	batch_labels = vector<vector<double>>(batch_size);
+	for (unsigned i = 0; i < batch_labels.size(); ++i)
+	{
+		// Each sample contains features first, then labels.
+		batch_labels[i] = vector<double>(network->GetSizeOfOutputLayer());
+	}
+
+	// Initialize privates
+	batchindex=0;
 }
 
 FunctionApproximatorNeuralNetwork::~FunctionApproximatorNeuralNetwork() {
@@ -56,31 +79,14 @@ FunctionApproximatorNeuralNetwork::~FunctionApproximatorNeuralNetwork() {
 
 pair<int,double> FunctionApproximatorNeuralNetwork::Get_Greedy_Pair(const SmartVector& state) const
 {
-	// Form the input vector.
-	vector<double> inputVals(network->GetSizeOfInputLayer(),0);
-
 	// Form the output vector.
-	vector<double> resultVals(network->GetSizeOfOutputLayer(),0);
+	vector<double> resultVals;
 
-	// Avoid the indexes that are out of limits.
-	assert(state.dimension == (int)inputVals.size());
+	vector<SmartVector> actions = environment->Get_Action_List(state);
 
-	// TODO: Edit the comment according to new topology.
-	// Fill the input data:
-	// Our input vector is formed as follows:
-	// input = {input_1, input_2, ..., input_n}
-	// where 	n is the size of states,
-	//			input_i is 1 if it is belong to that state,
-	//			input_i is 0 otherwise.
-	for (int i = 0; i < state.dimension; ++i) {
-		inputVals[i] = (state.elements[i]  - environment->state_mean[i]) * environment->state_scalar[i] ;
+	for (unsigned i = 0; i < actions.size(); ++i) {
+		resultVals.push_back( Get_Value(state,actions[i]) );
 	}
-
-	// Feed forward the input:
-	network->feedForward(inputVals);
-
-	// Collect the net's actual output results:
-	network->getResults(resultVals);
 
 	// initialize max value with minimum to update itself with the smallest bigger value.
 	double maxVal = std::numeric_limits<double>::lowest();
@@ -101,39 +107,42 @@ pair<int,double> FunctionApproximatorNeuralNetwork::Get_Greedy_Pair(const SmartV
 void FunctionApproximatorNeuralNetwork::Set_Value(const SmartVector& state, const SmartVector& action, double val)
 {
 	// Form the target/label vector.
-	vector<double> targetVals(network->GetSizeOfOutputLayer(),0);
+	//vector<double> targetVals(network->GetSizeOfOutputLayer(),0);
 
 	// Form the input vector.
 	vector<double> inputVals(network->GetSizeOfInputLayer(),0);
+
 	for (int i = 0; i < state.dimension; ++i) {
 		inputVals[i] = (state.elements[i]  - environment->state_mean[i]) * environment->state_scalar[i];
 	}
+	for (int i = 0; i < action.dimension; ++i) {
+		inputVals[ i + state.size() ] = (action.elements[i]  - environment->action_mean[i]) * environment->action_scalar[i];
+	}
 
+	// insert new samples and labels
+	batch_features	[batchindex] 	= inputVals;
+	batch_labels	[batchindex]	= vector<double>(network->GetSizeOfOutputLayer(),val);
+	batchindex++;
 
-	// Initialize training vector
-	// Our training vector is formed as follows:
-	// target = {target_1, target_2, ..., target_n}
-	// where 	n is the size of actions,
-	//			target_i is given-value 	:if it is belong to given action,
-	//			target_i is existing-value	:otherwise.
+	if(batchindex>=batch_features.size())
+	{
+		batchindex = 0;
 
-	// In order to get the existing-value we need to feed-forward current
-	// input to get other actions' QValue.
+		for (unsigned i = 0; i < numberof_training_pass; ++i) {
 
-	// Feed forward the input:
-	network->feedForward(inputVals);
+			for (unsigned j = 0; j < batch_features.size(); ++j)
+			{
+				// Feed forward the input:
+				network->feedForward(batch_features[j]);
 
-	// Collect the net's actual output results to our targetVals variable:
-	network->getResults(targetVals);
-
-	// Modify the target with given new Q Value.
-	targetVals[action.index] = val;
-
-	// Train the net what the outputs should have been:
-	network->backPropagation(targetVals);
+				// Train the net what the outputs that collected:
+				network->backPropagation(batch_labels[j]);
+			}
+		}
+	}
 
 	// Report how well the training is working, average over recent samples:
-	//cout << endl<< "Error: " << network->getRecentAverageError() << endl;
+	// cout <<endl<<"NetworkError: " << network->getRecentAverageError() <<endl;
 	errorList.push_back(network->getRecentAverageError() );
 }
 
@@ -146,8 +155,8 @@ double FunctionApproximatorNeuralNetwork::Get_Value(const SmartVector& state, co
 	vector<double> resultVals(network->GetSizeOfOutputLayer(),0);
 
 	// Avoid the indexes that are out of limits.
-	assert(state.dimension == (int)inputVals.size());
-	assert(action.index	>=0 	&& 		action.index< (int)resultVals.size());
+	assert( (state.dimension + action.dimension) == (int)inputVals.size());
+	assert( 1 == (int)resultVals.size());
 
 	// TODO: Edit The comment
 	// Fill the input data:
@@ -160,6 +169,9 @@ double FunctionApproximatorNeuralNetwork::Get_Value(const SmartVector& state, co
 		inputVals[i] = (state.elements[i]  - environment->state_mean[i]) * environment->state_scalar[i];
 	}
 
+	for (int i = 0; i < action.dimension; ++i) {
+		inputVals[ i + state.size() ] = (action.elements[i]  - environment->action_mean[i]) * environment->action_scalar[i];
+	}
 
 	// Feed forward the input:
 	network->feedForward(inputVals);
@@ -168,16 +180,16 @@ double FunctionApproximatorNeuralNetwork::Get_Value(const SmartVector& state, co
 	network->getResults(resultVals);
 
 	// Return the requested value.
-	return resultVals[action.index];
+	return resultVals[0];
 }
 
 SmartVector FunctionApproximatorNeuralNetwork::Get_Policy(const SmartVector& state) const
 {
-	SmartVector vec;
+	// Get Best Policy Index
+	pair<int,double> policyInfo = Get_Greedy_Pair(state);
 
-	cout<<endl<<"NOT IMPLEMENTED YET"<<endl<<endl;
-
-	return vec;
+	// Return It
+	return environment->Get_Action_List(state)[policyInfo.first];
 }
 
 void FunctionApproximatorNeuralNetwork::Print_Value()
@@ -196,24 +208,11 @@ void FunctionApproximatorNeuralNetwork::Print_Value()
 
 		cout<<"State #"<<i<< ":";
 
-		// Get the current state
-		SmartVector state = states[i];
+		auto actions = environment->Get_Action_List(states[i]);
 
-		// Initialize the input with zeros than change the related one.
-		inputVals = vector<double>(network->GetSizeOfInputLayer(),0);
-		for (int i = 0; i < state.dimension; ++i) {
-			inputVals[i] = (state.elements[i]  - environment->state_mean[i]) * environment->state_scalar[i];
-		}
-
-		// Feed forward the input:
-		network->feedForward(inputVals);
-
-		// Collect the net's actual output results:
-		network->getResults(resultVals);
-
-		for (unsigned j = 0; j < resultVals.size(); ++j)
+		for (unsigned j = 0; j < actions.size(); ++j)
 		{
-			double QValue = resultVals[j];
+			double QValue = Get_Value(states[i],actions[j]);
 
 			cout <<  setw(10) << setprecision(5) << QValue << "   ";
 		}

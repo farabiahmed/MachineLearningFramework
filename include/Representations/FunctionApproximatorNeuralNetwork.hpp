@@ -43,6 +43,17 @@ public:
 private:
 	vector<double> errorList;
 
+	vector<vector<double>> batch_features;
+	vector<vector<double>> batch_labels;
+
+	unsigned batchindex; 	/// It will be increased as every new sample received.
+	 	 	 	 	 	 	/// Training process will start after reaching maxsize
+	 	 	 	 	 	 	/// of batch samples (batch_samples.size())
+
+	unsigned numberof_training_pass; /// It determines how many backprobagation training
+	 	 	 	 	 	 	 	 	 /// will be done for current batch
+
+
 protected:
 	NeuralNet* network;
 };
