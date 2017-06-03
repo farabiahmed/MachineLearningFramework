@@ -53,7 +53,7 @@ void NeuralNet::feedForward(const vector<double> &inputVals)
 	// Otherwise throw runtime error.
 	assert(inputVals.size()==layers[0].size()-1);
 
-	// Assign the input values into the input neurons.
+	// Assign (latch) the input values into the input neurons.
 	for (unsigned i = 0; i < inputVals.size(); ++i) {
 		layers[0][i].setOutputVal(inputVals[i]);
 	}
@@ -92,8 +92,11 @@ void NeuralNet::backPropagation(const vector<double> &targetVals)
 		error += delta * delta;
 	}
 
-	error /= outputLayer.size() - 1;
-	error = sqrt(error); // RMS
+	// Mean Squared Error (MSE)
+	error /= (double)(outputLayer.size() - 1);
+
+	// Root Mean Squared Error (RMSE)
+	//error = sqrt(error);
 
 	// Implement a recent average measurement
 
