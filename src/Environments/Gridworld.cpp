@@ -380,6 +380,8 @@ void Gridworld::Display_Action(const SmartVector& action) const
 
 void Gridworld::Display_Policy(const Representation& rep)  const
 {
+	cout<<endl<<endl<<"Displaying Policy Status:"<<endl;
+
 	int Policy[number_of_rows][number_of_columns];
 	double maxQValue=0;
 
