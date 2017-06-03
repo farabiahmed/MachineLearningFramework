@@ -148,7 +148,25 @@ void RepresentationUDP::Set_Value(const SmartVector& state, const SmartVector& a
 
 void RepresentationUDP::Print_Value()
 {
+	cout<<endl<<"Displaying State-Action Pair Q Value:"<<endl;
 
+	vector<SmartVector> states = environment->Get_All_Possible_States();
+
+	for (unsigned i = 0; i < states.size(); ++i) {
+
+		cout<<"State #"<<i<< ":";
+
+		auto actions = environment->Get_Action_List(states[i]);
+
+		for (unsigned j = 0; j < actions.size(); ++j)
+		{
+			double QValue = Get_Value(states[i],actions[j]);
+
+			cout <<  setw(10) << setprecision(5) << QValue << "   ";
+		}
+		cout<<endl;
+	}
+	cout<<endl;
 }
 
 string RepresentationUDP::Vector_ToString(const SmartVector& vec) const
