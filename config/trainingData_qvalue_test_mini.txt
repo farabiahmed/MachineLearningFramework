@@ -1,5 +1,5 @@
 topology: 3 4 4
-iteration: 2500
+iteration: 25000
 in: 1.0 0.0 0.0
 out: 0.59 0.64 0.53 0.57
 in: 0.0 1.0 0.0
