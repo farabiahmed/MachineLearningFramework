@@ -44,6 +44,13 @@ make unittest/SmartVector_unittest
 ```
 ./bin/SmartVector_unittest
 ```
+
+### Post Processing
+This python script will produce all figures in '''log''' folder with related date.  
+```
+python3 scripts/python/parser_agentReport.py 
+```
+
 ## Developped Modules
 * Agents : Some popular algorithms to solve MDPs.
   * Qiteration
