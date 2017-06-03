@@ -5,7 +5,8 @@
 
 namespace plt = matplotlibcpp;
 
-int main()
+
+void test1()
 {
     // Prepare data.
     int n = 5000;
@@ -28,6 +29,7 @@ int main()
     plt::xlim(0, 1000*1000);
     // Enable legend.
     plt::legend();
+
     // Save the image (file format is determined by the extension)
     plt::save("./log/basic.png");
     plt::show();
@@ -35,7 +37,11 @@ int main()
     plt::figure();
     plt::named_plot("log(x)", x, z);
     plt::show();
+}
 
+int main()
+{
+	test1();
 }
 
 // g++ basic.cpp -lpython2.7
