@@ -38,6 +38,14 @@ Neuron::Neuron(unsigned numOutputs,unsigned index, vector<double> initialWeight)
 	gradient = 0;
 }
 
+void Neuron::SetOutputWeights(vector<double> initialWeight)
+{
+	for (unsigned c = 0; c < outputWeights.size(); ++c)
+	{
+		outputWeights[c].weight = initialWeight[c];
+	}
+}
+
 Neuron::~Neuron() {
 	// TODO Auto-generated destructor stub
 }

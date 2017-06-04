@@ -68,16 +68,25 @@ int main(int argc, char* argv[])
 	// Check the number of parameters given.
 	if(argc == 1)
 	{
+		// Ex:
+		// ./bin/NeuralNet_initialWeight_unittest
+
 		filename_trainingdata = "config/dataset_qvalue_mini.csv";
 		filename_weights = "config/weights_tensorflow.csv";
 	}
 	else if (argc == 2)
 	{
-		filename_trainingdata = "config/dataset_qvalue_mini.csv";
+		// Ex:
+		// ./bin/NeuralNet_initialWeight_unittest config/dataset_qvalue_mini.csv
+
+		filename_trainingdata = string(argv[1]);
 		filename_weights = "";
 	}
 	else
 	{
+		// Ex:
+		// ./bin/NeuralNet_initialWeight_unittest config/dataset_qvalue_mini.csv config/weights_tensorflow.csv
+
 		filename_trainingdata = string(argv[1]);
 		filename_weights = string(argv[2]);
 	}
@@ -85,22 +94,26 @@ int main(int argc, char* argv[])
 	// Menu for user
 	help_menu();
 
-	int numOfIteration=0;
-
-	// Holds the errorlist
+	// Some lists to hold plotting related variables.
 	vector<double> errorlist;
 	vector<double> iterationlist, samplelist;
+
+	// Batch samples of input-output lists.
+	vector<vector<double>> batchInput, batchLabel;
+
+	// Temporary variables
+	vector<double> inputVals, targetVals, resultVals, estimatedVals;
+
 
 	// Set the neuron parameters.
 	Neuron::alpha = 0.0;
 	Neuron::eta = 0.1;
 	Neuron::activation_function = Neuron::ACTIVATION_FUNCTION_TANH;
 
+	// Set the number of iterations
+	int numOfIteration = 5000;
 
-	vector<vector<double>> batchInput, batchLabel;
-	vector<double> inputVals, targetVals, resultVals, estimatedVals;
-
-
+	// Read Training Data File and load them to batchInput and batchLabel variables
 	ifstream file ( filename_trainingdata );
 	string value;
 	while ( file.good() )
@@ -120,31 +133,40 @@ int main(int argc, char* argv[])
 	}
 	file.close();
 
-	ifstream fileWeights ( filename_weights );
-	while ( fileWeights.good() )
+	// If initial weights are given load them to weights container.
+	if(filename_weights!="")
 	{
-	     getline ( fileWeights, value ); // read a string until next comma: http://www.cplusplus.com/reference/string/getline/
+		ifstream fileWeights ( filename_weights );
+		while ( fileWeights.good() )
+		{
+			 getline ( fileWeights, value ); // read a string until next comma: http://www.cplusplus.com/reference/string/getline/
 
-	     vector<double> weight = Convert::string_to_T<vector<double>>(value);
+			 vector<double> weight = Convert::string_to_T<vector<double>>(value);
 
-	     weights.push_back(weight);
+			 weights.push_back(weight);
+		}
+		fileWeights.close();
 	}
-	fileWeights.close();
+
 
 	// Inform the user.
-	cout<< endl << "End of Training Data" << endl;
-	cout<< "Number Of Input Data: " << batchInput.size()<<endl;
+	cout<< endl << "End of Fetching Training Data" << endl;
 
+	cout<< endl << "Number Of Input Data: " << batchInput.size()<<endl;
 
 	// Create a topology that holds layers and neurons
-	// e.g., { 3, 2, 1 }
 	vector<unsigned> topology;
+	// Input units
 	topology.push_back(batchInput[0].size());
+	// Hidden units
 	topology.push_back(4);
+	// Output Units
 	topology.push_back(batchLabel[0].size());
-	numOfIteration = 30000 * batchInput.size();
 
-	NeuralNet myNet(topology,weights);
+	NeuralNet myNet(topology);
+
+	if(weights.size()>0)
+		myNet.SetInitialWeights(weights);
 
 	// Print Info
 	myNet.Print();
@@ -162,57 +184,62 @@ int main(int argc, char* argv[])
 
 	int trainingPass = 0;
 
+	// Main Training Loop
 	while (trainingPass<numOfIteration)
 	{
 		++trainingPass;
 		cout << endl << "\033[32m Pass " << trainingPass << ": ";
 
-		inputVals = batchInput[(trainingPass-1)%batchInput.size()];
-
-		showVectorVals("\033[33m Inputs:", inputVals);
-		myNet.feedForward(inputVals);
-
-		// Collect the net's actual output results:
-		myNet.getResults(resultVals);
-		showVectorVals("\033[34m Outputs:", resultVals);
-
-		// Train the net what the outputs should have been:
-		targetVals = batchLabel[(trainingPass-1)%batchLabel.size()];
-		showVectorVals(" Targets:", targetVals);
-		assert(targetVals.size() == topology.back());
-
-		myNet.backPropagation(targetVals);
-
-		// Report how well the training is working, average over recent samples:
-		cout << "\033[31m Net recent average error: "
-				<< myNet.getRecentAverageError() << endl;
-
-		if((trainingPass%batchInput.size()) == 0)
+		// Batch Input Training
+		double batchError = 0;
+		for (unsigned i = 0; i < batchInput.size(); ++i)
 		{
-			// Batch Training Completed
+			inputVals = batchInput[i];
 
-			// Print Info
-			myNet.Print();
+			//showVectorVals("\033[33m Inputs:", inputVals);
+			myNet.feedForward(inputVals);
 
-			if (trainingPass%1000)
+			// Collect the net's actual output results:
+			myNet.getResults(resultVals);
+			//showVectorVals("\033[34m Outputs:", resultVals);
+
+			// Train the net what the outputs should have been:
+			targetVals = batchLabel[i];
+			//showVectorVals(" Targets:", targetVals);
+			assert(targetVals.size() == topology.back());
+
+			myNet.backPropagation(targetVals);
+
+			// Report how well the training is working, average over recent samples:
+			//cout << "\033[31m Net recent average error: "
+			//		<< myNet.getRecentAverageError() << endl;
+
+			batchError += myNet.getRecentAverageError();
+		}
+		batchError /= (double) batchInput.size();
+
+		// Print Info
+		//myNet.Print();
+
+		if (trainingPass%1000)
+		{
+			iterationlist.push_back(trainingPass);
+			errorlist.push_back(batchError);
+			// Get weights value history.
+			int weightNumber=0;
+			for(unsigned layer=0; layer<topology.size()-1;layer++)
 			{
-				iterationlist.push_back(trainingPass);
-				errorlist.push_back(myNet.getRecentAverageError());
-				// Get weights value history.
-				int weightNumber=0;
-				for(unsigned layer=0; layer<topology.size()-1;layer++)
+				for (unsigned  neuron = 0; neuron < topology[layer]+1; ++neuron)
 				{
-					for (unsigned  neuron = 0; neuron < topology[layer]+1; ++neuron)
+					for (unsigned  connection = 0; connection < topology[layer+1]; ++connection)
 					{
-						for (unsigned  connection = 0; connection < topology[layer+1]; ++connection)
-						{
-							weightlist[weightNumber++].push_back(myNet.GetWeight(layer,neuron,connection));
-							//cout<<layer<<"-"<<neuron<<"-"<<connection<<endl;
-						}
+						weightlist[weightNumber++].push_back(myNet.GetWeight(layer,neuron,connection));
+						//cout<<layer<<"-"<<neuron<<"-"<<connection<<endl;
 					}
 				}
 			}
 		}
+
 	}
 
 	cout<<"\033[0m"<<endl; //Reset the color.
@@ -220,7 +247,6 @@ int main(int argc, char* argv[])
 	cout << endl << "Training Done" << endl;
 
 	cout << endl << "Testing..." << endl;
-
 
 	samplelist.clear();
 	for (unsigned i = 0; i < batchInput.size(); ++i)

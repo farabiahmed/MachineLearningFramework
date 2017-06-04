@@ -42,6 +42,8 @@ public:
 
 	virtual ~Neuron();
 
+	void SetOutputWeights(vector<double> initialWeight);
+
 	void feedForward(const Layer &prevLayer);
 
 	double getOutputVal(void) const { return outputVal; }

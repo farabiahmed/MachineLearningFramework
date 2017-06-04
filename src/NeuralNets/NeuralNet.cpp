@@ -30,7 +30,16 @@ NeuralNet::NeuralNet(const vector<unsigned> &topology) {
 
 			// Add neurons to our last created Layer
 			// vector.back() is used to get latest layer.
-			layers.back().push_back(Neuron(numOutputs,neuronNum));
+
+			if(neuronNum == topology[layerNum])
+			{
+				// It is a bias neuron, then set its output-weights to zero.
+				vector<double> weights(numOutputs,0);
+				layers.back().push_back(Neuron(numOutputs,neuronNum,weights));
+			}
+			else
+				// It is a normal neuron
+				layers.back().push_back(Neuron(numOutputs,neuronNum));
 
 			//cout<<"A neuron created"<<endl;
 		}
@@ -43,38 +52,35 @@ NeuralNet::NeuralNet(const vector<unsigned> &topology) {
 	error = 0;
 }
 
-NeuralNet::NeuralNet(const vector<unsigned> &topology, const vector<vector<double>> &weights) {
-
+void NeuralNet::SetInitialWeights(const vector<vector<double>> &weights)
+{
 	// Get the number of layers
-	unsigned numLayers = topology.size();
+	unsigned numLayers = layers.size();
 
 	unsigned weightsBiasOffset = numLayers - 1;
 
 	// Loop through desired number of layers and start to fill "layer" variable.
 	for (unsigned layerNum = 0; layerNum < numLayers; ++layerNum) {
 
-		// Add our new layer
-		layers.push_back(Layer());
-
 		// Get the number of outputs that a neuron should have in this layer
 		// by knowing the neurons of the next layer.
-		unsigned numOutputs = (layerNum < (numLayers - 1)) ? topology[layerNum+1] : 0;
+		unsigned numOutputs = (layerNum < (numLayers - 1)) ? layers[layerNum+1].size()-1 : 0;
 
 		// Add neurons as indicated in topology[layerNum]
 		// Don't forget to add bias neuron! That is why we used <= in loop.
-		for (unsigned neuronNum = 0; neuronNum <= topology[layerNum]; ++neuronNum) {
+		for (unsigned neuronNum = 0; neuronNum <= layers[layerNum].size()-1; ++neuronNum) {
 
-			// Add neurons to our last created Layer
-			// vector.back() is used to get latest layer.
-			Neuron *newNeuron;
+			// Get the reference of current neuron that we want to set its weights
+			Neuron &neuron = layers[layerNum][neuronNum];
 
 			// It is output bias neuron. //TODO: Remove it -meaningless.
-			if(neuronNum == topology[layerNum] && layerNum == numLayers-1)
-				newNeuron = new Neuron(numOutputs,neuronNum);
+			if(neuronNum == layers[layerNum].size()-1 && layerNum == numLayers-1)
+			{
 
+			}
 			// It is a bias neuron.
-			else if(neuronNum == topology[layerNum])
-				newNeuron = new Neuron(numOutputs,neuronNum, weights[weightsBiasOffset+layerNum]);
+			else if(neuronNum == layers[layerNum].size()-1)
+				neuron.SetOutputWeights(weights[weightsBiasOffset+layerNum]);
 
 			// It is a weight neuron
 			else
@@ -83,21 +89,11 @@ NeuralNet::NeuralNet(const vector<unsigned> &topology, const vector<vector<doubl
 				unsigned stopIndex = startIndex + numOutputs;
 
 				vector<double> weight(weights[layerNum].begin()+startIndex,	weights[layerNum].begin()+stopIndex);
-				newNeuron = new Neuron(numOutputs,neuronNum, weight);
+				neuron.SetOutputWeights(weight);
 			}
-
-			layers.back().push_back(*newNeuron);
-			delete newNeuron;
-
-			//cout<<"A neuron created"<<endl;
 		}
-
-        // Force the bias node's output to 1.0 (it was the last neuron pushed in this layer):
-        layers.back().back().setOutputVal(1.0);
 	}
 
-	recentAverageError = -1;
-	error = 0;
 }
 
 NeuralNet::~NeuralNet() {

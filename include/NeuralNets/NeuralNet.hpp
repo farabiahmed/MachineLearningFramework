@@ -28,8 +28,8 @@ typedef vector<Neuron> Layer;
 class NeuralNet {
 public:
 	NeuralNet(const vector<unsigned> &topology);
-	NeuralNet(const vector<unsigned> &topology, const vector<vector<double>> &weights);
 	virtual ~NeuralNet();
+	void SetInitialWeights(const vector<vector<double>> &weights);
 	void feedForward(const vector<double> &inputVals);
 	void backPropagation(const vector<double> &targetVals);
 	void getResults(vector<double> &resultVals) const;
