@@ -65,11 +65,16 @@ int main(int argc, char* argv[])
 
 	vector<vector<double>> weights;
 
-	// Check the number of parameters
-	if (argc < 3)
+	// Check the number of parameters given.
+	if(argc == 1)
 	{
 		filename_trainingdata = "config/dataset_qvalue_mini.csv";
 		filename_weights = "config/weights_tensorflow.csv";
+	}
+	else if (argc == 2)
+	{
+		filename_trainingdata = "config/dataset_qvalue_mini.csv";
+		filename_weights = "";
 	}
 	else
 	{
@@ -86,11 +91,13 @@ int main(int argc, char* argv[])
 	vector<double> errorlist;
 	vector<double> iterationlist, samplelist;
 
+	// Set the neuron parameters.
 	Neuron::alpha = 0.0;
 	Neuron::eta = 0.1;
 	Neuron::activation_function = Neuron::ACTIVATION_FUNCTION_TANH;
 
-	vector<vector<double>> inputContainer, targetContainer;
+
+	vector<vector<double>> batchInput, batchLabel;
 	vector<double> inputVals, targetVals, resultVals, estimatedVals;
 
 
@@ -105,11 +112,11 @@ int main(int argc, char* argv[])
 	     for (unsigned i = 0; i < tokens.size()-1; ++i) {
 	    	 inputVals.push_back((double)stod(tokens[i]));
 	     }
-		 inputContainer.push_back(inputVals);
+		 batchInput.push_back(inputVals);
 
 	     targetVals.clear();
 	     targetVals.push_back((double)stod(tokens.back()));
-		 targetContainer.push_back(targetVals);
+		 batchLabel.push_back(targetVals);
 	}
 	file.close();
 
@@ -126,16 +133,16 @@ int main(int argc, char* argv[])
 
 	// Inform the user.
 	cout<< endl << "End of Training Data" << endl;
-	cout<< "Number Of Input Data: " << inputContainer.size()<<endl;
+	cout<< "Number Of Input Data: " << batchInput.size()<<endl;
 
 
 	// Create a topology that holds layers and neurons
 	// e.g., { 3, 2, 1 }
 	vector<unsigned> topology;
-	topology.push_back(inputContainer[0].size());
+	topology.push_back(batchInput[0].size());
 	topology.push_back(4);
-	topology.push_back(targetContainer[0].size());
-	numOfIteration = 30000 * inputContainer.size();
+	topology.push_back(batchLabel[0].size());
+	numOfIteration = 30000 * batchInput.size();
 
 	NeuralNet myNet(topology,weights);
 
@@ -160,7 +167,7 @@ int main(int argc, char* argv[])
 		++trainingPass;
 		cout << endl << "\033[32m Pass " << trainingPass << ": ";
 
-		inputVals = inputContainer[(trainingPass-1)%inputContainer.size()];
+		inputVals = batchInput[(trainingPass-1)%batchInput.size()];
 
 		showVectorVals("\033[33m Inputs:", inputVals);
 		myNet.feedForward(inputVals);
@@ -170,7 +177,7 @@ int main(int argc, char* argv[])
 		showVectorVals("\033[34m Outputs:", resultVals);
 
 		// Train the net what the outputs should have been:
-		targetVals = targetContainer[(trainingPass-1)%targetContainer.size()];
+		targetVals = batchLabel[(trainingPass-1)%batchLabel.size()];
 		showVectorVals(" Targets:", targetVals);
 		assert(targetVals.size() == topology.back());
 
@@ -180,7 +187,7 @@ int main(int argc, char* argv[])
 		cout << "\033[31m Net recent average error: "
 				<< myNet.getRecentAverageError() << endl;
 
-		if((trainingPass%inputContainer.size()) == 0)
+		if((trainingPass%batchInput.size()) == 0)
 		{
 			// Batch Training Completed
 
@@ -216,10 +223,10 @@ int main(int argc, char* argv[])
 
 
 	samplelist.clear();
-	for (unsigned i = 0; i < inputContainer.size(); ++i)
+	for (unsigned i = 0; i < batchInput.size(); ++i)
 	{
 
-		inputVals = inputContainer[i];
+		inputVals = batchInput[i];
 
 		//showVectorVals("\033[33m Inputs:", inputVals);
 		myNet.feedForward(inputVals);
@@ -233,8 +240,8 @@ int main(int argc, char* argv[])
 	}
 
 	targetVals.clear();
-	for (unsigned i = 0; i < targetContainer.size(); ++i) {
-		targetVals.push_back(targetContainer[i][0]);
+	for (unsigned i = 0; i < batchLabel.size(); ++i) {
+		targetVals.push_back(batchLabel[i][0]);
 	}
 
 	 //myNet.Print();
