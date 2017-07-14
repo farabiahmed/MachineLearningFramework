@@ -32,12 +32,16 @@ public:
 	void SetInitialWeights(const vector<vector<double>> &weights);
 	void feedForward(const vector<double> &inputVals);
 	void backPropagation(const vector<double> &targetVals);
+	double LearnSequential(vector<vector<double>>& batchInput, vector<vector<double>>& batchLabel);
+	double LearnBatch(vector<vector<double>>& batchInput, vector<vector<double>>& batchLabel);
 	void getResults(vector<double> &resultVals) const;
+	void getResults(unsigned layernum,vector<double> &resultVals) const;
 	double getRecentAverageError(void) const { return recentAverageError; }
 	int GetSizeOfInputLayer() const;
 	int GetSizeOfOutputLayer() const;
 	double GetWeight(int layer, int neuron, int connection) const;
 	void Print() const;
+	void showVectorVals(string label, vector<double> &v) const;
 
 private:
 	vector<Layer> layers; // layers[layerNum][neuronNum]
