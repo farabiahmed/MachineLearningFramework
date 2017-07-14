@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
 	Neuron::activation_function = Neuron::ACTIVATION_FUNCTION_TANH;
 
 	// Set the number of iterations
-	int numOfIteration = 5000;
+	int numOfIteration = 30000;
 
 	// Read Training Data File and load them to batchInput and batchLabel variables
 	ifstream file ( filename_trainingdata );
@@ -141,9 +141,11 @@ int main(int argc, char* argv[])
 		{
 			 getline ( fileWeights, value ); // read a string until next comma: http://www.cplusplus.com/reference/string/getline/
 
-			 vector<double> weight = Convert::string_to_T<vector<double>>(value);
-
-			 weights.push_back(weight);
+			 if(value.size()>0)
+			 {
+				 vector<double> weight = Convert::string_to_T<vector<double>>(value);
+				 weights.push_back(weight);
+			 }
 		}
 		fileWeights.close();
 	}
@@ -190,41 +192,14 @@ int main(int argc, char* argv[])
 		++trainingPass;
 		cout << endl << "\033[32m Pass " << trainingPass << ": ";
 
-		// Batch Input Training
-		double batchError = 0;
-		for (unsigned i = 0; i < batchInput.size(); ++i)
-		{
-			inputVals = batchInput[i];
-
-			//showVectorVals("\033[33m Inputs:", inputVals);
-			myNet.feedForward(inputVals);
-
-			// Collect the net's actual output results:
-			myNet.getResults(resultVals);
-			//showVectorVals("\033[34m Outputs:", resultVals);
-
-			// Train the net what the outputs should have been:
-			targetVals = batchLabel[i];
-			//showVectorVals(" Targets:", targetVals);
-			assert(targetVals.size() == topology.back());
-
-			myNet.backPropagation(targetVals);
-
-			// Report how well the training is working, average over recent samples:
-			//cout << "\033[31m Net recent average error: "
-			//		<< myNet.getRecentAverageError() << endl;
-
-			batchError += myNet.getRecentAverageError();
-		}
-		batchError /= (double) batchInput.size();
-
-		// Print Info
-		//myNet.Print();
+		double error=0;
+		error = myNet.LearnSequential(batchInput,batchLabel);
+		//error = myNet.LearnBatch(batchInput,batchLabel);
 
 		if (trainingPass%1000)
 		{
 			iterationlist.push_back(trainingPass);
-			errorlist.push_back(batchError);
+			errorlist.push_back(error);
 			// Get weights value history.
 			int weightNumber=0;
 			for(unsigned layer=0; layer<topology.size()-1;layer++)
@@ -290,7 +265,9 @@ int main(int argc, char* argv[])
      plt::legend();
 
 
+
  	plt::figure();
+    //plt::subplot(2,2,1);
  	for (unsigned i = 0; i < weightlist.size(); ++i) {
  		plt::named_plot("Weight"+to_string(i), iterationlist, weightlist[i]);
  	}
