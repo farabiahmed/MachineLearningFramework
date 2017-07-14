@@ -58,6 +58,10 @@ public:
 
 	double sumDOW(const Layer &nextLayer) const;
 
+	double GetGradient(void) const {return gradient;}
+
+	void SetGradient(double val) {gradient = val;}
+
 	vector<Connection> outputWeights; // Private!!
 
 	// Static Members (we want all the neurons can use the same value
@@ -96,7 +100,9 @@ private:
 	static double transferFunctionDerivative(double x);
 
 	// Class Members
-	double outputVal;
+	double outputVal; 	// o
+
+	double inputVal;  	// z
 
 	unsigned myIndex;
 

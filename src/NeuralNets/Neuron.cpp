@@ -59,6 +59,7 @@ void Neuron::feedForward(const Layer &prevLayer)
 				* prevLayer[neuronNum].outputWeights[myIndex].weight;
 	}
 
+	inputVal = sum;
 	outputVal = Neuron::transferFunction(sum);
 }
 
@@ -119,13 +120,15 @@ double Neuron::transferFunctionDerivative(double x)
 void Neuron::calcOutputGradients(double targetVal)
 {
 	double delta = targetVal - outputVal;
-	gradient = - delta * Neuron::transferFunctionDerivative(outputVal);
+	double derivative = Neuron::transferFunctionDerivative(inputVal);
+	gradient = - delta * derivative;
 }
 
 void Neuron::calcHiddenGradients(const Layer &nextLayer)
 {
 	double dow = sumDOW(nextLayer);
-	gradient = dow * Neuron::transferFunctionDerivative(outputVal);
+	double derivative = Neuron::transferFunctionDerivative(inputVal);
+	gradient = dow * derivative;
 }
 
 void Neuron::updateInputWeights(Layer &prevLayer)
