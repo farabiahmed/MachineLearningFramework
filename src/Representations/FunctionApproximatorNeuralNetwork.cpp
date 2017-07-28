@@ -69,6 +69,8 @@ FunctionApproximatorNeuralNetwork::FunctionApproximatorNeuralNetwork(const Envir
 
 	// Initialize privates
 	batchindex=0;
+
+	network->Print();
 }
 
 FunctionApproximatorNeuralNetwork::~FunctionApproximatorNeuralNetwork() {
