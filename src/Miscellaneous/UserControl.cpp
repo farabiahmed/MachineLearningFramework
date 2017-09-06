@@ -35,6 +35,7 @@ string UserControl::GetMessage(void)
 	// Protect shared objects with mutex
 	pthread_mutex_lock(&lock_message);
 	ret = message;
+	message = "";
 	pthread_mutex_unlock(&lock_message);
 
 	return ret;
