@@ -36,6 +36,32 @@ RepresentationUDP::~RepresentationUDP() {
 
 pair<int,double> RepresentationUDP::Get_Greedy_Pair(const SmartVector& state) const
 {
+	/*
+	// Form the output vector.
+	vector<double> resultVals;
+
+	vector<SmartVector> actions = environment->Get_Action_List(state);
+
+	for (unsigned i = 0; i < actions.size(); ++i) {
+		resultVals.push_back( Get_Value(state,actions[i]) );
+	}
+
+	// initialize max value with minimum to update itself with the smallest bigger value.
+	double maxVal = std::numeric_limits<double>::lowest();
+	int maxArg=-1;
+
+	// Get the index and value of maximum return
+	for (unsigned i = 0; i < resultVals.size(); ++i) {
+		if(resultVals[i] > maxVal)
+		{
+			maxVal = resultVals[i];
+			maxArg = i;
+		}
+	}
+
+	return make_pair(maxArg,maxVal);
+	*/
+
 	double maxVal = std::numeric_limits<double>::lowest();
 	int maxArg=0;
 
@@ -70,6 +96,7 @@ pair<int,double> RepresentationUDP::Get_Greedy_Pair(const SmartVector& state) co
 	maxVal = stod(words[3]);
 
 	return make_pair(maxArg,maxVal);
+
 }
 
 
