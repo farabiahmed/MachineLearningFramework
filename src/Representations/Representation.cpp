@@ -43,10 +43,15 @@ void Representation::Get_Report(string filePath, string fileName)
 			{
 				for(int j=0; j< states[i].dimension; ++j)
 				{
-					outfile << (states[i].elements[j] - environment->state_mean[j])
-							* environment->state_scalar[j]  << ",";
+					//outfile << (states[i].elements[j] - environment->state_mean[j])
+					//		* environment->state_scalar[j]  << ",";
+					outfile << (states[i].elements[j])<<",";
 				}
-				outfile <<  ( actions[a].elements[0] - environment->action_mean[0] ) * environment->action_scalar[0] << ",";
+				//outfile <<  ( actions[a].elements[0] - environment->action_mean[0] ) * environment->action_scalar[0] << ",";
+				for(int j=0; j< actions[a].dimension; ++j)
+				{
+					outfile <<  (actions[a].elements[j]) << ",";
+				}
 				outfile <<  Get_Value(states[i],actions[a]);
 				outfile << endl;
 			}
