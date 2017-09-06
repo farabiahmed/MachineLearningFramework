@@ -53,7 +53,7 @@ public:
 
 	void Test(void);
 
-private:
+protected:
 
 	vector<SmartVector> terminal_states;
 
