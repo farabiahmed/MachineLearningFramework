@@ -33,6 +33,12 @@ TrajectoryBasedValueIteration::TrajectoryBasedValueIteration(const Environment* 
 	// Probability that balances exploration and exploitation
 	epsilonProbability = cfg.GetValueOfKey<double>("EPSILON_PROBABILITY",0.8);
 
+	// Epsilon Probability Decay Rate
+	epsilonProbabilityDecayRate = cfg.GetValueOfKey<double>("EPSILON_PROBABILITY_DECAYRATE",1.0);
+
+	if(epsilonProbabilityDecayRate != 1.0)
+		epsilonProbability = 1.0;
+
 	// Number of next state samples
 	// It will be used to approximate the expectations on the next state.
 	sample_length_L1 = cfg.GetValueOfKey<int>("SAMPLE_LENGTH_L1",100);
@@ -65,31 +71,61 @@ TrajectoryBasedValueIteration::~TrajectoryBasedValueIteration() {
 bool TrajectoryBasedValueIteration::Start_Execution()
 {
 	unsigned numberof_bellmanupdate = 0;
+	unsigned numberof_processedtrajectorysteps = 0;
 
 	for (int num_of_iteration = 0; num_of_iteration < max_number_of_iterations; num_of_iteration++)
 	{
+		string userCommand = userControl.GetMessage();
+		if(userCommand=="stop")
+		{
+			break;
+		}
+		else if(userCommand=="qvalue")
+		{
+			//Show Q-Values
+			valueFunction->Print_Value();
+		}
+
 		cout<<"Iteration #: " << num_of_iteration;
 
 		// Q Value Update Value (currentQ-expectedQ)
 		vector<double> diff;
 
+		// Keep track of each trajectory element number for troubleshooting
+		numberof_processedtrajectorysteps=0;
+
+		// Create trajectory instance
 		vector<pair<SmartVector,SmartVector>> trajectory;
+		bool isTrajectoryHaveTerminalState=false;
+
 		SmartVector state = environment->Get_Random_State();
 		SmartVector action;
 
 		// Determine state and action trajectory
-		for (unsigned int i = 0; i < length_of_trajectory; ++i) {
+		//while (isTrajectoryHaveTerminalState==false)
+		//{
+			//if(trajectory.size()>0) cout<<" Bad Trajectory ";
+			//trajectory.clear();
+			for (unsigned int i = 0; i < length_of_trajectory; ++i) {
 
-			// Get next action to apply (Exploitation-Exploration)
-			action  = Epsilon_Greedy_Policy(state);
+				// Get next action to apply (Exploitation-Exploration)
+				action  = Epsilon_Greedy_Policy(state);
 
-			// Combine current state and action
-			trajectory.push_back(make_pair(state,action));
+				// Combine current state and action
+				trajectory.push_back(make_pair(state,action));
 
-			// Get next state by iterating previous state and action.
-			state = environment->Get_Next_State(state,action);
+				// Get next state by iterating previous state and action.
+				state = environment->Get_Next_State(state,action);
 
-		}
+				if(environment->Check_Terminal_State(state))
+				{
+					isTrajectoryHaveTerminalState=true;
+					break;
+				}
+			}
+		//}
+		// For troubleshooting purposes
+		// Show_Trajectory(trajectory);
 
 		for (unsigned int i = 0; i < trajectory.size(); ++i)
 		{
@@ -97,8 +133,12 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 			state = trajectory[i].first;
 			action  = trajectory[i].second;
 
-			if(environment->Check_Terminal_State(state)){}
-			else if (environment->Check_Blocked_State(state)){}
+			if(environment->Check_Terminal_State(state)){
+
+			}
+			else if (environment->Check_Blocked_State(state)){
+
+			}
 			else
 			{
 				double Q_plus = 0.0;
@@ -118,6 +158,10 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 
 					// Update Q_plus
 					Q_plus += (1.0/(double)sample_length_L1) * ( reward + gamma * maxQvalue ) ;
+
+					//if(reward>0.8)
+					//	cout<<endl<<"Reward:"<<reward<<" maxQ:"<<maxQvalue<<" Q_plus:"<<Q_plus<<endl;
+
 				}
 
 				double currentQValue = valueFunction->Get_Value(state,action);
@@ -125,6 +169,8 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 				// Update the difference value between new and old value
 				diff.push_back(abs( currentQValue - Q_plus));
 
+				// Count the valid trajectory steps for troubleshooting purposes
+				numberof_processedtrajectorysteps++;
 
 				// Update Value
 				valueFunction->Set_Value(state,action,Q_plus);
@@ -138,6 +184,10 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 				}
 			}
 		}// Trajectory Loop
+
+		cout<<" Belman:"<<numberof_bellmanupdate;
+		cout<<" Traject:"<<trajectory.size();
+		cout<<" E-Prob:"<<epsilonProbability;
 
 		// Calculate mean diff
 		double sum_diff = 0;
@@ -161,6 +211,9 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 			return true;
 		}
 
+		if(epsilonProbability>0.1)
+			epsilonProbability *= epsilonProbabilityDecayRate;
+
 	}// End of iterations loop
 	return false;
 }
@@ -168,6 +221,11 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 
 SmartVector TrajectoryBasedValueIteration::Epsilon_Greedy_Policy(const SmartVector& state) const
 {
+	// Measure propability engine performance
+	// by keeping track of those variables.
+	static unsigned int exploration=0;
+	static unsigned int exploitation=0;
+
 	// Create return parameter.
 	//vector<SmartVector> policy;
 	SmartVector action;
@@ -199,6 +257,7 @@ SmartVector TrajectoryBasedValueIteration::Epsilon_Greedy_Policy(const SmartVect
 	// with a small probability epsilon.
 	if(outcomes[0])
 	{
+		exploration++;
 		// Run new probability experiment with uniform parameters.
 		//cout<<"Exploration"<<endl;
 
@@ -233,6 +292,7 @@ SmartVector TrajectoryBasedValueIteration::Epsilon_Greedy_Policy(const SmartVect
 	// Select an action greedily with respect to QValue.
 	else
 	{
+		exploitation++;
 		//cout<<"Exploitation"<<endl;
 
 		int argMax = valueFunction->Get_Greedy_Pair(state).first;
@@ -244,65 +304,43 @@ SmartVector TrajectoryBasedValueIteration::Epsilon_Greedy_Policy(const SmartVect
 	// Release Memory
 	delete p;
 
+	// Measure probability engine performance.
+	//cout<<endl<<"Experienced Exploitation-Exploration Epsilon: " << (float)exploration/(float)(exploitation+exploration) <<endl;
+
 	return action;
-	//return policy;
 }
 
-	/*
-	SmartVector action;
-	SmartVector state = environment->Get_Initial_State();
+void TrajectoryBasedValueIteration::Show_Trajectory(vector<pair<SmartVector,SmartVector>> trajectory) const
+{
+	cout<<endl<<"---------------------------"<<endl;
+	cout<<"Trajectory Details:"<<endl;
 
-	for (int i = 0; i < 100; ++i) {
-		action = Epsilon_Greedy_Policy(state);
-		action.Print();
-	}
-	*/
+	for (unsigned int i = 0; i < trajectory.size(); ++i)
+	{
+		// Get current pair
+		SmartVector state = trajectory[i].first;
+		SmartVector action  = trajectory[i].second;
 
-	/*
+		cout<<"#"<<i<<" State: [ ";
+		for (int j = 0; j < state.size(); ++j) {
+			cout<<state.elements[j]<<" ";
+		}
+		cout<<"] ";
 
-	vector<SmartVector> states = environment->Get_All_Possible_States();
-	vector<SmartVector> actions = environment->Get_Action_List(states[0]);
-	double QValue=0;
-	int Policy[3][4];
-	double maxQValue=0;
+		cout<<"Action: [ ";
+		for (int j = 0; j < action.size(); ++j) {
+			cout<<action.elements[j]<<" ";
+		}
+		cout<<"]";
 
-	for (unsigned int i = 0; i < states.size(); ++i) {
 
-		maxQValue = -99;
-		for (unsigned int j = 0; j < actions.size(); ++j) {
-
-			QValue = valueFunction->Get_Value(states[i],actions[j]);
-
-			if(QValue>maxQValue)
-			{
-				maxQValue = QValue;
-				Policy[i/4][i%4] = j;
-			}
-			cout<< setw(10) << setprecision(5) << QValue << "     ";
+		if(environment->Check_Terminal_State(state)){
+			cout<<" Terminal State";
+		}
+		else if (environment->Check_Blocked_State(state)){
+			cout<<" Blocked State";
 		}
 		cout<<endl;
-
 	}
-
-
-	for (int r = 0; r < 3; r++)
-	{
-		for (int c = 0; c < 4; c++)
-		{
-			char ch = (Policy[r][c]==0) ? '^' : (Policy[r][c]==1) ? '>' : (Policy[r][c]==2) ? '_' : '<';
-
-			if(r==1 && c==1) ch = 'x';
-			if(r==0 && c==3) ch = '+';
-			if(r==1 && c==3) ch = '-';
-
-			cout<<ch;
-			cout << "    ";
-		}
-		cout << " " << endl;
-	}
-
-	//theta.Print();
-	 *
-	 *
-	 */
-
+	cout<<"---------------------------"<<endl;
+}

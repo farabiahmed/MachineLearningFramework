@@ -34,6 +34,9 @@ public:
 	// Policy Selector
 	SmartVector Epsilon_Greedy_Policy(const SmartVector& state) const;
 
+	// Show Trajectory for troubleshooting
+	void Show_Trajectory(vector<pair<SmartVector,SmartVector>> trajectory) const;
+
 private:
 
 	double gamma;
@@ -42,6 +45,8 @@ private:
 
 	double epsilonProbability; 			/// Explore-Exploit Parameter.
 										/// Probability that balances exploration and exploitation
+
+	double epsilonProbabilityDecayRate; /// Explore-Exploit Parameter decay rate.
 
 	unsigned int sample_length_L1;		/// Number of next state samples
 	 	 	 	 	 	 	 	 	 	/// It will be used to approximate the expectations on the next state.
