@@ -111,25 +111,32 @@ int main(int argc, char* argv[])
 	Neuron::activation_function = Neuron::ACTIVATION_FUNCTION_TANH;
 
 	// Set the number of iterations
-	int numOfIteration = 30000;
+	int numOfIteration = 3000;
 
 	// Read Training Data File and load them to batchInput and batchLabel variables
 	ifstream file ( filename_trainingdata );
 	string value;
+	int line_no=0;
 	while ( file.good() )
 	{
-	     getline ( file, value ); // read a string until next comma: http://www.cplusplus.com/reference/string/getline/
-	     vector<string> tokens = Parse_String(value,',');
+		line_no++;
+		getline ( file, value ); // read a string until next comma: http://www.cplusplus.com/reference/string/getline/
 
-	     inputVals.clear();
-	     for (unsigned i = 0; i < tokens.size()-1; ++i) {
-	    	 inputVals.push_back((double)stod(tokens[i]));
-	     }
-		 batchInput.push_back(inputVals);
+		if(!value.empty())
+		{
+			cout<<"Reading line: "<<line_no<<" Content: "<<value<<endl;
+			vector<string> tokens = Parse_String(value,',');
 
-	     targetVals.clear();
-	     targetVals.push_back((double)stod(tokens.back()));
-		 batchLabel.push_back(targetVals);
+			inputVals.clear();
+			for (unsigned i = 0; i < tokens.size()-1; ++i) {
+			inputVals.push_back((double)stod(tokens[i]));
+			}
+			batchInput.push_back(inputVals);
+
+			targetVals.clear();
+			targetVals.push_back((double)stod(tokens.back()));
+			batchLabel.push_back(targetVals);
+		}
 	}
 	file.close();
 
@@ -161,7 +168,7 @@ int main(int argc, char* argv[])
 	// Input units
 	topology.push_back(batchInput[0].size());
 	// Hidden units
-	topology.push_back(4);
+	topology.push_back(24);
 	// Output Units
 	topology.push_back(batchLabel[0].size());
 
@@ -195,6 +202,7 @@ int main(int argc, char* argv[])
 		double error=0;
 		error = myNet.LearnSequential(batchInput,batchLabel);
 		//error = myNet.LearnBatch(batchInput,batchLabel);
+		cout<<"Error: "<< error;
 
 		if (trainingPass%1000)
 		{
