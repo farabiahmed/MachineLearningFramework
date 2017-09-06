@@ -2,14 +2,24 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import sys #for commandline args
 from datetime import datetime
 
 # Usage:
-# python3.4 scripts/python/parser_agentReport.py 
+# python3.4 scripts/python/parser_agentReport.py
 
+# If you want to skip some records try this
+# python3.4 scripts/python/parser_agentReport.py 10
 
 # Get The Newest Folder form given path
 path = "log"
+skipline = 1
+
+print(sys.argv)
+
+if len(sys.argv) == 2:
+    skipline = int(sys.argv[1])
+
 
 # Get subdirectories
 subdirectories = os.listdir(path)
@@ -28,15 +38,19 @@ arr = df.values
 print("Related File:", freshfolder,"/agentReport.csv")
 
 # Loop through each data and scatter
-iteration = arr.shape[0]
-for xe in np.arange(iteration):
+records = arr.shape[0]
+print('Total Records',records)
+print('Skipline:',skipline)
+indexlist = np.arange(0,records,skipline)
+
+for xe in indexlist:
     for ye in arr[xe,1:]:
         plt.scatter(arr[xe,0],ye,color='purple', alpha=0.1)
 
 # Plot using matplotlib
 
 # Draw mean values
-plt.plot(arr[:,0],np.mean(arr[:,1:], axis=1))
+plt.plot(arr[::skipline,0],np.mean(arr[::skipline,1:], axis=1))
 
 plt.title('Performance Of The Agent')
 plt.xlabel('Number of Bellman Update')
