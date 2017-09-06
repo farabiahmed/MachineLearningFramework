@@ -115,10 +115,12 @@ void FunctionApproximatorNeuralNetwork::Set_Value(const SmartVector& state, cons
 	vector<double> inputVals(network->GetSizeOfInputLayer(),0);
 
 	for (int i = 0; i < state.dimension; ++i) {
-		inputVals[i] = (state.elements[i]  - environment->state_mean[i]) * environment->state_scalar[i];
+		//inputVals[i] = (state.elements[i]  - environment->state_mean[i]) * environment->state_scalar[i];
+		inputVals[i] = (state.elements[i]);
 	}
 	for (int i = 0; i < action.dimension; ++i) {
-		inputVals[ i + state.size() ] = (action.elements[i]  - environment->action_mean[i]) * environment->action_scalar[i];
+		//inputVals[ i + state.size() ] = (action.elements[i]  - environment->action_mean[i]) * environment->action_scalar[i];
+		inputVals[ i + state.size() ] = (action.elements[i]);
 	}
 
 	// insert new samples and labels
@@ -128,6 +130,7 @@ void FunctionApproximatorNeuralNetwork::Set_Value(const SmartVector& state, cons
 
 	if(batchindex>=batch_features.size())
 	{
+		//cout<<"Training Process Started. Epoch: " << numberof_training_pass << " Batch Size: "<< batch_features.size();
 		batchindex = 0;
 
 		for (unsigned i = 0; i < numberof_training_pass; ++i) {
@@ -141,6 +144,9 @@ void FunctionApproximatorNeuralNetwork::Set_Value(const SmartVector& state, cons
 				network->backPropagation(batch_labels[j]);
 			}
 		}
+
+		//cout << " Error: " << network->getRecentAverageError();
+		//cout<<" OK"<<endl;
 	}
 
 	// Report how well the training is working, average over recent samples:
@@ -168,11 +174,13 @@ double FunctionApproximatorNeuralNetwork::Get_Value(const SmartVector& state, co
 	//			input_i is 1 if it is belong to that state,
 	//			input_i is 0 otherwise.
 	for (int i = 0; i < state.dimension; ++i) {
-		inputVals[i] = (state.elements[i]  - environment->state_mean[i]) * environment->state_scalar[i];
+		//inputVals[i] = (state.elements[i]  - environment->state_mean[i]) * environment->state_scalar[i];
+		inputVals[i] = (state.elements[i]);
 	}
 
 	for (int i = 0; i < action.dimension; ++i) {
-		inputVals[ i + state.size() ] = (action.elements[i]  - environment->action_mean[i]) * environment->action_scalar[i];
+		//inputVals[ i + state.size() ] = (action.elements[i]  - environment->action_mean[i]) * environment->action_scalar[i];
+		inputVals[ i + state.size() ] = (action.elements[i]);
 	}
 
 	// Feed forward the input:
@@ -221,6 +229,8 @@ void FunctionApproximatorNeuralNetwork::Print_Value()
 		cout<<endl;
 	}
 	cout<<endl;
+
+	network->Print();
 
     // Plot a line whose name will show up as "log(x)" in the legend.
     //plt::named_plot("Recent Average Error", errorList);
