@@ -34,8 +34,6 @@ void Agent::Get_Cumulative_Rewards(unsigned numberof_bellmanupdate)
 	for (unsigned i = 0; i < number_of_simulations; ++i) {
 		double r = Simulate();
 		rewards.push_back(r);
-
-		cout<<".";
 	}
 
 	auto pair = make_pair(numberof_bellmanupdate, rewards );
@@ -82,6 +80,7 @@ double Agent::Simulate(void)
 
 	// If simulation stucked and then terminated, warn user.
 	if(number_of_movement>=max_steps_in_simulation) cout<<"x";
+	else cout<<".";
 
 	return reward;
 }
