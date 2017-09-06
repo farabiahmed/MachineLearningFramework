@@ -61,6 +61,7 @@ int main()
 	// Class Pointers
 	Environment* environment 	= new Gridworld(cfg);
 	Representation* value 		= new TabularStateActionPair(*environment,cfg);
+	//Representation* value 		= new FunctionApproximatorNeuralNetwork(*environment,cfg);
 	Agent* agent 				= new TrajectoryBasedValueIteration(environment, value, cfg);
 
 	// Start Calculation
@@ -74,6 +75,9 @@ int main()
 
 	//Get Report
 	agent->Get_Report("log/"+Get_TimeStamp(),"agentReport.csv");
+
+	//Get Report
+	value->Get_Report("log/"+Get_TimeStamp(),"representationReport.csv");
 
 	delete agent;
 	delete environment;
