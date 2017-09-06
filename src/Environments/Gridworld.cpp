@@ -47,7 +47,7 @@ Gridworld::Gridworld(const ConfigParser& cfg) {
 
 	number_of_states = number_of_columns * number_of_rows;
 
-	number_of_actions = 4;
+	number_of_actions = 5;
 }
 
 Gridworld::~Gridworld() {
@@ -59,6 +59,7 @@ double Gridworld::Get_Reward(const SmartVector& currentState, const SmartVector&
 {
 	double reward = 0.0;
 
+
 	for (unsigned i = 0; i < terminal_states.size(); ++i)
 	{
 		if(nextState == terminal_states[i])
@@ -67,6 +68,27 @@ double Gridworld::Get_Reward(const SmartVector& currentState, const SmartVector&
 		}
 	}
 
+	/*
+	 * Distributed Reward through distance to terminal
+	 */
+	/*
+	if(nextState == terminal_states[0])
+	{
+		reward = rewards_of_terminal_states[0];
+	}
+	else
+	{
+		// Get the terminal state for two agent
+		SmartVector terminalState = terminal_states[0];
+
+		// Get the distance from state to terminal
+		SmartVector diff = terminalState - nextState;
+		double dist = diff.Magnitude();
+
+		// Calculate reward relative to distance
+		reward = 0.01 * 1.0 / (1.0 + dist);
+	}
+	*/
 	return reward+cost_action;
 }
 
@@ -84,10 +106,10 @@ vector<pair<SmartVector,double>> Gridworld::Get_Transition_Probability(const Sma
 	double pRight = probability_of_random_action*0.5;
 
 	// Get all actions
-	vector<SmartVector> actions = Get_Action_List(currentState);
+	vector<SmartVector> actions = Gridworld::Get_Action_List(currentState);
 
 	// Get all states
-	vector<SmartVector> states = Get_All_Possible_States();
+	vector<SmartVector> states = Gridworld::Get_All_Possible_States();
 
 	// Create Instance of return variable
 	vector<pair<SmartVector,double>> state_probability;
@@ -169,9 +191,15 @@ vector<pair<SmartVector,double>> Gridworld::Get_Transition_Probability(const Sma
 				state_probability.push_back(make_pair(states[currentState.index+number_of_columns],pLeft)) :
 				state_probability.push_back(make_pair(currentState,pLeft));
 	}
+	// Do Nothing
+	else if (action.elements[0]==4)
+	{
+		state_probability.push_back(make_pair(currentState,1.0));
+	}
 
+	// Get the index of returned state
 	for (unsigned i = 0; i < state_probability.size(); ++i) {
-		state_probability[i].first.index = Get_State_Index(state_probability[i].first);
+		state_probability[i].first.index = Gridworld::Get_State_Index(state_probability[i].first);
 	}
 
 	return state_probability;
@@ -292,6 +320,11 @@ vector<SmartVector> Gridworld::Get_Action_List(const SmartVector& state) const
 	vec.index = 3;
 	actions.push_back(vec);
 
+	// Add DoNothing (4)
+	vec.elements[0] = 4;
+	vec.index = 4;
+	actions.push_back(vec);
+
 	return actions;
 }
 
@@ -300,7 +333,7 @@ SmartVector Gridworld::Get_Next_State(const SmartVector& state, const SmartVecto
 
 	SmartVector vec;
 
-	vector<pair<SmartVector,double>> nextStateCandidates = Get_Transition_Probability(state,action);
+	vector<pair<SmartVector,double>> nextStateCandidates = Gridworld::Get_Transition_Probability(state,action);
 
 	vector<double> probabilities;
 
@@ -370,12 +403,16 @@ bool Gridworld::Check_Blocked_State(const SmartVector& state) const
 
 void Gridworld::Display_State(const SmartVector& state)  const
 {
-
+	cout<<"State "<<state.index<<": ";
+	for (int i = 0; i < state.size(); ++i) {
+		cout<<state.elements[i]<<" ";
+	}
+	cout<<endl;
 }
 
 void Gridworld::Display_Action(const SmartVector& action) const
 {
-
+	action.Print();
 }
 
 void Gridworld::Display_Policy(const Representation& rep)  const
@@ -410,7 +447,7 @@ void Gridworld::Display_Policy(const Representation& rep)  const
 	{
 		for (int c = 0; c < number_of_columns; c++)
 		{
-			char ch = (Policy[r][c]==0) ? '^' : (Policy[r][c]==1) ? '>' : (Policy[r][c]==2) ? '_' : '<';
+			char ch = (Policy[r][c]==4) ? 'o' : (Policy[r][c]==0) ? '^' : (Policy[r][c]==1) ? '>' : (Policy[r][c]==2) ? '_' : '<';
 
 			SmartVector state(2);
 			state.elements[0] = r;
@@ -455,9 +492,10 @@ void Gridworld::Display_Policy(const Representation& rep)  const
 	}
 }
 
+//TODO Use Hashmaps instead of bruteforce search
 int Gridworld::Get_State_Index(const SmartVector& state) const
 {
-	vector<SmartVector> states = Get_All_Possible_States();
+	vector<SmartVector> states = Gridworld::Get_All_Possible_States();
 
 	for (unsigned i = 0; i < states.size(); ++i) {
 		if(state == states[i])
