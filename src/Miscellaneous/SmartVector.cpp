@@ -150,6 +150,18 @@ int SmartVector::size() const
 	return dimension;
 }
 
+double SmartVector::Magnitude() const
+{
+	double sum;
+
+	for (int i = 0; i < dimension; i++)
+	{
+		sum += elements[i]*elements[i];
+	}
+
+	return sqrt(sum);
+}
+
 void SmartVector::Print() const
 {
 	// Inform user that it is the begining.
@@ -210,4 +222,45 @@ SmartVector SmartVector::Plus(const SmartVector& v1, const SmartVector& v2)
 	}
 
 	return sumVec;
+}
+
+SmartVector SmartVector::Combine(const SmartVector& v1, const SmartVector& v2)
+{
+	SmartVector comVec(v1.size()+v2.size());
+
+	for (int i = 0; i < v1.size(); ++i) {
+		comVec.elements[i] = v1.elements[i];
+	}
+
+	for (int i = 0; i < v2.size(); ++i) {
+		comVec.elements[i+v1.size()] = v2.elements[i];
+	}
+
+	return comVec;
+}
+
+vector<SmartVector> SmartVector::Split(const SmartVector& vec, const int n)
+{
+	if(vec.dimension % n != 0)
+	{
+		throw std::invalid_argument( "SmartVector split: vector dimensions mismatched." );
+	}
+
+	// Get the size of the vectors that will be produced.
+	int new_size = vec.dimension / n;
+
+	vector<SmartVector> ret;
+
+	for (int i = 0; i < vec.size(); i+=new_size)
+	{
+		SmartVector s(new_size);
+
+		for (int j = 0; j < new_size; ++j) {
+			s.elements[j] = vec.elements[i+j];
+		}
+
+		ret.push_back(s);
+	}
+
+	return ret;
 }

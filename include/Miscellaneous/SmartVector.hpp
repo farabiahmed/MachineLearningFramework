@@ -10,6 +10,8 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <vector>
+#include <cmath>
 
 using namespace std;
 
@@ -87,6 +89,9 @@ public:
 	// Get the size of elements
 	int size() const;
 
+	// Calculate Magnitude of the vector
+	double Magnitude() const;
+
 	// Static Functions
 
 	// Returns Inner Product of the input vectors
@@ -94,6 +99,12 @@ public:
 
 	// Sum Operator
 	static SmartVector Plus(const SmartVector& v1, const SmartVector& v2);
+
+	// Combines two vectors into a single vector.
+	static SmartVector Combine(const SmartVector& v1, const SmartVector& v2);
+
+	// Splits the vector into given multiple vectors with given size n.
+	static vector<SmartVector> Split(const SmartVector& vec, const int n);
 
 	// Caution!: If you add or remove any property,
 	// you need to modify constructors and assignment
