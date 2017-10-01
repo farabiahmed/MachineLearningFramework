@@ -109,6 +109,11 @@ void ConfigParser::ExtractContents(const string &line)
 	ExtractKey(key, sepPos, temp);
 	ExtractValue(value, sepPos, temp);
 
+	AddContent(key,value);
+}
+
+void ConfigParser::AddContent(const std::string &key, const std::string &value)
+{
 	if (!KeyExists(key))
 		contents.insert(std::pair<std::string, std::string>(key, value));
 	else
