@@ -24,6 +24,7 @@
 
 #include "Representations/Representation.hpp"
 #include "Representations/TabularStateActionPair.hpp"
+#include "Representations/RepresentationUDP.hpp"
 
 #include "Agents/Agent.hpp"
 #include "Agents/QIteration.hpp"
@@ -60,8 +61,9 @@ int main()
 
 	// Class Pointers
 	Environment* environment 	= new Gridworld(cfg);
-	Representation* value 		= new TabularStateActionPair(*environment,cfg);
+	//Representation* value 		= new TabularStateActionPair(*environment,cfg);
 	//Representation* value 		= new FunctionApproximatorNeuralNetwork(*environment,cfg);
+	Representation* value 		= new RepresentationUDP(*environment,cfg);
 	Agent* agent 				= new TrajectoryBasedValueIteration(environment, value, cfg);
 
 	// Start Calculation
