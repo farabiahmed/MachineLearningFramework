@@ -20,6 +20,8 @@
 #include "Agents/Agent.hpp"
 #include "Agents/QIteration.hpp"
 #include "Agents/TrajectoryBasedValueIteration.hpp"
+#include "Agents/GreedyAgent.hpp"
+#include "Agents/OnlineTrajectoryValueIteration.hpp"
 
 #include "Representations/Representation.hpp"
 #include "Representations/RepresentationUDP.hpp"
@@ -67,39 +69,46 @@ int main()
 
 
 	// Assign the default file if it is not assigned yet.
-	if(configFile.empty()) configFile = "config/config_rendezvous_5x5.cfg";
+	if(configFile.empty()) configFile = "config/config_rendezvous_5x5_3agent.cfg";
 
 	// Get parameters from file
 	ConfigParser cfg = ConfigParser(configFile);
+	cfg.AddContent(string("TIME_STAMP"),timeStamp);
 
 	// Initialize Environment
 	environment 	= new Rendezvous(cfg);
 
 	// Initialize Representation Function
 	//value 			= new TabularStateActionPair(*environment,cfg);
-	value 				= new FunctionApproximatorNeuralNetwork(*environment,cfg);
-	//value 			= new RepresentationUDP(*environment,cfg);
+	//value 				= new FunctionApproximatorNeuralNetwork(*environment,cfg);
+	value 			= new RepresentationUDP(*environment,cfg);
 
 	// Initialize Solver
 	//agent 			= new QIteration(environment, value, cfg);
-	agent 			= new TrajectoryBasedValueIteration(environment, value, cfg);
+	agent 				= new TrajectoryBasedValueIteration(environment, value, cfg);
+	//agent 				= new OnlineTrajectoryValueIteration(environment, value, cfg);
+	//agent				= new GreedyAgent(environment,cfg);
 
 	//Start Calculation
 	agent->Start_Execution();
 
 	//Show Q-Values
-	value->Print_Value();
+	//value->Print_Value();
 
 	//Show Policy
-	environment->Display_Policy(*value);
+	//environment->Display_Policy(*value);
 
 	//Get Report
 	agent->Get_Report("log/"+timeStamp,"agentReport.csv");
 
 	//Get Report
-	value->Get_Report("log/"+timeStamp,"representationReport.csv");
+	//value->Get_Report("log/"+timeStamp,"representationReport.csv");
 
 	cout<<"Done."<<endl;
+
+	delete agent;
+	delete environment;
+	delete value;
 
 	return 0;
 }
