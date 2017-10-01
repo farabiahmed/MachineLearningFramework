@@ -24,7 +24,7 @@ public:
 
 	SmartVector Get_Initial_State();
 
-	SmartVector Get_Random_State();
+	//SmartVector Get_Random_State();
 
 	double Get_Reward(const SmartVector& currentState, const SmartVector& action, const SmartVector& nextState);
 
@@ -43,6 +43,8 @@ public:
 	bool Check_Blocked_State(const SmartVector& state) const;
 
 	void Display_Policy(const Representation& rep)  const;
+
+	void Display_State(const SmartVector& state) const;
 
 private:
 

@@ -25,8 +25,51 @@ vector<SmartVector> Rendezvous::Get_All_Possible_States() const
 {
 	static vector<SmartVector> states;		//Cache states since it is expensive to calculate
 
+	int index=0;
+
 	if(states.size()==0)
 	{
+		size_t size_of_states = pow(number_of_rows * number_of_columns, number_of_agents);
+
+		for (size_t i = 0; i < size_of_states; ++i)
+		{
+			SmartVector state(2 * number_of_agents);
+
+			for (int j = 0; j < state.size(); j+=2) {
+
+				/*
+				 	* 3 Agent case
+					state.elements[0] = RowA;
+					state.elements[1] = ColA;
+					state.elements[2] = RowB;
+					state.elements[3] = ColB;
+					state.elements[4] = RowC;
+					state.elements[5] = ColC;
+
+				 	* Parametrization 2 Agent case:
+					state.elements[0] = (i / number_of_columns * number_of_rows * number_of_columns) 	% number_of_rows;
+					state.elements[1] = (i / number_of_columns * number_of_rows) 	% number_of_columns;
+					state.elements[2] = (i / number_of_columns) 					% number_of_rows;
+					state.elements[3] = (i / 1) 									% number_of_columns;
+				 */
+
+				unsigned currentAgentId = j / 2;
+
+				unsigned numberOfFieldsToPass = pow(number_of_columns * number_of_rows, (number_of_agents - currentAgentId - 1));
+
+				state.elements[j] 	= (i / (numberOfFieldsToPass * number_of_columns) ) 	% number_of_rows;
+				state.elements[j+1] = (i / numberOfFieldsToPass) 						% number_of_columns;
+			}
+
+			if(!Check_Blocked_State(state))
+			{
+				state.index = index++;
+				states.push_back(state);
+			}
+		}
+
+
+		/*
 		vector<SmartVector> statesSingle; 	// for single agent.
 		vector<SmartVector> statesMulti; 	// for multiagent
 
@@ -62,39 +105,45 @@ vector<SmartVector> Rendezvous::Get_All_Possible_States() const
 		}
 
 		states = statesMulti;
+		*/
 	}
 
 	return states;
 }
 
-//TODO needs to be updated for parametric multiagent case.
-//It is currently just for single terminal state. Needs to be updated for
+//TODO: needs to be updated for parametric multiagent case. -> FIXED
+//TODO: It is currently just for single terminal state. Needs to be updated for
 //multiple terminal states.
 bool Rendezvous::Check_Terminal_State(const SmartVector& state) const
 {
-	for (unsigned i = 0; i < terminal_states.size(); ++i)
+	SmartVector terminalState;
+
+	for (unsigned i = 0; i < number_of_agents; ++i)
 	{
-		if(state == SmartVector::Combine(terminal_states[i],terminal_states[i]))
-		{
-			return true;
-		}
+		terminalState = SmartVector::Combine(terminalState,terminal_states[0]);
 	}
+
+	if(state == terminalState)
+	{
+		return true;
+	}
+
 
 	return false;
 }
 
-//TODO needs to be updated for parametric multiagent case.
+//TODO needs to be fixed for multiblock and multiagent case -> multiagent-FIXED
 bool Rendezvous::Check_Blocked_State(const SmartVector& state) const
 {
-	/*
-	for (unsigned i = 0; i < blocked_states.size(); ++i)
+	vector<SmartVector> splittedStates = SmartVector::Split(state,number_of_agents);
+
+	for (size_t i = 0; i < splittedStates.size(); ++i)
 	{
-		if(state == SmartVector::Combine(blocked_states[i],blocked_states[i]))
+		if(Gridworld::Check_Blocked_State(splittedStates[i]))
 		{
 			return true;
 		}
 	}
-	*/
 
 	return false;
 }
@@ -102,6 +151,7 @@ bool Rendezvous::Check_Blocked_State(const SmartVector& state) const
 //TODO needs to be updated for parametric multiagent case.
 vector<SmartVector> Rendezvous::Get_Action_List(const SmartVector& state) const
 {
+	/*
 	vector<SmartVector> actionsSingleAgent = Gridworld::Get_Action_List(state);
 	vector<SmartVector> actionsMultiAgent;
 
@@ -117,49 +167,129 @@ vector<SmartVector> Rendezvous::Get_Action_List(const SmartVector& state) const
 	}
 
 	return actionsMultiAgent;
+	*/
+
+	static vector<SmartVector> actions;
+
+	unsigned index=0;
+	if(actions.size()==0)
+	{
+		size_t size_of_actions = pow(number_of_actions, number_of_agents);
+
+		for (size_t i = 0; i < size_of_actions; ++i)
+		{
+			SmartVector action(number_of_agents);
+
+			for (int j = 0; j < action.size(); j++)
+			{
+				/*
+				 *	3 Agent Case:
+				 	action[0] = ActionA
+				 	action[1] = ActionB
+				 	action[2] = ActionC
+
+				 *	Parametric 3 Agent Case:
+				 	action[0] = (i / number_of_actions * number_of_actions) % number_of_actions
+				 	action[1] = (i / number_of_actions) % number_of_actions
+				 	action[2] = (i / 1) % number_of_actions
+				 */
+
+				unsigned currentAgentId = j;
+
+				unsigned numberOfFieldsToPass = pow(number_of_actions, (number_of_agents - currentAgentId - 1));
+
+				action.elements[j] 	= (i / numberOfFieldsToPass ) 	% number_of_actions;
+
+			}
+			action.index = index++;
+			actions.push_back(action);
+		}
+	}
+
+	return actions;
+
 }
 
-//TODO: Fix for multiagent case
+//TODO: Fix for multiagent case. - FIXED
+//TODO: Fix for multi terminal state case.
+//TODO: Uncomment Distributed Reward for huge state spaces.
 double Rendezvous::Get_Reward(const SmartVector& currentState, const SmartVector& action, const SmartVector& nextState)
 {
 	double reward = 0.0;
-	/*
-	for (unsigned i = 0; i < terminal_states.size(); ++i)
+
+	// Initialize terminal state for at least two agent:
+	SmartVector terminalState;
+
+	// If there are more than two agent, adapt terminal state by modifiying it.
+	for (unsigned i = 0; i < number_of_agents; ++i)
 	{
-		if(nextState == SmartVector::Combine(terminal_states[i],terminal_states[i]))
-		{
-			reward = rewards_of_terminal_states[i];
-		}
+		terminalState = SmartVector::Combine(terminalState,terminal_states[0]);
+	}
+
+	/*
+	 * Model 0 Naive
+	 */
+	/*
+	if(nextState == terminalState)
+	{
+		reward = rewards_of_terminal_states[0];
 	}
 	*/
 
-	if(nextState == SmartVector::Combine(terminal_states[0],terminal_states[0]))
+
+	/*
+	 * Model 1 Multiple
+	*/
+	/*
+	if(nextState == terminalState)
 	{
 		reward = rewards_of_terminal_states[0];
 	}
 	else
 	{
-		// Get the terminal state for two agent
-		SmartVector terminalState = SmartVector::Combine(terminal_states[0],terminal_states[0]);
-
 		// Get the distance from state to terminal
 		SmartVector diff = terminalState - nextState;
 		double dist = diff.Magnitude();
 
 		// Calculate reward relative to distance
-		reward = 0.1 * 1.0 / (1.0 + dist);
+		reward = 0.01 * 1.0 / (1.0 + dist);
 	}
+	*/
+
 
 	/*
-	vector<SmartVector> states = SmartVector::Split(nextState,number_of_agents);
-	SmartVector diff1 = terminal_states[0] - states[0];
-	SmartVector diff2 = terminal_states[0] - states[1];
+	 * Model 2 Single
+	 */
 
-	double dist1 = diff1.Magnitude();
-	double dist2 = diff2.Magnitude();
+	if(nextState == terminalState)
+	{
+		reward = rewards_of_terminal_states[0];
+	}
+	else
+	{
+		vector<SmartVector>  nextstates = SmartVector::Split(nextState,number_of_agents);
+		//vector<SmartVector>  currentstates = SmartVector::Split(currentState,number_of_agents);
 
-	reward = 1.0 / (1.0 + dist1 * dist2);
-	*/
+		double temp=0;
+		for (unsigned i = 0; i < number_of_agents; ++i)
+		{
+			SmartVector diff_nextstate = terminal_states[0] - nextstates[i];
+			//SmartVector diff_currstate = terminal_states[0] - currentstates[i];
+
+			double dist_next = diff_nextstate.Magnitude();
+			//double dist_curr = diff_currstate.Magnitude();
+
+			temp += 1.0/(1.0+dist_next);
+			/*
+			if(dist_next<=dist_curr)
+				temp += 1.0/(1.0+dist_next);
+			else
+				temp -= 100;
+			*/
+		}
+
+		reward = 0.001*temp;
+	}
 
 	return reward+cost_action;
 }
@@ -169,20 +299,22 @@ SmartVector Rendezvous::Get_Initial_State()
 {
 	SmartVector vec;
 
-	//vec = this->Get_All_Possible_States()[0];
-
-	vec = SmartVector::Combine(initial_state[0],initial_state[1]);
+	for (size_t i = 0; i < number_of_agents; ++i)
+	{
+		vec = SmartVector::Combine(vec,initial_state[i]);
+	}
 
 	vec.index = Get_State_Index(vec);
 
 	return vec;
 }
 
+/*
 SmartVector Rendezvous::Get_Random_State()
 {
 	return Get_Initial_State();
 }
-
+*/
 vector<pair<SmartVector,double>> Rendezvous::Get_Transition_Probability(const SmartVector& currentState, const SmartVector& action)
 {
 	// Create Instance of return variable
@@ -247,12 +379,17 @@ SmartVector Rendezvous::Get_Next_State(const SmartVector& state, const SmartVect
 
 	for (unsigned i = 0; i < number_of_agents; ++i) {
 		states[i].index = Gridworld::Get_State_Index(states[i]);
-		nextStates.push_back(Gridworld::Get_Next_State(states[i],actions[i]));
+
+		SmartVector nextstate = Gridworld::Get_Next_State(states[i],actions[i]);
+
+
+
+		nextStates.push_back(nextstate);
 	}
 
 	SmartVector newStateComposed;
-	for (unsigned i = 0; i < number_of_agents-1; ++i) {
-		newStateComposed = SmartVector::Combine(nextStates[i],nextStates[i+1]);
+	for (unsigned i = 0; i < number_of_agents; ++i) {
+		newStateComposed = SmartVector::Combine(newStateComposed,nextStates[i]);
 	}
 
 	newStateComposed.index = Get_State_Index(newStateComposed);
@@ -295,61 +432,66 @@ void Rendezvous::Display_Policy(const Representation& rep)  const
 		}
 	}
 
+}
 
+void Rendezvous::Display_State(const SmartVector& state) const
+{
+	char ch;
 
-	for (unsigned a = 0; a < number_of_agents; ++a) {
+	vector<SmartVector> agent_states = SmartVector::Split(state,number_of_agents);
 
-		cout<<"Agent #"<<a<<":"<<endl;
-
-		for (int r = 0; r < number_of_rows; r++)
+	for (int r = 0; r < number_of_rows; r++)
+	{
+		for (int c = 0; c < number_of_columns; c++)
 		{
-			for (int c = 0; c < number_of_columns; c++)
-			{
-				unsigned policy = Policy[a][r][c];
+			ch = ' ';
+			SmartVector state(2);
+			state.elements[0] = r;
+			state.elements[1] = c;
 
-				char ch = (policy==4) ? 'o' : (policy==0) ? '^' : (policy==1) ? '>' : (policy==2) ? '_' : '<';
-
-				SmartVector state(2);
-				state.elements[0] = r;
-				state.elements[1] = c;
-
-				for (unsigned i = 0; i < blocked_states.size(); ++i) {
-					if(state == blocked_states[i])
-						ch = 'x';
-				}
-
-				for (unsigned i = 0; i < terminal_states.size(); ++i) {
-					if(state == terminal_states[i])
-					{
-						if(rewards_of_terminal_states[i]>0)
-							ch = '+';
-						else if(rewards_of_terminal_states[i]<0)
-							ch = '-';
-					}
-				}
-
-				// For more unicode characters: http://shapecatcher.com/
-				if(ch=='_')
-					cout<<"\u2193";
-				else if(ch=='<')
-					cout<<"\u2190";
-				else if(ch=='^')
-					cout<<"\u2191";
-				else if(ch=='>')
-					cout<<"\u2192";
-				else if(ch=='x')
-					cout<<"\033[33m\u2612\033[0m"; // Yellow Blocked Cross
-				else if(ch=='+')
-					cout<<"\033[32m\u2714\033[0m"; // Green Tick
-				else if(ch=='-')
-					cout<<"\033[31m\u2620\033[0m"; // Red Skull with bones
-				else
-					cout<<ch;
-
-				cout << " ";
+			for (unsigned a = 0; a < number_of_agents; ++a) {
+				if(state==agent_states[a])
+					ch = 'A' + a;
 			}
-			cout << " " << endl;
+
+
+			for (unsigned i = 0; i < blocked_states.size(); ++i) {
+				if(state == blocked_states[i])
+					ch = 'x';
+			}
+
+			for (unsigned i = 0; i < terminal_states.size(); ++i) {
+				if(state == terminal_states[i])
+				{
+					if(rewards_of_terminal_states[i]>0)
+						ch = '+';
+					else if(rewards_of_terminal_states[i]<0)
+						ch = '-';
+				}
+			}
+
+			// For more unicode characters: http://shapecatcher.com/
+			if(ch=='_')
+				cout<<"\u2193";
+			else if(ch=='<')
+				cout<<"\u2190";
+			else if(ch=='^')
+				cout<<"\u2191";
+			else if(ch=='>')
+				cout<<"\u2192";
+			else if(ch=='x')
+				cout<<"\033[33m\u2612\033[0m"; // Yellow Blocked Cross
+			else if(ch=='+')
+				cout<<"\033[32m\u2714\033[0m"; // Green Tick
+			else if(ch=='-')
+				cout<<"\033[31m\u2620\033[0m"; // Red Skull with bones
+			else if(ch==' ')
+				cout<<"\u2317";
+			else
+				cout<<ch;
+
+			cout << " ";
 		}
-		cout << endl;
+		cout << " " << endl;
 	}
 }
