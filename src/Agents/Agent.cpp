@@ -7,7 +7,8 @@
 
 #include "Agents/Agent.hpp"
 
-Agent::Agent(const ConfigParser& cfg) : userControl(UserControl::GetInstance())
+Agent::Agent(const ConfigParser& cfg) :
+userControl(UserControl::GetInstance())
 {
 	/*
 	// Inform the user about environment name.
@@ -19,6 +20,8 @@ Agent::Agent(const ConfigParser& cfg) : userControl(UserControl::GetInstance())
 	// Inform the user about representation name.
 	cout << "Agent Name: " << Name << endl;
 	*/
+
+	log_file_path = "log/"+ cfg.GetValueOfKey<string>("TIME_STAMP");
 }
 
 Agent::~Agent() {
@@ -27,26 +30,54 @@ Agent::~Agent() {
 
 void Agent::Get_Cumulative_Rewards(unsigned numberof_bellmanupdate)
 {
-	cout<<endl<<endl<<"Cumulative Rewards Collecting: [";
+	static int game_played;
+	vector<double> rewards;
+
+	cout<<endl<<endl<<"Game Simulation: #"<< game_played++;
 
 	// Collect the performance of current session to draw a plot.
-	vector<double> rewards;
+	vector<pair<int, double>> sim_results;
 	for (unsigned i = 0; i < number_of_simulations; ++i) {
-		double r = Simulate();
-		rewards.push_back(r);
+		pair<unsigned, double> sim = Simulate();
+
+		sim_results.push_back(sim);
 	}
 
-	auto pair = make_pair(numberof_bellmanupdate, rewards );
+	cout<<" Results:[ ";
+	for(auto sim:sim_results)
+	{
+		if((unsigned)sim.first<max_steps_in_simulation)
+			cout<<".";
+		else
+			cout<<"x";
+	}
+	cout<<" ]";
+
+	cout<<" Moves:[ ";
+	for(auto sim:sim_results)
+	{
+			cout<<sim.first<<" ";
+	}
+	cout<<"]";
+
+	cout<<" Rewards:[ ";
+	for(auto sim:sim_results)
+	{
+			cout<<sim.second<<" ";
+			rewards.push_back(sim.second);
+	}
+	cout<<"]";
 
 	// pair: <numberof_bellmanupdate, rewards_for_that_bellmanupdate>
+	// To plot bellman vs reward graphic.
+	auto pair = make_pair(numberof_bellmanupdate, rewards );
 	rewards_cumulative.push_back(pair);
 
-	cout<<" OK]"<<endl<<endl;
+	cout<<endl<<endl;
 }
 
-double Agent::Simulate(void)
+pair<unsigned,double> Agent::Simulate(void)
 {
-
 	// Hold the reward that we will return.
 	double reward=0;
 
@@ -78,11 +109,7 @@ double Agent::Simulate(void)
 		number_of_movement++;
 	}
 
-	// If simulation stucked and then terminated, warn user.
-	if(number_of_movement>=max_steps_in_simulation) cout<<"x";
-	else cout<<".";
-
-	return reward;
+	return make_pair(number_of_movement,reward);
 }
 
 void Agent::Get_Report(string filePath, string fileName)

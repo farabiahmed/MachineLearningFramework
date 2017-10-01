@@ -39,6 +39,7 @@ public:
 	string Name;	///< It stores the name of agent to increase readability and awareness.
     				///< Such as Qiteration, TrajectoryBased etc.
 
+	string log_file_path;
 protected:
 
 	Environment* environment;
@@ -50,7 +51,7 @@ protected:
 	void Get_Cumulative_Rewards(unsigned numberof_bellmanupdate);  	///< It does the simulation for predefined times
 																	///< in a loop and fills the "rewards_cumulative".
 
-	double Simulate(void); 		///< Simulates the agent from an random initial point through
+	pair<unsigned,double> Simulate(void); 		///< Simulates the agent from an random initial point through
 								///< calculated last policy.
 
 	vector< pair<int,vector<double>> > rewards_cumulative;	///< Stores the rewards that collected during
@@ -68,6 +69,8 @@ protected:
 
 	unsigned bellman_stride_forsimulation;			///< Defines how many bellman updates should be discarded to
 											    ///< make simulation to plot the performance of agent.
+
+
 };
 
 #endif /* AGENTS_AGENT_HPP_ */
