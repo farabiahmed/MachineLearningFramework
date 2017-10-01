@@ -73,6 +73,9 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 	unsigned numberof_bellmanupdate = 0;
 	unsigned numberof_processedtrajectorysteps = 0;
 
+	// Test initial controller performance.
+	Get_Cumulative_Rewards(numberof_bellmanupdate);
+
 	for (int num_of_iteration = 0; num_of_iteration < max_number_of_iterations; num_of_iteration++)
 	{
 		string userCommand = userControl.GetMessage();
@@ -86,7 +89,7 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 			valueFunction->Print_Value();
 		}
 
-		cout<<"Iteration #: " << num_of_iteration;
+		cout<<"Iteration #: " << num_of_iteration << flush;
 
 		// Q Value Update Value (currentQ-expectedQ)
 		vector<double> diff;
@@ -127,6 +130,9 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 		// For troubleshooting purposes
 		// Show_Trajectory(trajectory);
 
+		cout<<" Traject:"<<trajectory.size() << flush;
+		cout<<" E-Prob:"<<epsilonProbability << flush;
+		cout<<" Belman:" << flush;
 		for (unsigned int i = 0; i < trajectory.size(); ++i)
 		{
 			// Get current pair
@@ -134,10 +140,10 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 			action  = trajectory[i].second;
 
 			if(environment->Check_Terminal_State(state)){
-
+				cout<<" Terminal State!";
 			}
 			else if (environment->Check_Blocked_State(state)){
-
+				cout<<" Blocked State!";
 			}
 			else
 			{
@@ -175,6 +181,7 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 				// Update Value
 				valueFunction->Set_Value(state,action,Q_plus);
 
+				//cout<< numberof_bellmanupdate <<"\r" << flush;
 				numberof_bellmanupdate++;
 
 				if(numberof_bellmanupdate % bellman_stride_forsimulation == 0)
@@ -185,9 +192,9 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 			}
 		}// Trajectory Loop
 
-		cout<<" Belman:"<<numberof_bellmanupdate;
-		cout<<" Traject:"<<trajectory.size();
-		cout<<" E-Prob:"<<epsilonProbability;
+		//cout<< " "<<flush;
+		//cout<<" Belman:"<<numberof_bellmanupdate << flush;
+		cout<<numberof_bellmanupdate<<flush;
 
 		// Calculate mean diff
 		double sum_diff = 0;
@@ -198,6 +205,7 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 		mean_diff = sum_diff / (double) (diff.size());
 		cout<<" Diff: "<< mean_diff <<endl;
 
+		/*
 		// Check whether stopping criteria reached.
 		if(mean_diff<epsilon)
 		{
@@ -205,12 +213,15 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 
 			// If agent finishes before reaching BELLMAN_STRIDE_FORSIMULATION
 			// run a simulation to evaluate performance.
-			if(!rewards_cumulative.size())
-				Get_Cumulative_Rewards(numberof_bellmanupdate);
+			//if(!rewards_cumulative.size())
+			//	Get_Cumulative_Rewards(numberof_bellmanupdate);
+
+			// Run last simulation
+			Get_Cumulative_Rewards(numberof_bellmanupdate);
 
 			return true;
 		}
-
+		*/
 		if(epsilonProbability>0.1)
 			epsilonProbability *= epsilonProbabilityDecayRate;
 

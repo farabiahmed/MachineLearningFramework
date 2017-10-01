@@ -37,7 +37,7 @@ public:
 	// Show Trajectory for troubleshooting
 	void Show_Trajectory(vector<pair<SmartVector,SmartVector>> trajectory) const;
 
-private:
+protected:
 
 	double gamma;
 
