@@ -9,6 +9,7 @@ from keras.layers import Dense
 from keras.layers.advanced_activations import LeakyReLU
 import os.path
 import h5py
+import time
 
 class Representation_Keras_MultiAgent_TensorInput(Representation):
 
@@ -108,12 +109,23 @@ class Representation_Keras_MultiAgent_TensorInput(Representation):
 
     def Set_Value(self,state,action,value):
 
+        time_Convert_State_To_Input = time.time()
         inputVal = self.Convert_State_To_Input(state)
+        print("Convert_State_To_Input: %s seconds" % (time.time() - time_Convert_State_To_Input))
+
+
+        time_ForwardPass = time.time()
         values = self.ForwardPass(inputVal)
+        print("ForwardPass: %s seconds" % (time.time() - time_ForwardPass))
+
+        time_Get_Action_Index = time.time()
         index = self.Get_Action_Index(action)
         values[index] = value
+        print("Get_Action_Index: %s seconds" % (time.time() - time_Get_Action_Index))
 
 
+
+        time_Prepare_Fit = time.time()
         # Rearrange the given input and output to make it appropriate for our NN
         sampleX = inputVal
         sampleY = values
@@ -146,13 +158,19 @@ class Representation_Keras_MultiAgent_TensorInput(Representation):
                 X, Y = minibatch[i]
                 self.batchSamplesX = np.vstack((self.batchSamplesX, X))
                 self.batchSamplesY = np.vstack((self.batchSamplesY, Y))
-
+        
+            time_Fit = time.time()
             with self.graph.as_default():
-                self.model.fit(self.batchSamplesX, self.batchSamplesY, epochs=self.trainPass, batch_size= self.batchsize, verbose=1)
+                self.model.fit(self.batchSamplesX, self.batchSamplesY, epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
+            print("Get_Fit: %s seconds" % (time.time() - time_Fit))
+
 
             # Reset the batch
             self.batchSamplesX = np.array([], dtype=np.float).reshape(0, self.size_of_input_units)
             self.batchSamplesY = np.array([], dtype=np.float).reshape(0, self.output_unit)
+        
+        print("Get_Prepare_Fit: %s seconds" % (time.time() - time_Prepare_Fit))
+
 
         # # Increase counter to ensure enough new samples are gathered
         # self.fresh_experience_counter+=1
