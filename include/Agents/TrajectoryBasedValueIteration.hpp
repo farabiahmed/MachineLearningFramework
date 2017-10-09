@@ -16,6 +16,7 @@
 #include "ProbabilityDistributions/DiscreteDistribution.hpp"
 #include "Miscellaneous/ConfigParser.hpp"
 
+using namespace std;
 /*
  *
  */

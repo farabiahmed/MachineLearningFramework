@@ -22,6 +22,13 @@ userControl(UserControl::GetInstance())
 	*/
 
 	log_file_path = "log/"+ cfg.GetValueOfKey<string>("TIME_STAMP");
+
+	// Log parameters
+	// Create File Directory First
+	system(("mkdir -p " + log_file_path).c_str());
+
+	logger.open((log_file_path + "/agentReport2.csv").c_str(),fstream::out);
+
 }
 
 Agent::~Agent() {

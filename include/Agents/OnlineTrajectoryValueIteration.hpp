@@ -23,8 +23,6 @@ public:
 	// Solver
 	bool Start_Execution();
 
-protected:
-	std::fstream logger;
 };
 
 #endif /* AGENTS_ONLINETRAJECTORYVALUEITERATION_HPP_ */

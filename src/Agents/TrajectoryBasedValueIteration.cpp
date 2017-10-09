@@ -62,15 +62,19 @@ TrajectoryBasedValueIteration::TrajectoryBasedValueIteration(const Environment* 
 
 
 	states = environment->Get_All_Possible_States();
+
+	// Put Header first
+	logger<<"game,moves,egreedy,bellman"<<endl<<flush;
 }
 
-TrajectoryBasedValueIteration::~TrajectoryBasedValueIteration() {
-
+TrajectoryBasedValueIteration::~TrajectoryBasedValueIteration()
+{
+	logger.close();
 }
 
 bool TrajectoryBasedValueIteration::Start_Execution()
 {
-	unsigned numberof_bellmanupdate = 0;
+	unsigned numberof_bellmanupdate = 237000;
 	unsigned numberof_processedtrajectorysteps = 0;
 
 	// Test initial controller performance.
@@ -99,7 +103,6 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 
 		// Create trajectory instance
 		vector<pair<SmartVector,SmartVector>> trajectory;
-		bool isTrajectoryHaveTerminalState=false;
 
 		SmartVector state = environment->Get_Random_State();
 		SmartVector action;
@@ -122,7 +125,6 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 
 				if(environment->Check_Terminal_State(state))
 				{
-					isTrajectoryHaveTerminalState=true;
 					break;
 				}
 			}
@@ -195,6 +197,12 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 		//cout<< " "<<flush;
 		//cout<<" Belman:"<<numberof_bellmanupdate << flush;
 		cout<<numberof_bellmanupdate<<flush;
+
+		logger<<num_of_iteration<<",";
+		logger<<trajectory.size()<<",";
+		logger<<epsilonProbability<<",";
+		logger<<numberof_bellmanupdate;
+		logger<<endl;
 
 		// Calculate mean diff
 		double sum_diff = 0;
