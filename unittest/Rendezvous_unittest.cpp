@@ -69,7 +69,7 @@ int main()
 
 
 	// Assign the default file if it is not assigned yet.
-	if(configFile.empty()) configFile = "config/config_rendezvous_5x5_3agent.cfg";
+	if(configFile.empty()) configFile = "config/config_rendezvous_3x3_3agent.cfg";
 
 	// Get parameters from file
 	ConfigParser cfg = ConfigParser(configFile);
