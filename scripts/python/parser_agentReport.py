@@ -69,6 +69,14 @@ for xe in indexlist:
 # Draw mean values
 plt.plot(arr[::skipline,0],np.mean(arr[::skipline,1:], axis=1))
 
+# filter_coef = 0.95
+# #filtered = np.zeros([indexlist.shape[0],1])
+# filtered = arr[::skipline,1]
+# for i in indexlist:
+# 	for j in np.arange(1,arr.shape[1]):
+# 		filtered[i] = filtered[i] * filter_coef + (1-filter_coef) * arr[i,j]
+# plt.plot(arr[::skipline,0],filtered)
+
 plt.title('Performance Of The Agent')
 plt.xlabel('Number of Bellman Update')
 plt.ylabel('Cumulative Reward')
