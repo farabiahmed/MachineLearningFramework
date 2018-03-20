@@ -1,18 +1,20 @@
 from abc import ABCMeta, abstractmethod
 
-class Representation(metaclass=ABCMeta):
+
+class Memory(metaclass=ABCMeta):
+
     @abstractmethod
-    def Get_Greedy_Pair(self,state):
+    def add(self, sample):
         raise NotImplementedError()
 
     @abstractmethod
-    def Get_Value(self,state,action):
+    def sample(self, n):
         raise NotImplementedError()
 
     @abstractmethod
-    def Set_Value(self,state,action,value):
+    def update(self, data):
         raise NotImplementedError()
 
     @abstractmethod
-    def Add_Experience(self,state,action,nextstate,reward,status):
+    def length(self):
         raise NotImplementedError()

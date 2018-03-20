@@ -31,8 +31,8 @@ class Representation_Keras_MultiAgent_TensorInput(Representation):
         # create model
         self.model = Sequential()
         self.model.add(Dense(self.hidden_unit[0], activation='tanh', input_dim = self.size_of_input_units ))
-        self.model.add(Dense(self.hidden_unit[1], activation='tanh'))
-        self.model.add(Dense(self.hidden_unit[2], activation='tanh'))
+        for i in range(1, len(hidden_unit)):
+            self.model.add(Dense(self.hidden_unit[i], activation='tanh'))
         self.model.add(Dense(self.output_unit, activation=LeakyReLU(0.3)))
 
         # Compile model
@@ -147,7 +147,7 @@ class Representation_Keras_MultiAgent_TensorInput(Representation):
         if len(self.memory) >= self.batchsize :
 
             self.trainingepochtotal += self.trainPass
-            print('Training Epoch:', self.trainingepochtotal)
+            #print('Training Epoch:', self.trainingepochtotal)
 
             # Reset the counter
             # self.fresh_experience_counter=0
@@ -236,6 +236,9 @@ class Representation_Keras_MultiAgent_TensorInput(Representation):
             print("###############################")
             print("Model saved.......")
             print("###############################")
+
+    def Add_Experience(self,state,action,nextstate,reward,status):
+        raise NotImplementedError()
 
     def __del__(self):
         print('Representation object died.')

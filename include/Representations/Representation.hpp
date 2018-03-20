@@ -38,6 +38,8 @@ public:
 
 	virtual void Print_Value() = 0;
 
+	virtual void Add_Experience(const SmartVector& state, const SmartVector& action, const SmartVector& nextState, const double& reward, const int status){};
+
 	virtual void Get_Report(string filePath, string fileName);
 
 	string Name;	///< It stores the name of representation to increase readability and awareness.

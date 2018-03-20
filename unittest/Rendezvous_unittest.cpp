@@ -22,6 +22,7 @@
 #include "Agents/TrajectoryBasedValueIteration.hpp"
 #include "Agents/GreedyAgent.hpp"
 #include "Agents/OnlineTrajectoryValueIteration.hpp"
+#include "Agents/DeepQNetwork.hpp"
 
 #include "Representations/Representation.hpp"
 #include "Representations/RepresentationUDP.hpp"
@@ -29,6 +30,7 @@
 #include <Representations/FunctionApproximatorGaussianRadialBasis.hpp>
 #include <Representations/FunctionApproximatorNeuralNetwork.hpp>
 #include <Representations/TabularStateActionPair.hpp>
+#include "Representations/RepresentationDeepQNetworkUDP.hpp"
 
 using namespace std;
 
@@ -69,7 +71,7 @@ int main()
 
 
 	// Assign the default file if it is not assigned yet.
-	if(configFile.empty()) configFile = "config/config_rendezvous_3x3_3agent.cfg";
+	if(configFile.empty()) configFile = "config/config_rendezvous_3x3_2agent.cfg";
 
 	// Get parameters from file
 	ConfigParser cfg = ConfigParser(configFile);
@@ -81,13 +83,16 @@ int main()
 	// Initialize Representation Function
 	//value 			= new TabularStateActionPair(*environment,cfg);
 	//value 				= new FunctionApproximatorNeuralNetwork(*environment,cfg);
-	value 			= new RepresentationUDP(*environment,cfg);
+	//value 			= new RepresentationUDP(*environment,cfg);
+	value 				= new RepresentationDeepQNetworkUDP(*environment,cfg);
 
 	// Initialize Solver
 	//agent 			= new QIteration(environment, value, cfg);
-	agent 				= new TrajectoryBasedValueIteration(environment, value, cfg);
+	//agent 				= new TrajectoryBasedValueIteration(environment, value, cfg);
 	//agent 				= new OnlineTrajectoryValueIteration(environment, value, cfg);
 	//agent				= new GreedyAgent(environment,cfg);
+	agent 				= new DeepQNetwork(environment, value, cfg);
+
 
 	//Start Calculation
 	agent->Start_Execution();

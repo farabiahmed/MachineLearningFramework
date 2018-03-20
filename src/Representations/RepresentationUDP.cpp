@@ -28,6 +28,8 @@ RepresentationUDP::RepresentationUDP(const Environment& env, const ConfigParser&
 
 	// Initialize transmitter
 	udpsocket.SetTargetIp((char*)host_ip.c_str(),port_tx);
+
+	gamma = cfg.GetValueOfKey<double>("GAMMA",0.8);
 }
 
 RepresentationUDP::~RepresentationUDP() {
@@ -173,6 +175,14 @@ void RepresentationUDP::Set_Value(const SmartVector& state, const SmartVector& a
 	//cout<<"UDP Receiver: "<<len<<" Data:"<<rxBuffer<<endl;
 }
 
+void RepresentationUDP::Add_Experience(const SmartVector& state, const SmartVector& action, const SmartVector& nextState, const double& reward, const int status)
+{
+	double maxQvalue = this->Get_Greedy_Pair(nextState).second;
+
+	double qvalue = reward + gamma * maxQvalue;
+
+	this->Set_Value(state,action,qvalue);
+}
 void RepresentationUDP::Print_Value()
 {
 	cout<<endl<<"Displaying State-Action Pair Q Value:"<<endl;

@@ -38,22 +38,27 @@ public:
 
 	void Set_Value(const SmartVector& state, const SmartVector& action, double value);
 
+	void Add_Experience(const SmartVector& state, const SmartVector& action, const SmartVector& nextState, const double& reward, const int status);
+
 	void Print_Value();
 
 	string Name;	///< It stores the name of representation to increase readability and awareness.
     				///< Such as StateActionValue, GaussianRBF etc.
 
-
-private:
+protected:
 	string Vector_ToString(const SmartVector& vec) const;
 
 	UDP udpsocket;
+
+private:
 
 	string host_ip;
 
 	int port_tx;
 
 	int port_rx;
+
+	double gamma;
 
 };
 

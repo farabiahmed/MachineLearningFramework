@@ -4,6 +4,8 @@ import time
 import datetime as dt
 import numpy as np
 from Representation_Keras_MultiAgent_TensorInput import Representation_Keras_MultiAgent_TensorInput
+from DeepQNetwork import DeepQNetwork
+from DeepQNetwork_PrioritizedReplay import DeepQNetwork_PrioritizedReplay
 
 from command_parser import command_parser
 
@@ -15,14 +17,28 @@ from command_parser import command_parser
 #                                       batch_size=9*4,
 #                                       trainpass=5000)
 
-rep = Representation_Keras_MultiAgent_TensorInput      (gridsize=5,
+
+rep = DeepQNetwork_PrioritizedReplay                   (gridsize=3,
                                                         actionspaceperagent=5,
-                                                        numberofagent=3,
-                                                        hidden_unit=[512,1024,512],
+                                                        numberofagent=2,
+                                                        #hidden_unit=[256, 512, 256],
+                                                        hidden_unit=[25, 25],
                                                         learning_rate=0.1,
                                                         batch_size=32,
                                                         trainpass=25,
-                                                        experiencebuffer=128)
+                                                        experiencebuffer = 128,
+                                                        statePreprocessType = 'Tensor',
+                                                        convolutionLayer=True
+                                                        )
+
+# rep = Representation_Keras_MultiAgent_TensorInput      (gridsize=3,
+#                                                         actionspaceperagent=5,
+#                                                         numberofagent=2,
+#                                                         hidden_unit=[25,25],
+#                                                         learning_rate=0.1,
+#                                                         batch_size=32,
+#                                                         trainpass=25,
+#                                                         experiencebuffer=128)
 
 # rep = Representation_Tensorflow_ExperienceReplay_TypeB(statedimperagent=2,
 #                                                         actionspaceperagent=5,
@@ -83,19 +99,11 @@ def read():
         #print(rxstr)
 
         # Parse Received Command
-        command, state, action, value = command_parser(rxstr)
+        command, state, action, value , nextstate, status = command_parser(rxstr)
 
         # Send ok to client to let it know that packet received.
         #send_command_type = command
         #send_ok = True
-
-        '''
-        print('Command:', command)
-        
-        print('State:', state)
-        print('Action:', action)
-        print('Value:', value)
-        '''
 
         if command == 'setvalue':
             rep.Set_Value(state, action, value)
@@ -116,6 +124,11 @@ def read():
             s.sendto((tmp).encode(), (HOSTTX, PORTTX))
             #n2 = dt.datetime.now()
             #print(((n2-n1).microseconds)/1e3)
+
+        elif command == 'experience':
+            rep.Add_Experience(state, action, nextstate, value, status)
+            total_setval_persec += 1
+            s.sendto(("OK,experience").encode(), (HOSTTX, PORTTX))
 
         total_command_persec+=1
 
