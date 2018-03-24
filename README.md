@@ -10,8 +10,9 @@ Dynamic Programming applications.
 In order to utilize most of this project, currently you need to make those
 softwares ready on your system. 
 ```
+g++
 make
-Python3
+Python3 (sudo apt install python-dev)
 matplotlib
 tensorflow
 openCL
