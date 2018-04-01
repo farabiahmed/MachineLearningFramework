@@ -41,12 +41,23 @@ public:
 		return Convert::string_to_T<ValueType>(value);
 	}
 
+	void Print_Arguments(void)
+	{
+		for (auto it : contents)
+		{
+			cout << it.first << " : " << it.second << endl;
+		}
+	}
+
 	//
 	bool KeyExists(const std::string &key) const;
 
 	void AddContent(const std::string &key, const std::string &value); //picks both lvalue and rvalue
 	//void AddContent(std::string &key, std::string &value); //picks just lvalue  of key
 	//void AddContent(std::string &&key,std::string &value); //picks just rvalue of key
+
+	// Key-Value Pairs
+	map<string,string> GetContents(void) { return contents;}
 
 private:
 
