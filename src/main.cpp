@@ -31,6 +31,7 @@ string Get_TimeStamp(void)
 
 vector<string> param_names; 			/* Holds set name */
 vector<vector<string>> param_list;		/* List of elements in each set */
+vector<float> param_results; 			/* Holds result of each model */
 
 string executable_name;
 string gridsearch_type;
@@ -40,6 +41,7 @@ int total_numberof_models = 1;
 vector<string> Get_Model_withIndex(vector<vector<string>>& list, int index);
 string add_escape(string s);
 void read_shared_memory(char* buffer, size_t size);
+void Print_Search_List(void);
 
 void help_menu(void)
 {
@@ -108,6 +110,8 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	param_results = vector<float>(total_numberof_models);
+
 	cout << endl;
 	cout << "---------------------------------------------------"<<endl;
 	cout << "Miscellaneous Parameters							"<<endl;
@@ -117,30 +121,7 @@ int main(int argc, char* argv[])
 	cout << "Grid Search Type: " << gridsearch_type << endl;
 	cout << "Total Number of Models: " << total_numberof_models << endl;
 
-
-	cout << endl;
-	cout << "---------------------------------------------------"<<endl;
-	cout << "Search List										"<<endl;
-	cout << "---------------------------------------------------"<<endl;
-
-	cout << "Index,";
-	for(auto it_vec : param_names)
-	{
-		cout << it_vec << ",";
-	}
-	cout<<endl;
-
-	for (int i = 0; i < total_numberof_models; ++i) {
-		/* Current model to run */
-		vector<string> param =  Get_Model_withIndex(param_list, i);
-
-		std::cout.width(4); cout<< i; cout << ",";
-		for(auto it_vec : param)
-		{
-			cout << it_vec << ",";
-		}
-		cout<< endl;
-	}
+	Print_Search_List();
 
 	cout << endl;
 	cout << "---------------------------------------------------"<<endl;
@@ -156,6 +137,9 @@ int main(int argc, char* argv[])
 			arguments += " -" + param_names[j] + " " + param[j];
 		}
 
+		arguments += " -TIME_STAMP " + timeStamp;
+		arguments += " -MODEL_ID " + std::to_string(i);
+
 		cout<<"Executing ";
 		std::cout.width(3); cout << i;
 		cout<< ". Model: (" << (executable_name + arguments) << ")" <<endl;
@@ -169,10 +153,13 @@ int main(int argc, char* argv[])
 		read_shared_memory(buffer, sizeof buffer);
 		sscanf(buffer,"%f",&fval);
 
+		param_results[i] = fval;
+
 		cout<<"Return Value:"<<fval<<endl;
 		cout<<endl;
 	}
 
+	Print_Search_List();
 
 	return 0;
 }
@@ -239,4 +226,33 @@ void read_shared_memory(char* buffer, size_t size)
 
 	// destroy the shared memory
 	shmctl(shmid,IPC_RMID,NULL);
+}
+
+void Print_Search_List(void)
+{
+	cout << endl;
+	cout << "---------------------------------------------------"<<endl;
+	cout << "Search List										"<<endl;
+	cout << "---------------------------------------------------"<<endl;
+
+	cout << "Index,";
+	for(auto it_vec : param_names)
+	{
+		cout << it_vec << ",";
+	}
+	cout << "Result";
+	cout<<endl;
+
+	for (int i = 0; i < total_numberof_models; ++i) {
+		/* Current model to run */
+		vector<string> param =  Get_Model_withIndex(param_list, i);
+
+		std::cout.width(4); cout<< i; cout << ",";
+		for(auto it_vec : param)
+		{
+			cout << it_vec << ",";
+		}
+		cout << to_string(param_results[i]);
+		cout<< endl;
+	}
 }

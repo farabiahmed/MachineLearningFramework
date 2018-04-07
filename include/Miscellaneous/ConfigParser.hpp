@@ -52,6 +52,8 @@ public:
 	//
 	bool KeyExists(const std::string &key) const;
 
+	void UpdateContent(const std::string &key, const std::string &value);
+
 	void AddContent(const std::string &key, const std::string &value); //picks both lvalue and rvalue
 	//void AddContent(std::string &key, std::string &value); //picks just lvalue  of key
 	//void AddContent(std::string &&key,std::string &value); //picks just rvalue of key

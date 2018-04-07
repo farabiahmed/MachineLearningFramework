@@ -34,6 +34,8 @@ public:
 
 	void Print_Arguments(void);
 
+	// Key-Value Pairs
+	unordered_map<string,string> GetContents(void) { return dictionary;}
 
 private:
 	vector<string> words;

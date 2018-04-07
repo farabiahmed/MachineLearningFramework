@@ -13,6 +13,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <Miscellaneous/CommandLineParser.hpp>
+#include <Miscellaneous/ConfigParser.hpp>
 using namespace std;
 
 void write_shared_memory(char* buffer, size_t size);
@@ -41,25 +42,38 @@ int main(int argc, char* argv[])
 	// Menu for user
 	help_menu();
 
-//	ConfigParser cfg("../config/config.cfg");
-//	cout<<endl<<"Config Variables"<<endl;
-//	cfg.Print_Arguments();
-
+	/* Print commandline parameters */
 	cout<<endl<<"Command Line Variables"<<endl;
 	CommandLineParser clp = CommandLineParser(argc,argv);
 	clp.Print_Arguments();
 
-	//cout<<endl<<"Updated Config Variables"<<endl;
-	//cfg.Print_Arguments();
+	/* Print configuration parameters */
+	ConfigParser cfg(clp.GetOption<string>("CONFIG"));
+	cout<<endl<<"Default Config Variables"<<endl;
+	cfg.Print_Arguments();
+
+	/* Update configuration via command line arguments */
+	unordered_map<string, string> contents = clp.GetContents();
+	for(auto it : contents)
+	{
+		cfg.UpdateContent(it.first,it.second);
+	}
+
+	/* Print updated configuration parameters */
+	cout<<endl<<"Updated Config Variables"<<endl;
+	cfg.Print_Arguments();
+
+	/* Add Time stamp if not exist */
+	if(!cfg.KeyExists("TIME_STAMP"))
+	{
+		string timeStamp = Get_TimeStamp();
+		cfg.AddContent(string("TIME_STAMP"),timeStamp);
+	}
+
+	/* Run Model Here */
 
 
-//	string timeStamp = Get_TimeStamp();
-//
-//
-//	// Get parameters from file
-//	ConfigParser cfg = ConfigParser(configFile);
-//	cfg.AddContent(string("TIME_STAMP"),timeStamp);
-
+	/* Return Performance Value */
 	float f = 3.14;
 	char array[1024];
 	sprintf(array, "%f", f);

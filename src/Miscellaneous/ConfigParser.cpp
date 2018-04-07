@@ -120,6 +120,14 @@ void ConfigParser::AddContent(const std::string &key, const std::string &value)
 		exitWithError("CFG: Can only have unique key names!\n");
 }
 
+void ConfigParser::UpdateContent(const std::string &key, const std::string &value)
+{
+	if (KeyExists(key))
+		contents.find(key)->second = value;
+	else
+		AddContent(key,value);
+}
+
 void ConfigParser::ExtractKey(std::string &key, size_t const &sepPos, const std::string &line) const
 {
 	key = line.substr(0, sepPos);
