@@ -14,6 +14,11 @@
 #include <sys/shm.h>
 #include <Miscellaneous/CommandLineParser.hpp>
 #include <Miscellaneous/ConfigParser.hpp>
+#include <Environments/EnvironmentFactory.hpp>
+#include <Environments/Environment.hpp>
+#include <Agents/Agent.hpp>
+#include <Representations/Representation.hpp>
+
 using namespace std;
 
 void write_shared_memory(char* buffer, size_t size);
@@ -71,13 +76,22 @@ int main(int argc, char* argv[])
 	}
 
 	/* Run Model Here */
+	Environment *environment = EnvironmentFactory::Create(EnvironmentFactory::ENVIRONMENT_TYPE_RENDEZVOUS,cfg);
+	Agent *agent;
+	Representation *value;
 
+	environment->Display_State(environment->Get_Initial_State());
 
 	/* Return Performance Value */
 	float f = 3.14;
 	char array[1024];
 	sprintf(array, "%f", f);
 	write_shared_memory(array, sizeof array);
+
+
+	delete agent;
+	delete environment;
+	delete value;
 
 	cout<<"Done."<<endl;
 
