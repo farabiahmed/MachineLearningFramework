@@ -89,9 +89,9 @@ int main(int argc, char* argv[])
 	write_shared_memory(array, sizeof array);
 
 
-	delete agent;
+	//delete agent;
 	delete environment;
-	delete value;
+	//delete value;
 
 	cout<<"Done."<<endl;
 

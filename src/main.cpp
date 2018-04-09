@@ -35,6 +35,7 @@ vector<float> param_results; 			/* Holds result of each model */
 
 string executable_name;
 string gridsearch_type;
+string redirection;
 int total_numberof_models = 1;
 
 /* Prototypes */
@@ -92,6 +93,10 @@ int main(int argc, char* argv[])
 		{
 			gridsearch_type = cfg.GetValueOfKey<string>(it.first);
 		}
+		else if( it.first == "REDIRECTION")
+		{
+			redirection = cfg.GetValueOfKey<string>(it.first);
+		}
 		else
 		{
 			param_names.push_back(it.first);
@@ -140,12 +145,15 @@ int main(int argc, char* argv[])
 		arguments += " -TIME_STAMP " + timeStamp;
 		arguments += " -MODEL_ID " + std::to_string(i);
 
+
+		string command = (executable_name + arguments + " " + redirection);
+		command = add_escape(command);
+
 		cout<<"Executing ";
 		std::cout.width(3); cout << i;
-		cout<< ". Model: (" << (executable_name + arguments) << ")" <<endl;
+		cout<< ". Model: (" << command << ")" <<endl;
 
-		string command = (executable_name + arguments);
-		command = add_escape(command);
+		/* Run Command */
 		system(command.c_str());
 
 		char buffer[1024];
