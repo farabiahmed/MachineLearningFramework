@@ -161,3 +161,14 @@ void Agent::Get_Report(string filePath, string fileName)
 	}
 	logger.close();
 }
+
+float Agent::Get_Score(void)
+{
+	auto pair = rewards_cumulative[rewards_cumulative.size()-1];
+	float sum = 0;
+
+	for (unsigned j = 0; j < pair.second.size(); ++j) {
+		sum += pair.second[j];
+	}
+	return sum/pair.second.size();
+}

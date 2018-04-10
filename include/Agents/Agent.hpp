@@ -31,6 +31,8 @@ public:
 
 	void Get_Report(string filePath, string fileName);
 
+	float Get_Score(void);
+
 	int max_number_of_iterations;	///< Stores number of max iteration to find best policy.
 
 	vector<SmartVector> states;  ///< Stores the states of the environment to increase speed

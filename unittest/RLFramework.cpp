@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
 
 
 	/* Return Performance Value */
-	float f = 3.14;
+	float f = agent->Get_Score();
 	char array[1024];
 	sprintf(array, "%f", f);
 	write_shared_memory(array, sizeof array);

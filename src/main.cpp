@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
 		command = add_escape(command);
 
 		cout<<"Executing ";
-		std::cout.width(3); cout << i;
+		std::cout.width(3); cout << i << "/" << total_numberof_models -1;
 		cout<< ". Model: (" << command << ")" <<endl;
 
 		/* Run Command */
