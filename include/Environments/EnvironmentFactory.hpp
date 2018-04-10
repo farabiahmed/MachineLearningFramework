@@ -18,35 +18,12 @@ class EnvironmentFactory
 {
 public:
 
-	enum Environment_Type
+	static Environment* Create(string type, const ConfigParser& config)
 	{
-		ENVIRONMENT_TYPE_NONE = 0,
-		ENVIRONMENT_TYPE_BLOCKSWORLD,
-		ENVIRONMENT_TYPE_GRIDWORLD,
-		ENVIRONMENT_TYPE_RENDEZVOUS
-	};
-
-	static Environment* Create(Environment_Type type, const ConfigParser& config)
-	{
-		switch(type)
-		{
-			case ENVIRONMENT_TYPE_NONE:
-				return NULL;
-				break;
-			case ENVIRONMENT_TYPE_BLOCKSWORLD:
-				return new Blocksworld(config);
-				break;
-			case ENVIRONMENT_TYPE_GRIDWORLD:
-				return new Gridworld(config);
-				break;
-			case ENVIRONMENT_TYPE_RENDEZVOUS:
-				return new Rendezvous(config);
-				break;
-			default:
-				return NULL;
-				break;
-		}
-
+			if(type == "blocksworld") 		return new Blocksworld(config);
+			else if(type == "gridworld")	return new Gridworld(config);
+			else if(type == "rendezvous")	return new Rendezvous(config);
+			else							return NULL;
 	}
 };
 

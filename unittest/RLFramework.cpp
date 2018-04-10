@@ -17,7 +17,9 @@
 #include <Environments/EnvironmentFactory.hpp>
 #include <Environments/Environment.hpp>
 #include <Agents/Agent.hpp>
+#include <Agents/AgentFactory.hpp>
 #include <Representations/Representation.hpp>
+#include <Representations/RepresentationFactory.hpp>
 
 using namespace std;
 
@@ -75,12 +77,34 @@ int main(int argc, char* argv[])
 		cfg.AddContent(string("TIME_STAMP"),timeStamp);
 	}
 
-	/* Run Model Here */
-	Environment *environment = EnvironmentFactory::Create(EnvironmentFactory::ENVIRONMENT_TYPE_RENDEZVOUS,cfg);
-	Agent *agent;
-	Representation *value;
+	/* Get Model Id */
+	if(!cfg.KeyExists("MODEL_ID"))
+	{
+		cfg.AddContent(string("MODEL_ID"),string(""));
+	}
 
-	environment->Display_State(environment->Get_Initial_State());
+	/* Run Model Here */
+	Environment *environment 	= EnvironmentFactory::Create(clp.GetOption<string>("ENVIRONMENT"),cfg);
+	Representation *value		= RepresentationFactory::Create(clp.GetOption<string>("REPRESENTATION"), environment, cfg);
+	Agent *agent 				= AgentFactory::Create(clp.GetOption<string>("AGENT"), environment, value, cfg);
+
+	//environment->Display_State(environment->Get_Initial_State());
+
+	//Start Calculation
+	agent->Start_Execution();
+
+	//Show Q-Values
+	//value->Print_Value();
+
+	//Show Policy
+	//environment->Display_Policy(*value);
+
+	//Get Report
+	agent->Get_Report("log/"+clp.GetOption<string>("TIME_STAMP"),"agentReport_" + clp.GetOption<string>("MODEL_ID") +".csv");
+
+	//Get Report
+	//value->Get_Report("log/"+timeStamp,"representationReport.csv");
+
 
 	/* Return Performance Value */
 	float f = 3.14;
@@ -89,9 +113,9 @@ int main(int argc, char* argv[])
 	write_shared_memory(array, sizeof array);
 
 
-	//delete agent;
+	delete agent;
 	delete environment;
-	//delete value;
+	delete value;
 
 	cout<<"Done."<<endl;
 
