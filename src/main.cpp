@@ -13,6 +13,7 @@
 #include <Miscellaneous/ConfigParser.hpp>
 #include <Miscellaneous/UserControl.hpp>
 #include <stdio.h>
+#include <time.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
@@ -29,9 +30,26 @@ string Get_TimeStamp(void)
 	return string(buffer);
 }
 
+double Get_ElapsedTime(string start, string end)
+{
+	double sec;
+	tm tm_start, tm_end;
+
+	if (strptime(start.c_str(), "%Y%m%d_%H%M%S", &tm_start) != NULL){}
+	if (strptime(end.c_str(), "%Y%m%d_%H%M%S", &tm_end) != NULL){}
+
+	time_t time_start = mktime(&tm_start);
+	time_t time_end = mktime(&tm_end);
+
+	sec = (double)difftime(time_end, time_start);
+
+	return sec;
+}
+
 vector<string> param_names; 			/* Holds set name */
 vector<vector<string>> param_list;		/* List of elements in each set */
 vector<float> param_results; 			/* Holds result of each model */
+vector<double> elapsedtime;
 
 string executable_name;
 string gridsearch_type;
@@ -116,6 +134,7 @@ int main(int argc, char* argv[])
 	}
 
 	param_results = vector<float>(total_numberof_models);
+	elapsedtime = vector<double>(total_numberof_models);
 
 	cout << endl;
 	cout << "---------------------------------------------------"<<endl;
@@ -153,8 +172,11 @@ int main(int argc, char* argv[])
 		std::cout.width(3); cout << i << "/" << total_numberof_models -1;
 		cout<< ". Model: (" << command << ")" <<endl;
 
+		string time_start = Get_TimeStamp();
 		/* Run Command */
 		system(command.c_str());
+		elapsedtime[i] = Get_ElapsedTime(time_start,Get_TimeStamp());
+
 
 		char buffer[1024];
 		float fval;
@@ -248,7 +270,7 @@ void Print_Search_List(void)
 	{
 		cout << it_vec << ",";
 	}
-	cout << "Result";
+	cout << "Result,ElapsedTime";
 	cout<<endl;
 
 	for (int i = 0; i < total_numberof_models; ++i) {
@@ -260,7 +282,8 @@ void Print_Search_List(void)
 		{
 			cout << it_vec << ",";
 		}
-		cout << to_string(param_results[i]);
+		cout << to_string(param_results[i]) << ",";
+		cout << to_string(elapsedtime[i]);
 		cout<< endl;
 	}
 }
