@@ -10,6 +10,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
+#include <iomanip>
 #include <Miscellaneous/ConfigParser.hpp>
 #include <Miscellaneous/UserControl.hpp>
 #include <stdio.h>
@@ -60,7 +61,7 @@ int total_numberof_models = 1;
 vector<string> Get_Model_withIndex(vector<vector<string>>& list, int index);
 string add_escape(string s);
 void read_shared_memory(char* buffer, size_t size);
-void Print_Search_List(void);
+void Print_Search_List(ostream& stream);
 
 void help_menu(void)
 {
@@ -77,6 +78,9 @@ int main(int argc, char* argv[])
 	string configFile = "";
 
 	string timeStamp = Get_TimeStamp();
+
+	// Create File Directory First
+	system((string("mkdir -p log/") + timeStamp).c_str());
 
 	// Check the number of parameters
 	if (argc >= 2)
@@ -145,7 +149,18 @@ int main(int argc, char* argv[])
 	cout << "Grid Search Type: " << gridsearch_type << endl;
 	cout << "Total Number of Models: " << total_numberof_models << endl;
 
-	Print_Search_List();
+	cout << endl;
+	cout << "---------------------------------------------------"<<endl;
+	cout << "Search List										"<<endl;
+	cout << "---------------------------------------------------"<<endl;
+	Print_Search_List(cout);
+
+	/* Publish Gridsearch results as a file */
+	{
+		ofstream report("log/"+timeStamp+"/gridsearchReportPre.csv");
+		Print_Search_List(report);
+		report.close();
+	}
 
 	cout << endl;
 	cout << "---------------------------------------------------"<<endl;
@@ -189,7 +204,19 @@ int main(int argc, char* argv[])
 		cout<<endl;
 	}
 
-	Print_Search_List();
+	/* Inform user about the gridsearch results */
+	cout << endl;
+	cout << "---------------------------------------------------"<<endl;
+	cout << "Search List										"<<endl;
+	cout << "---------------------------------------------------"<<endl;
+	Print_Search_List(cout);
+
+	/* Publish Gridsearch results as a file */
+	{
+		ofstream report("log/"+timeStamp+"/gridsearchReport.csv");
+		Print_Search_List(report);
+		report.close();
+	}
 
 	return 0;
 }
@@ -258,32 +285,27 @@ void read_shared_memory(char* buffer, size_t size)
 	shmctl(shmid,IPC_RMID,NULL);
 }
 
-void Print_Search_List(void)
+void Print_Search_List(ostream& stream)
 {
-	cout << endl;
-	cout << "---------------------------------------------------"<<endl;
-	cout << "Search List										"<<endl;
-	cout << "---------------------------------------------------"<<endl;
-
-	cout << "Index,";
+	stream << "Index,";
 	for(auto it_vec : param_names)
 	{
-		cout << it_vec << ",";
+		stream << it_vec << ",";
 	}
-	cout << "Result,ElapsedTime";
-	cout<<endl;
+	stream << "Result,ElapsedTime";
+	stream<<endl;
 
 	for (int i = 0; i < total_numberof_models; ++i) {
 		/* Current model to run */
 		vector<string> param =  Get_Model_withIndex(param_list, i);
 
-		std::cout.width(4); cout<< i; cout << ",";
+		stream << setw(4) << i; stream << ",";
 		for(auto it_vec : param)
 		{
-			cout << it_vec << ",";
+			stream << it_vec << ",";
 		}
-		cout << to_string(param_results[i]) << ",";
-		cout << to_string(elapsedtime[i]);
-		cout<< endl;
+		stream << to_string(param_results[i]) << ",";
+		stream << to_string(elapsedtime[i]);
+		stream << endl;
 	}
 }
