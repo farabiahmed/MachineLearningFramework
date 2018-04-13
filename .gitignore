@@ -14,8 +14,8 @@ log/*
 *~
 
 # CDT-specific (C/C++ Development Tooling)
-.cproject
-.project
+#.cproject
+#.project
 .settings/
 
 # Ignore Mac specific files
