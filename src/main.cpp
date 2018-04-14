@@ -201,6 +201,7 @@ int main(int argc, char* argv[])
 		param_results[i] = fval;
 
 		cout<<"Return Value:"<<fval<<endl;
+		cout<<"Elapsed Time:"<<elapsedtime[i] <<endl;
 		cout<<endl;
 	}
 
