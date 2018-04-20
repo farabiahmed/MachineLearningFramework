@@ -45,6 +45,12 @@ make unittest/SmartVector_unittest
 ```
 ./bin/SmartVector_unittest
 ```
+```
+./bin/RLFramework --CONFIG config/config_rendezvous_3x3_2agent.cfg --ENVIRONMENT rendezvous --AGENT trajectory-based-value-iteration --REPRESENTATION RepresentationUDP
+```
+```
+python3 scripts/python/main.py 
+```
 
 ### Post Processing
 This python script will produce all figures in '''log''' folder with related date.  
