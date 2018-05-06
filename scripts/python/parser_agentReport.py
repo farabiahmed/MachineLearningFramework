@@ -7,6 +7,7 @@ from datetime import datetime
 import os.path
 from os.path import basename
 from os.path import splitext
+import getopt
 
 # Usage:
 # python3.4 scripts/python/parser_agentReport.py
@@ -17,24 +18,50 @@ from os.path import splitext
 # Get The Newest Folder form given path
 path = "log"
 skipline = 1
+inputFolder = ""
 
 print(sys.argv)
 
-if len(sys.argv) == 2:
-    skipline = int(sys.argv[1])
+try:
+   opts, args = getopt.getopt(sys.argv[1:],"hi:s:")
+except getopt.GetoptError:
+   print ('Check input params')
+   sys.exit(2)
+for opt, arg in opts:
+    if opt == '-h':
+       print ('parser_agent.py -i <inputfolder>')
+       print ('parser_agent.py -i <inputfolder> -s <skipline>')
+       sys.exit()
+    elif opt in ("-i", "--inputfolder"):
+       inputFolder = arg
+    elif opt in ("-s", "--skip"):
+       skipline = int(arg)
 
+print('ARGV      :', sys.argv[1:])
+print('OPTIONS   :', opts)
 
-# Get subdirectories
-subdirectories = os.listdir(path)
+if len(inputFolder) < 1:
+    print ('Getting newest simulation folder...')
+    
+    # Get subdirectories
+    subdirectories = os.listdir(path)
+    
+    # Sort the list to find newest one
+    subdirectories.sort(key=lambda date: datetime.strptime(date, "%Y%m%d_%H%M%S"))
+    
+    # Get the newest directory
+    inputFolder = subdirectories[-1]
 
-# Sort the list to find newest one
-subdirectories.sort(key=lambda date: datetime.strptime(date, "%Y%m%d_%H%M%S"))
-
-# Get the newest directory
-freshfolder = subdirectories[-1]
+if not os.path.exists(path + '/' + inputFolder):
+    print ('Check input params')
+    sys.exit(2)
+    
+print("Current Simulation To Process:", path + '/' + inputFolder)    
 
 # 'agentReport_15.csv', 'agentReport_1.csv', 'agentReport_7.csv',....
-modelFiles = [filename for filename in os.listdir(path + '/' + freshfolder) if filename.startswith("agentReport_")]
+modelFiles = [filename for filename in os.listdir(path + '/' + inputFolder) if filename.startswith("agentReport_") and filename.endswith(".csv")]
+
+print(modelFiles)
 modelFiles.sort(key=lambda str: int(splitext(basename(str))[0].split('_')[1]))
 print(modelFiles)
 
@@ -47,12 +74,12 @@ for filename in modelFiles:
     index = index + 1
     
     # Get related file and read via pandas
-    df = pd.read_csv('log/'+freshfolder+'/'+filename)
+    df = pd.read_csv('log/'+inputFolder+'/'+filename)
     arr = df.values
     
     # Inform The User
     print("REPORT #", index);
-    print("Related File:", freshfolder,"/"+filename)
+    print("Related File:", inputFolder,"/"+filename)
     
     # Loop through each data and scatter
     records = arr.shape[0]
@@ -90,14 +117,15 @@ for filename in modelFiles:
     plt.title('Performance Of The Agent')
     plt.xlabel('Number of Bellman Update')
     plt.ylabel('Cumulative Reward')
-    plt.savefig('log/'+freshfolder+"/"+splitext(basename(filename))[0]+".svg", format="svg")
-
-
+    plt.savefig('log/'+inputFolder+"/"+splitext(basename(filename))[0]+".svg", format="svg")
+    
+    plt.close(f1)
+    
 ###################################
 # Report #2
 ###################################
 
-reportfilename = 'log/'+freshfolder+'/agentReport2.csv'
+reportfilename = 'log/'+inputFolder+'/agentReport2.csv'
 
 if os.path.isfile(reportfilename):
 
@@ -107,7 +135,7 @@ if os.path.isfile(reportfilename):
 
 	# Inform The User
 	print("REPORT Type#2");
-	print("Related File:", freshfolder,"/agentReport2.csv")
+	print("Related File:", inputFolder,"/agentReport2.csv")
 
 	# Loop through each data and scatter
 	records = arr.shape[0]
@@ -125,7 +153,7 @@ if os.path.isfile(reportfilename):
 	plt.title('Performance Of The Agent')
 	plt.xlabel('Game #')
 	plt.ylabel('Player Moves')
-	plt.savefig('log/'+freshfolder+"/agentReport_gamevsmove.svg", format="svg")
+	plt.savefig('log/'+inputFolder+"/agentReport_gamevsmove.svg", format="svg")
 
 
 
@@ -135,5 +163,5 @@ if os.path.isfile(reportfilename):
 	plt.title('Exploration-Exploitation Parameter')
 	plt.xlabel('Game #')
 	plt.ylabel('E-Greedy Epsilon')
-	plt.savefig('log/'+freshfolder+"/agentReport_epsilon.svg", format="svg")
+	plt.savefig('log/'+inputFolder+"/agentReport_epsilon.svg", format="svg")
 
