@@ -76,7 +76,7 @@ for filename in modelFiles:
     # Get related file and read via pandas
     df = pd.read_csv('log/'+inputFolder+'/'+filename)
     arr = df.values
-    
+
     # Inform The User
     print("REPORT #", index);
     print("Related File:", inputFolder,"/"+filename)
