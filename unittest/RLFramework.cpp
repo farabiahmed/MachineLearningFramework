@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
 	/* Get Model Id */
 	if(!cfg.KeyExists("MODEL_ID"))
 	{
-		cfg.AddContent(string("MODEL_ID"),string(""));
+		cfg.AddContent(string("MODEL_ID"),string("0"));
 	}
 
 	/* Run Model Here */

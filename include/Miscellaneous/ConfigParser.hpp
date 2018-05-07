@@ -41,7 +41,7 @@ public:
 		return Convert::string_to_T<ValueType>(value);
 	}
 
-	void Print_Arguments(void)
+	void Print_Arguments(void) const
 	{
 		for (auto it : contents)
 		{
@@ -59,7 +59,7 @@ public:
 	//void AddContent(std::string &&key,std::string &value); //picks just rvalue of key
 
 	// Key-Value Pairs
-	map<string,string> GetContents(void) { return contents;}
+	map<string,string> GetContents(void) const { return contents;}
 
 private:
 

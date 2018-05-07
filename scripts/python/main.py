@@ -6,8 +6,8 @@ import numpy as np
 from Representation_Keras_MultiAgent_TensorInput import Representation_Keras_MultiAgent_TensorInput
 from DeepQNetwork import DeepQNetwork
 from DeepQNetwork_PrioritizedReplay import DeepQNetwork_PrioritizedReplay
-
-from command_parser import command_parser
+from Representation import Representation
+from command_parser import command_parser, config_parser
 
 #rep = Representation_Tabular([4,12,12])
 #rep = Representation_Tensorflow(4,0.1)
@@ -18,18 +18,22 @@ from command_parser import command_parser
 #                                       trainpass=5000)
 
 
-rep = DeepQNetwork_PrioritizedReplay                   (gridsize=3,
-                                                        actionspaceperagent=5,
-                                                        numberofagent=2,
-                                                        #hidden_unit=[256, 512, 256],
-                                                        hidden_unit=[25, 25],
-                                                        learning_rate=0.1,
-                                                        batch_size=32,
-                                                        trainpass=25,
-                                                        experiencebuffer = 128,
-                                                        statePreprocessType = 'Tensor',
-                                                        convolutionLayer=True
-                                                        )
+def init_model(config):
+
+    rep = DeepQNetwork_PrioritizedReplay                   (gridsize=3,
+                                                            actionspaceperagent=5,
+                                                            numberofagent=2,
+                                                            #hidden_unit=[256, 512, 256],
+                                                            hidden_unit=[25, 25],
+                                                            learning_rate=0.1,
+                                                            batch_size=32,
+                                                            trainpass=25,
+                                                            experiencebuffer = 128,
+                                                            statePreprocessType = 'Vector',
+                                                            convolutionLayer=False
+                                                            )
+
+    return rep
 
 # rep = Representation_Keras_MultiAgent_TensorInput      (gridsize=3,
 #                                                         actionspaceperagent=5,
@@ -84,11 +88,14 @@ total_getval_persec = 0
 total_setval_persec = 0
 total_getgreedy_persec = 0
 
+rep = None
+
+
 # UDP Receiver
 def read():
 
     # Initialize parameters
-    global flag_continue, send_command_type, send_ok,rep, total_command_persec, total_getgreedy_persec, total_setval_persec, total_getval_persec
+    global flag_continue, send_command_type, send_ok,rep, total_command_persec, total_getgreedy_persec, total_setval_persec, total_getval_persec, rep
 
     while flag_continue:
         # Read port when available
@@ -97,40 +104,48 @@ def read():
         # Convert the byte array to string
         rxstr = data.decode('utf-8')
         #print(rxstr)
-
-        # Parse Received Command
-        command, state, action, value , nextstate, status = command_parser(rxstr)
-
-        # Send ok to client to let it know that packet received.
-        #send_command_type = command
-        #send_ok = True
-
-        if command == 'setvalue':
-            rep.Set_Value(state, action, value)
-            total_setval_persec += 1
-            s.sendto(("OK,setvalue").encode(), (HOSTTX, PORTTX))
-
-        elif command == 'getvalue':
-            val = rep.Get_Value(state, action)
-            total_getval_persec+=1
-            s.sendto(("OK,getvalue,"+ str(val) ).encode(), (HOSTTX, PORTTX))
-
-
-        elif command == 'getgreedypair':
-            #n1 = dt.datetime.now()
-            arg, val = rep.Get_Greedy_Pair(state)
-            total_getgreedy_persec += 1
-            tmp = "OK,getgreedypair," + str(arg) + "," + str(val)
-            s.sendto((tmp).encode(), (HOSTTX, PORTTX))
-            #n2 = dt.datetime.now()
-            #print(((n2-n1).microseconds)/1e3)
-
-        elif command == 'experience':
-            rep.Add_Experience(state, action, nextstate, value, status)
-            total_setval_persec += 1
-            s.sendto(("OK,experience").encode(), (HOSTTX, PORTTX))
-
-        total_command_persec+=1
+        
+        # Check whether it is config or command            
+        params = rxstr.split(",")
+        
+                
+        if params[0] == "command" :
+            # Parse Received Command
+            command, state, action, value , nextstate, status = command_parser(params[1:])
+            
+            if command == 'setvalue':
+                rep.Set_Value(state, action, value)
+                total_setval_persec += 1
+                s.sendto(("OK,setvalue").encode(), (HOSTTX, PORTTX))
+    
+            elif command == 'getvalue':
+                val = rep.Get_Value(state, action)
+                total_getval_persec+=1
+                s.sendto(("OK,getvalue,"+ str(val) ).encode(), (HOSTTX, PORTTX))
+    
+    
+            elif command == 'getgreedypair':
+                #n1 = dt.datetime.now()
+                arg, val = rep.Get_Greedy_Pair(state)
+                total_getgreedy_persec += 1
+                tmp = "OK,getgreedypair," + str(arg) + "," + str(val)
+                s.sendto((tmp).encode(), (HOSTTX, PORTTX))
+                #n2 = dt.datetime.now()
+                #print(((n2-n1).microseconds)/1e3)
+    
+            elif command == 'experience':
+                rep.Add_Experience(state, action, nextstate, value, status)
+                total_setval_persec += 1
+                s.sendto(("OK,experience").encode(), (HOSTTX, PORTTX))
+    
+            total_command_persec+=1
+    
+        elif params[0] == "config" :
+            config = config_parser(rxstr[7:].split("|"))
+            print("Received Configuration:")
+            print(config)
+            rep = init_model(config)
+            s.sendto(("OK,config").encode(), (HOSTTX, PORTTX))
 
     print("Thread read() stopped.")
 

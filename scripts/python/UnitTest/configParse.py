@@ -2,7 +2,8 @@ configstr = "NUMBER_OF_AGENTS=2,NUMBER_OF_ROWS=5,HIDDEN_LAYERS=12;6,ETA_LEARNING
 
 configParams = configstr.split(",")
 
-print(configParams)
+print(configParams[0])
+print(configParams[1:])
 
 
 dict = {}
@@ -12,3 +13,5 @@ for param in configParams:
     
 print(dict)
 print(dict["HIDDEN_LAYERS"])
+
+

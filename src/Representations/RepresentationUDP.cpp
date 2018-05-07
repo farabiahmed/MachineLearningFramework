@@ -6,7 +6,9 @@
  */
 
 #include <Representations/RepresentationUDP.hpp>
-
+#include <map>			// Pair of key-value
+#include <string>
+#include <iostream>
 
 using namespace std;
 
@@ -30,6 +32,30 @@ RepresentationUDP::RepresentationUDP(const Environment& env, const ConfigParser&
 	udpsocket.SetTargetIp((char*)host_ip.c_str(),port_tx);
 
 	gamma = cfg.GetValueOfKey<double>("GAMMA",0.8);
+
+
+	// "config,NUMBER_OF_AGENTS=2,NUMBER_OF_ROWS=5,HIDDEN_LAYERS=12;6,ETA_LEARNING_RATE=0.1"
+	string data;
+	data+="config,";
+
+	for (auto it : cfg.GetContents())
+	{
+		data += it.first + "=" + it.second + "|";
+	}
+
+	data.erase(data.size()-1,1);
+
+	cout<<"Config Params:"<<endl;
+	cout<<data<<endl;
+	udpsocket.WriteSocket((unsigned char*)data.c_str(),data.size());
+
+
+	// Return packet:
+	// ex: OK,setvalue
+
+	unsigned char rxBuffer[65535];
+	int len = udpsocket.ReadSocket(rxBuffer,65535);
+	//cout<<"UDP Receiver: "<<len<<" Data:"<<rxBuffer<<endl;
 }
 
 RepresentationUDP::~RepresentationUDP() {
@@ -72,7 +98,7 @@ pair<int,double> RepresentationUDP::Get_Greedy_Pair(const SmartVector& state) co
 	// ex: getgreedypair,state,2,3
 
 	string data;
-	data+="getgreedypair,";
+	data+="command,getgreedypair,";
 	data+="state,";
 	data+=Vector_ToString(state);
 
@@ -118,7 +144,7 @@ double RepresentationUDP::Get_Value(const SmartVector& state, const SmartVector&
 	// ex: getvalue,state,2,3,action,3
 
 	string data;
-	data+="getvalue,";
+	data+="command,getvalue,";
 	data+="state,";
 	data+=Vector_ToString(state);
 	data+=",";
@@ -154,7 +180,7 @@ void RepresentationUDP::Set_Value(const SmartVector& state, const SmartVector& a
 	// ex: setvalue,valuestate,2,3,action,3
 
 	string data;
-	data+="setvalue,";
+	data+="command,setvalue,";
 	data+="value,";
 	data+=to_string(value);
 	data+=",";

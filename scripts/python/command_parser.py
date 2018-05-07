@@ -1,8 +1,16 @@
 import numpy as np
 
+def config_parser(configParams):
 
-# Command Parser
-def command_parser(str):
+    dict = {}
+    
+    for param in configParams:
+        dict[param.split("=")[0]] = param.split("=")[1]
+    
+    return dict
+
+# Command Parser receives Splited string
+def command_parser(words):
 
     # Initialize returns
     state = []
@@ -12,9 +20,6 @@ def command_parser(str):
     value = 0
     status = 0
     commandtype = ''
-
-    # Split the string by commas
-    words = str.split(",")
 
     # loop thorough each element then catch
     # appropriate item
