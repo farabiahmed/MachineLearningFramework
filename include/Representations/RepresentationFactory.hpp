@@ -8,11 +8,10 @@
 #ifndef REPRESENTATIONS_REPRESENTATIONFACTORY_HPP_
 #define REPRESENTATIONS_REPRESENTATIONFACTORY_HPP_
 
+#include <Representations/RepresentationActorCriticTabular.hpp>
 #include "Representations/FunctionApproximatorNeuralNetwork.hpp"
 #include "Representations/RepresentationDeepQNetworkUDP.hpp"
 #include "Representations/RepresentationUDP.hpp"
-#include "Representations/TabularStateActionPair.hpp"
-
 #include "Environments/Environment.hpp"
 #include "Representations/Representation.hpp"
 #include "Miscellaneous/ConfigParser.hpp"
@@ -27,6 +26,7 @@ public:
 			else if(type == "RepresentationDeepQNetworkUDP")		return new RepresentationDeepQNetworkUDP(*env,cfg);
 			else if(type == "RepresentationUDP")					return new RepresentationUDP(*env,cfg);
 			else if(type == "TabularStateActionPair")				return new TabularStateActionPair(*env,cfg);
+			else if(type == "RepresentationActorCriticTabular")		return new RepresentationActorCriticTabular(*env,cfg);
 			else													return NULL;
 	}
 };

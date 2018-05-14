@@ -172,10 +172,10 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 
 				}
 
-				//double currentQValue = valueFunction->Get_Value(state,action);
+				double currentQValue = valueFunction->Get_Value(state,action);
 
 				// Update the difference value between new and old value
-				//diff.push_back(abs( currentQValue - Q_plus));
+				diff.push_back(abs( currentQValue - Q_plus));
 
 				// Count the valid trajectory steps for troubleshooting purposes
 				numberof_processedtrajectorysteps++;
