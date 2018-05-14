@@ -45,6 +45,8 @@ if len(inputFolder) < 1:
     
     # Get subdirectories
     subdirectories = os.listdir(path)
+    #print("Subdirectories:")
+    #print(subdirectories)
     
     # Sort the list to find newest one
     subdirectories.sort(key=lambda date: datetime.strptime(date, "%Y%m%d_%H%M%S"))
@@ -61,8 +63,12 @@ print("Current Simulation To Process:", path + '/' + inputFolder)
 # 'agentReport_15.csv', 'agentReport_1.csv', 'agentReport_7.csv',....
 modelFiles = [filename for filename in os.listdir(path + '/' + inputFolder) if filename.startswith("agentReport_") and filename.endswith(".csv")]
 
-print(modelFiles)
-modelFiles.sort(key=lambda str: int(splitext(basename(str))[0].split('_')[1]))
+if len(modelFiles) == 0:
+    modelFiles = ["agentReport.csv"]
+else:
+    print(modelFiles)
+    modelFiles.sort(key=lambda str: int(splitext(basename(str))[0].split('_')[1]))
+    
 print(modelFiles)
 
 index = 0
