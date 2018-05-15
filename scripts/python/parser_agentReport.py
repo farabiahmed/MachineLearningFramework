@@ -71,6 +71,9 @@ else:
     
 print(modelFiles)
 
+f2 = plt.figure(1)
+ax2 = f2.add_subplot(111)
+
 index = 0
 for filename in modelFiles:
     ###################################
@@ -99,7 +102,7 @@ for filename in modelFiles:
     print('Skipline:',skipline)
     indexlist = np.arange(0,records,skipline)
     
-    f1 = plt.figure()
+    f1 = plt.figure(0)
     ax1 = f1.add_subplot(111)
     
     for xe in indexlist:
@@ -107,11 +110,10 @@ for filename in modelFiles:
             plt.scatter(arr[xe,0],ye,color='purple', alpha=0.1)
     
     # Plot using matplotlib
-    
-    
+
     # Draw mean values
-    plt.plot(arr[::skipline,0],np.mean(arr[::skipline,1:], axis=1))
-    
+    ax1.plot(arr[::skipline,0],np.mean(arr[::skipline,1:], axis=1))
+
     # filter_coef = 0.95
     # #filtered = np.zeros([indexlist.shape[0],1])
     # filtered = arr[::skipline,1]
@@ -127,6 +129,12 @@ for filename in modelFiles:
     
     plt.close(f1)
     
+    plt.figure(1)
+    ax2.plot(arr[::skipline,0],np.mean(arr[::skipline,1:], axis=1))
+    
+plt.figure(1)
+plt.savefig('log/'+inputFolder+"/"+"combined"+".svg", format="svg")        
+plt.close(f2)  
 ###################################
 # Report #2
 ###################################
