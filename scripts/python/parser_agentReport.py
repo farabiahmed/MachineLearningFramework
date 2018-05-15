@@ -130,9 +130,14 @@ for filename in modelFiles:
     plt.close(f1)
     
     plt.figure(1)
-    ax2.plot(arr[::skipline,0],np.mean(arr[::skipline,1:], axis=1))
+    # skipline = 1
+    ax2.plot(range(len(arr[::skipline,0])),np.mean(arr[::skipline,1:], axis=1), label = 'Model #'+ str(index))
     
 plt.figure(1)
+plt.legend()
+plt.title('Performance Of The Models')
+plt.xlabel('Game Number')
+plt.ylabel('Cumulative Reward')
 plt.savefig('log/'+inputFolder+"/"+"combined"+".svg", format="svg")        
 plt.close(f2)  
 ###################################
