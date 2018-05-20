@@ -1,3 +1,5 @@
 /Representation.cpython-34.pyc
 /Representation_Keras_MultiAgent_TensorInput.cpython-34.pyc
 /command_parser.cpython-34.pyc
+/DeepQNetwork.cpython-34.pyc
+/DeepQNetwork_PrioritizedReplay.cpython-34.pyc

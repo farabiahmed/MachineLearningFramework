@@ -21,3 +21,6 @@ log/*
 # Ignore Mac specific files
 .DS_Store
 /output.html
+/.pydevproject
+/log.txt
+/modelinit.h5
