@@ -6,6 +6,7 @@
  */
 
 #include "Agents/Agent.hpp"
+#include <iomanip>
 
 Agent::Agent(const ConfigParser& cfg) :
 userControl(UserControl::GetInstance())
@@ -40,7 +41,8 @@ void Agent::Get_Cumulative_Rewards(unsigned numberof_bellmanupdate)
 	static int game_played;
 	vector<double> rewards;
 
-	cout<<endl<<endl<<"Game Simulation: #"<< game_played++;
+	//cout<<endl<<endl<<"Game Simulation: #"<< game_played++;
+	cout<<" Sim: #"<< game_played++;
 
 	// Collect the performance of current session to draw a plot.
 	vector<pair<int, double>> sim_results;
@@ -63,14 +65,14 @@ void Agent::Get_Cumulative_Rewards(unsigned numberof_bellmanupdate)
 	cout<<" Moves:[ ";
 	for(auto sim:sim_results)
 	{
-			cout<<sim.first<<" ";
+			cout << setw(4) << std::fixed<< sim.first<<" ";
 	}
 	cout<<"]";
 
 	cout<<" Rewards:[ ";
 	for(auto sim:sim_results)
 	{
-			cout<<sim.second<<" ";
+			cout<< setw(4) << setprecision(2) << sim.second<<" ";
 			rewards.push_back(sim.second);
 	}
 	cout<<"]";
@@ -80,7 +82,7 @@ void Agent::Get_Cumulative_Rewards(unsigned numberof_bellmanupdate)
 	auto pair = make_pair(numberof_bellmanupdate, rewards );
 	rewards_cumulative.push_back(pair);
 
-	cout<<endl<<endl;
+	//cout<<endl<<endl;
 }
 
 pair<unsigned,double> Agent::Simulate(void)
