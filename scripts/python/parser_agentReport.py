@@ -131,7 +131,7 @@ for filename in modelFiles:
     
     plt.figure(1)
     # skipline = 1
-    ax2.plot(range(len(arr[::skipline,0])),np.mean(arr[::skipline,1:], axis=1), label = 'Model #'+ str(index))
+    ax2.plot(range(0,records,skipline),np.mean(arr[::skipline,1:], axis=1), label = 'Model #'+ str(index))
     
 plt.figure(1)
 plt.legend()
