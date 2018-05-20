@@ -39,13 +39,18 @@ public:
 
 private:
 
-	int SoftMax(vector<double> &values) const;
+	vector<double> SoftMax(vector<double> &values) const;
+
+	int ActionSelect(vector<double> probabilities) const;
 
 	// State and Action Pairs
 	vector< vector<double> > ActorValue;
 
 	// Utility Matrix
 	vector< double > CriticValue;
+
+	// Action Selection Number of Sampling
+	int ActionSelectorNumberOfSampling;
 };
 
 
