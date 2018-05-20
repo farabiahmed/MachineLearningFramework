@@ -78,10 +78,14 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 	unsigned numberof_processedtrajectorysteps = 0;
 
 	// Test initial controller performance.
-	Get_Cumulative_Rewards(numberof_bellmanupdate);
+	//Get_Cumulative_Rewards(numberof_bellmanupdate);
 
 	for (int num_of_iteration = 0; num_of_iteration < max_number_of_iterations; num_of_iteration++)
 	{
+		// Test controller performance.
+		Get_Cumulative_Rewards(numberof_bellmanupdate);
+		cout << endl;
+
 		string userCommand = userControl.GetMessage();
 		if(userCommand=="stop")
 		{
@@ -93,7 +97,7 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 			valueFunction->Print_Value();
 		}
 
-		cout<<"Iteration #: " << num_of_iteration << flush;
+		cout<<"Game #: " << num_of_iteration << flush;
 
 		// Q Value Update Value (currentQ-expectedQ)
 		vector<double> diff;
@@ -132,8 +136,8 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 		// For troubleshooting purposes
 		// Show_Trajectory(trajectory);
 
-		cout<<" Traject:"<<trajectory.size() << flush;
-		cout<<" E-Prob:"<<epsilonProbability << flush;
+		cout<<" Traject:"<<setw(4) << trajectory.size() << flush;
+		cout<<" E-Prob:"<< setw(4) << setprecision(2) << epsilonProbability << flush;
 		cout<<" Belman:" << flush;
 		for (unsigned int i = 0; i < trajectory.size(); ++i)
 		{
@@ -186,17 +190,19 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 				//cout<< numberof_bellmanupdate <<"\r" << flush;
 				numberof_bellmanupdate++;
 
+				/*
 				if(numberof_bellmanupdate % bellman_stride_forsimulation == 0)
 				{
 					// Get the cumulative rewards for the current bellman update.
 					Get_Cumulative_Rewards(numberof_bellmanupdate);
 				}
+				*/
 			}
 		}// Trajectory Loop
 
 		//cout<< " "<<flush;
 		//cout<<" Belman:"<<numberof_bellmanupdate << flush;
-		cout<<numberof_bellmanupdate<<flush;
+		cout<< setw(8) << numberof_bellmanupdate<<flush;
 
 		// Calculate mean diff
 		double sum_diff = 0;
@@ -205,7 +211,7 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 			sum_diff += diff[i];
 		}
 		mean_diff = sum_diff / (double) (diff.size());
-		cout<<" Diff: "<< mean_diff <<endl;
+		cout<<" Diff: "<< setw(10) << setprecision(6) << mean_diff;
 
 
 		logger<<num_of_iteration<<",";
@@ -215,6 +221,7 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 		logger<<mean_diff;
 		logger<<endl;
 
+		/*
 		// Check whether stopping criteria reached.
 		if(mean_diff<epsilon)
 		{
@@ -230,6 +237,7 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 
 			return true;
 		}
+		*/
 
 		if(epsilonProbability>0.1)
 			epsilonProbability *= epsilonProbabilityDecayRate;
