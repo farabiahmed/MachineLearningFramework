@@ -9,6 +9,7 @@
 #define REPRESENTATIONS_REPRESENTATIONFACTORY_HPP_
 
 #include <Representations/RepresentationActorCriticTabular.hpp>
+#include <Representations/TabularStateActionPair.hpp>
 #include "Representations/FunctionApproximatorNeuralNetwork.hpp"
 #include "Representations/RepresentationDeepQNetworkUDP.hpp"
 #include "Representations/RepresentationUDP.hpp"
