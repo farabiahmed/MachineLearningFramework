@@ -64,7 +64,7 @@ TrajectoryBasedValueIteration::TrajectoryBasedValueIteration(const Environment* 
 	states = environment->Get_All_Possible_States();
 
 	// Put Header first
-	logger<<"game,moves,egreedy,bellman"<<endl<<flush;
+	logger<<"game,moves,egreedy,bellman,diff"<<endl<<flush;
 }
 
 TrajectoryBasedValueIteration::~TrajectoryBasedValueIteration()
@@ -198,12 +198,6 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 		//cout<<" Belman:"<<numberof_bellmanupdate << flush;
 		cout<<numberof_bellmanupdate<<flush;
 
-		logger<<num_of_iteration<<",";
-		logger<<trajectory.size()<<",";
-		logger<<epsilonProbability<<",";
-		logger<<numberof_bellmanupdate;
-		logger<<endl;
-
 		// Calculate mean diff
 		double sum_diff = 0;
 		double mean_diff = 0;
@@ -213,7 +207,14 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 		mean_diff = sum_diff / (double) (diff.size());
 		cout<<" Diff: "<< mean_diff <<endl;
 
-		/*
+
+		logger<<num_of_iteration<<",";
+		logger<<trajectory.size()<<",";
+		logger<<epsilonProbability<<",";
+		logger<<numberof_bellmanupdate<<",";
+		logger<<mean_diff;
+		logger<<endl;
+
 		// Check whether stopping criteria reached.
 		if(mean_diff<epsilon)
 		{
@@ -229,7 +230,7 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 
 			return true;
 		}
-		*/
+
 		if(epsilonProbability>0.1)
 			epsilonProbability *= epsilonProbabilityDecayRate;
 
