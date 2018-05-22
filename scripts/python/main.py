@@ -20,12 +20,12 @@ from command_parser import command_parser, config_parser
 
 def init_model(config):
 
-    rep = DeepQNetwork_PrioritizedReplay                   (gridsize=3,
+    rep = DeepQNetwork_PrioritizedReplay                   (gridsize=config["NUMBER_OF_ROWS"],
                                                             actionspaceperagent=5,
-                                                            numberofagent=2,
+                                                            numberofagent=config["NUMBER_OF_AGENTS"],
                                                             #hidden_unit=[256, 512, 256],
                                                             hidden_unit=[25, 25],
-                                                            learning_rate=0.1,
+                                                            learning_rate=config["ETA_LEARNING_RATE"],
                                                             batch_size=32,
                                                             trainpass=25,
                                                             experiencebuffer = 128,
