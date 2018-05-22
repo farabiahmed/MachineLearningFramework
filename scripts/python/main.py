@@ -17,15 +17,26 @@ from command_parser import command_parser, config_parser
 #                                       batch_size=9*4,
 #                                       trainpass=5000)
 
+def strToValue(str):
+    if len(str.split(";")) > 1 :
+        try:
+            return [int(i) for i in str.split(";")]
+        except ValueError:
+            return [float(i) for i in str.split(";")]
+    else:
+        try:
+            return int(str)
+        except ValueError:
+            return float(str)
 
 def init_model(config):
 
-    rep = DeepQNetwork_PrioritizedReplay                   (gridsize=config["NUMBER_OF_ROWS"],
+    rep = DeepQNetwork_PrioritizedReplay                   (gridsize=strToValue(config["NUMBER_OF_ROWS"]),
                                                             actionspaceperagent=5,
-                                                            numberofagent=config["NUMBER_OF_AGENTS"],
+                                                            numberofagent=strToValue(config["NUMBER_OF_AGENTS"]),
                                                             #hidden_unit=[256, 512, 256],
-                                                            hidden_unit=[25, 25],
-                                                            learning_rate=config["ETA_LEARNING_RATE"],
+                                                            hidden_unit=strToValue(config["HIDDEN_LAYERS"]),
+                                                            learning_rate=strToValue(config["ETA_LEARNING_RATE"]),
                                                             batch_size=32,
                                                             trainpass=25,
                                                             experiencebuffer = 128,
