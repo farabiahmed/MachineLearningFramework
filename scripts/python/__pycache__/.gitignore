@@ -3,3 +3,8 @@
 /command_parser.cpython-34.pyc
 /DeepQNetwork.cpython-34.pyc
 /DeepQNetwork_PrioritizedReplay.cpython-34.pyc
+/DeepQNetwork.cpython-35.pyc
+/DeepQNetwork_PrioritizedReplay.cpython-35.pyc
+/Representation.cpython-35.pyc
+/Representation_Keras_MultiAgent_TensorInput.cpython-35.pyc
+/command_parser.cpython-35.pyc
