@@ -39,17 +39,25 @@ In order to build an unittest from unittest folder:
 make unittest/SmartVector_unittest
 ```
 ### Running an executable
+To start new grid search:
 ```
-./bin/main
+./bin/main -CONFIG config/gridsearch_rendezvous.cfg
 ```
+To continue from where you left off:
 ```
-./bin/SmartVector_unittest
+./bin/main -CONFIG config/gridsearch_rendezvous.cfg -TIME_STAMP 20180527_133325
 ```
+To conduct single simulation:
 ```
 ./bin/RLFramework --CONFIG config/config_rendezvous_3x3_2agent.cfg --ENVIRONMENT rendezvous --AGENT trajectory-based-value-iteration --REPRESENTATION RepresentationUDP
 ```
+To run tensorflow supported network:
 ```
 python3 scripts/python/main.py 
+```
+To test other unittest examples
+```
+./bin/SmartVector_unittest
 ```
 
 ### Post Processing
