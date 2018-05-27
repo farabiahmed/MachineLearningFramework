@@ -22,7 +22,9 @@ class DeepQNetwork_PrioritizedReplay(Representation):
                  gamma = 0.99,
                  model_reset_counter=32,
                  statePreprocessType = "Tensor",
-                 convolutionLayer= False):
+                 convolutionLayer= False,
+                 modelId = "noid",
+                 logfolder = ""):
 
         self.Gamma = gamma
         self.batchsize = batch_size
@@ -48,7 +50,9 @@ class DeepQNetwork_PrioritizedReplay(Representation):
         self.train_period = train_period # After how many new experience we will run fitting/training.
         self.counter_experience = 0 # A counter to hold how many tuple experienced
         self.counter_modelReset = model_reset_counter
-
+        self.modelId = modelId
+        self.logfolder = logfolder
+        
         # create model
         self.model = Sequential()
 
@@ -76,13 +80,13 @@ class DeepQNetwork_PrioritizedReplay(Representation):
 
         self.model.summary()
 
-        if os.path.isfile("modeltrained.h5"):
-            self.model.load_weights("modeltrained.h5")
+        if os.path.isfile("log/"+self.logfolder+"/modeltrained.h5"):
+            self.model.load_weights("log/"+self.logfolder+"/modeltrained.h5")
             print("###############################")
             print("Existing model loaded.......")
             print("###############################")
 
-        self.model.save_weights("modelinit.h5")
+        self.model.save_weights("log/"+self.logfolder+"/modelinit_"+self.modelId+".h5")
 
         # Reset the batch
         self.Reset_Batch()
@@ -230,10 +234,11 @@ class DeepQNetwork_PrioritizedReplay(Representation):
 
     def Save_Model(self):
         with self.graph.as_default():
-            self.model.save_weights("modelOutput.h5")
+            self.model.save_weights("log/"+self.logfolder+"/modelOutput_"+self.modelId+".h5")
             print("###############################")
             print("Model saved.......")
             print("###############################")
 
     def __del__(self):
+        self.Save_Model()
         print('Representation object died.')
