@@ -13,10 +13,16 @@
 #include <iomanip>
 #include <Miscellaneous/ConfigParser.hpp>
 #include <Miscellaneous/UserControl.hpp>
+#include <Miscellaneous/CommandLineParser.hpp>
 #include <stdio.h>
 #include <time.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <errno.h>
+#include <vector>
+#include <string>
 
 #define __cplusplus 201103L
 
@@ -47,6 +53,7 @@ double Get_ElapsedTime(string start, string end)
 	return sec;
 }
 
+
 vector<string> param_names; 			/* Holds set name */
 vector<vector<string>> param_list;		/* List of elements in each set */
 vector<float> param_results; 			/* Holds result of each model */
@@ -56,12 +63,15 @@ string executable_name;
 string gridsearch_type;
 string redirection;
 int total_numberof_models = 1;
+vector<int> existedModelIds;		/* To continue where you left off */
 
 /* Prototypes */
 vector<string> Get_Model_withIndex(vector<vector<string>>& list, int index);
 string add_escape(string s);
 void read_shared_memory(char* buffer, size_t size);
 void Print_Search_List(ostream& stream);
+int getdir (string dir, vector<string> &files);
+int getListOfExistedModels (vector<string> &files, vector<int> &existedModelIds);
 
 void help_menu(void)
 {
@@ -75,17 +85,44 @@ int main(int argc, char* argv[])
 	// For Random Number Generator
 	srand(time(0));
 
+	/* Print commandline parameters */
+	cout<<endl<<"Command Line Variables"<<endl;
+	CommandLineParser clp = CommandLineParser(argc,argv);
+	clp.Print_Arguments();
+
 	string configFile = "";
-
-	string timeStamp = Get_TimeStamp();
-
-	// Create File Directory First
-	system((string("mkdir -p log/") + timeStamp).c_str());
-
-	// Check the number of parameters
-	if (argc >= 2)
+	string timeStamp;
+	if(clp.ChecOptionExists("TIME_STAMP"))
 	{
-		configFile = string(argv[1]);
+		timeStamp = clp.GetOption<string>("TIME_STAMP");
+		vector<string> files = vector<string>();
+
+		if(!getdir("log/" + timeStamp,files))
+		{
+			getListOfExistedModels(files, existedModelIds);
+		}
+		else
+		{
+			cout << "GIVEN SIMULATION LOG CANNOT BE FOUND." << endl;
+			return 0;
+		}
+	}
+	else
+	{
+		timeStamp = Get_TimeStamp();
+
+		// Create File Directory First
+		system((string("mkdir -p log/") + timeStamp).c_str());
+	}
+
+	if(clp.ChecOptionExists("CONFIG"))
+	{
+		configFile = clp.GetOption<string>("CONFIG");
+	}
+	else
+	{
+		cout << "NO CONFIG FILE IS SPECIFIED." << endl;
+ 		return 0;
 	}
 
 	// Assign the default file if it is not assigned yet.
@@ -167,6 +204,22 @@ int main(int argc, char* argv[])
 	cout << "Execute Search List								"<<endl;
 	cout << "---------------------------------------------------"<<endl;
 	for (int i = 0; i < total_numberof_models; ++i) {
+
+		bool executeModel = true;
+
+		for(unsigned j = 0; j < existedModelIds.size(); ++j)
+		{
+			if(i == existedModelIds[j])
+			{
+				cout << endl<< "MODEL ID:" << i << " IS ALREADY SIMULATED, IT IS BEING SKIPPED!" << endl << endl;
+				executeModel = false;
+				break;
+			}
+		}
+
+		if(executeModel == false)
+			continue;
+
 		/* Current model to run */
 		vector<string> param =  Get_Model_withIndex(param_list, i);
 
@@ -309,4 +362,47 @@ void Print_Search_List(ostream& stream)
 		stream << to_string(elapsedtime[i]);
 		stream << endl;
 	}
+}
+
+/*function... might want it in some class?*/
+int getdir (string dir, vector<string> &files)
+{
+	DIR *dp;
+	struct dirent *dirp;
+	if((dp = opendir(dir.c_str())) == NULL)
+	{
+		cout << "Error(" << errno << ") opening " << dir << endl;
+		return errno;
+	}
+
+	while ((dirp = readdir(dp)) != NULL)
+	{
+		files.push_back(string(dirp->d_name));
+	}
+	closedir(dp);
+	return 0;
+}
+
+int getListOfExistedModels (vector<string> &files, vector<int> &existedModelIds)
+{
+	string preFix = "agentReport_";
+	string postFix = ".csv";
+	int modelId;
+	int totalModels = 0;
+	cout<< endl << "EXISTED MODELS ARE CHECKING..." << endl;
+	for (unsigned int i = 0;i < files.size();i++)
+	{
+		if(!strncmp(files[i].c_str(), preFix.c_str(), preFix.size()) // Starts with
+				&&
+				!strncmp(files[i].c_str() + (files[i].size() - postFix.size()), postFix.c_str(), postFix.size())) // Ends with
+		{
+			sscanf(files[i].c_str(), "%*[^_]%*c%d%*c%*s",&modelId);
+			existedModelIds.push_back(modelId);
+			totalModels++;
+			cout << files[i] << " " << modelId << endl;
+		}
+	}
+
+	cout<< "TOTAL FOUND EXISTED MODELS: "<< totalModels << endl;
+	return totalModels;
 }
