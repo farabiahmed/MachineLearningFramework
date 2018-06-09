@@ -9,6 +9,7 @@
 #include <map>			// Pair of key-value
 #include <string>
 #include <iostream>
+#include <exception>
 
 using namespace std;
 
@@ -120,11 +121,20 @@ pair<int,double> RepresentationUDP::Get_Greedy_Pair(const SmartVector& state) co
 
 	assert(words[0] == "OK" && words[1] == "getgreedypair");
 
-	maxArg = stoi(words[2]);
-	maxVal = stod(words[3]);
+	try
+	{
+		maxArg = stoi(words[2]);
+		maxVal = stod(words[3]);
+	}
+	catch (int e)
+	{
+		cout << "An exception occurred. Exception Code: " << e << '\n';
+		cout << "Inputs: " << words[2] << " " << words[3] << '\n';
+
+		exit(0);
+	}
 
 	return make_pair(maxArg,maxVal);
-
 }
 
 
@@ -168,9 +178,20 @@ double RepresentationUDP::Get_Value(const SmartVector& state, const SmartVector&
 	// Parse string to vector-list
 	vector<string> words = Convert::string_to_T<vector<string>>(str);
 
+	//cout<<"GetValue:" << str<<endl;
 	assert(words[0] == "OK" && words[1] == "getvalue");
+	try
+	{
+		return stod(words[2]);
+	}
+	catch (int e)
+	{
+		cout << "An exception occurred. Exception Code: " << e << '\n';
+		cout << "Inputs: " << words[2] << " " << words[3] << '\n';
 
-	return stod(words[2]);
+		exit(0);
+		return 0;
+	}
 }
 
 void RepresentationUDP::Set_Value(const SmartVector& state, const SmartVector& action, double value)
