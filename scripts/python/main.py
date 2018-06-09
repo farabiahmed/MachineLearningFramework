@@ -6,6 +6,7 @@ import numpy as np
 from Representation_Keras_MultiAgent_TensorInput import Representation_Keras_MultiAgent_TensorInput
 from DeepQNetwork import DeepQNetwork
 from DeepQNetwork_PrioritizedReplay import DeepQNetwork_PrioritizedReplay
+from DeepActorCritic_PrioritizedReplay import DeepActorCritic_PrioritizedReplay
 from Representation import Representation
 from command_parser import command_parser, config_parser
 
