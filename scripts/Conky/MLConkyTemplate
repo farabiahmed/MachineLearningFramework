@@ -2,8 +2,6 @@
 # "CPU Panel (4-core)" theme for Conky by Tony George (teejee2008@gmail.com)
 #
 # Webpage: http://teejeetech.blogspot.in/
-
-Added GPU specific info.
 # **********************************************************************
 
 
@@ -11,9 +9,6 @@ background yes
 double_buffer yes
 
 alignment top_right
-
-default_graph_width=180,
-default_graph_height=100,
 
 border_width 1
 cpu_avg_samples 2
@@ -24,6 +19,7 @@ draw_borders no
 draw_graph_borders yes
 draw_outline no
 draw_shades no
+default_graph_size 300 50
 
 gap_x 20
 gap_y 40
@@ -85,7 +81,7 @@ ${goto 6}${voffset 5}${font conkycolors:size=16}${font}${voffset -6}${goto 2}\
 Memory:${alignr}${exec nvidia-smi --query-gpu=memory.used --format=csv,noheader} / ${exec nvidia-smi --query-gpu=memory.total --format=csv,noheader}
 ${goto 6}${voffset 5}${font conkycolors:size=16}${font}${voffset -6}${goto 2}\
 Utilization Gpu/Mem:${alignr}${exec nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader} / ${exec nvidia-smi --query-gpu=utilization.memory --format=csv,noheader}
-${execgraph nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader 100,300}
+${execgraph nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader}
 ${else}\
 ${goto 6}${voffset 5}${font conkycolors:size=16}r${font}${voffset -6}${goto 2}OFF
 ${endif}\
