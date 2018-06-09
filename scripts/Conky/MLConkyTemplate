@@ -1,0 +1,102 @@
+# **********************************************************************
+# "CPU Panel (4-core)" theme for Conky by Tony George (teejee2008@gmail.com)
+#
+# Webpage: http://teejeetech.blogspot.in/
+# **********************************************************************
+
+
+background yes
+double_buffer yes
+
+alignment top_right
+
+border_width 1
+cpu_avg_samples 2
+default_color white
+default_outline_color white
+default_shade_color white
+draw_borders no
+draw_graph_borders yes
+draw_outline no
+draw_shades no
+
+gap_x 20
+gap_y 40
+net_avg_samples 2
+no_buffers yes
+out_to_console no
+out_to_stderr no
+extra_newline no
+
+own_window yes
+own_window_type normal
+own_window_transparent yes
+own_window_colour 000000
+own_window_argb_visual no
+own_window_argb_value 0
+own_window_hints undecorated,below,sticky,skip_taskbar,skip_pager
+
+minimum_size 300 350
+stippled_borders 0
+update_interval 2.0
+uppercase no
+use_spacer none
+
+show_graph_scale no
+show_graph_range no
+
+use_xft yes
+xftalpha 0.1
+xftfont Droid Sans:size=12
+color0 white
+color1 EAEAEA
+color2 FFA300
+color3 grey
+
+
+TEXT
+
+${font Ubuntu:size=12}${color2} SYSTEM ${color0} ${hr 2} ${font}
+${goto 6}Uptime: ${alignr}${uptime}
+${goto 6}OS: ${alignr}  ${pre_exec lsb_release -d | cut -f 2| tr "[:upper:]" "[:lower:]"}
+${goto 6}Machine: ${alignr} $machine
+${goto 6}Kernel: ${alignr} ${kernel}
+
+${font Ubuntu:size=12}${color2}CPU ${color0} ${cpu cpu0}%  ${color3}${cpubar cpu0 10,} 
+${cpugraph cpu0 100,300}${voffset -19}
+${cpugraph cpu1 50,150}${cpugraph cpu2 50,150}${voffset -19}
+${cpugraph cpu3 50,150}${cpugraph cpu4 50,150}
+${font Ubuntu:size=10}${voffset -110}${color3}${goto 10}1 ${goto 160}2 ${goto 0} ${voffset 50} ${goto 10}3 ${goto 160}4
+${font Ubuntu:size=8}${voffset -67}${color3}${goto 108}${freq_g (1)}GHz ${goto 258}${freq_g (2)}GHz ${goto 0}${voffset 50}${goto 108}${freq_g (3)}GHz ${goto 258}${freq_g (4)}GHz 
+
+
+
+${font Ubuntu:size=12}${color2}GPU  ${color0} ${hr 2} 
+${if_match ${exec lsmod | grep 'nvidia' -c} > 0}\
+${goto 6}${voffset 5}${font conkycolorslogos:size=16}${font}${voffset -6}${goto 2}${exec nvidia-smi --query-gpu=name --format=csv,noheader}
+${goto 6}${voffset 5}${font conkycolors:size=16}${font}${voffset -6}${goto 2}\
+Temperature: ${alignr}${color #FCAF3E}${exec nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits} °C$color
+${goto 6}${voffset 5}${font conkycolors:size=16}${font}${voffset -6}${goto 2}\
+Memory:${alignr}${exec nvidia-smi --query-gpu=memory.used --format=csv,noheader} / ${exec nvidia-smi --query-gpu=memory.total --format=csv,noheader}
+${goto 6}${voffset 5}${font conkycolors:size=16}${font}${voffset -6}${goto 2}\
+Utilization Gpu/Mem:${alignr}${exec nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader} / ${exec nvidia-smi --query-gpu=utilization.memory --format=csv,noheader}
+${else}\
+${goto 6}${voffset 5}${font conkycolors:size=16}r${font}${voffset -6}${goto 2}OFF
+${endif}\
+
+${color2}CPU ${color0}${alignr}${cpu cpu0}%
+${cpubar cpu0 5,}
+${top name 1} $alignr ${top cpu 1}%
+${top name 2} $alignr ${top cpu 2}%
+${top name 3} $alignr ${top cpu 3}%
+${top name 4} $alignr ${top cpu 4}%
+${top name 5} $alignr ${top cpu 5}%
+
+${color2}RAM ${color0}${alignr}${mem}
+${membar 5,}
+${top_mem name 1} $alignr ${top_mem mem_res 1}
+${top_mem name 2} $alignr ${top_mem mem_res 2}
+${top_mem name 3} $alignr ${top_mem mem_res 3}
+${top_mem name 4} $alignr ${top_mem mem_res 4}
+${top_mem name 5} $alignr ${top_mem mem_res 5}
+
