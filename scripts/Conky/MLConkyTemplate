@@ -2,6 +2,8 @@
 # "CPU Panel (4-core)" theme for Conky by Tony George (teejee2008@gmail.com)
 #
 # Webpage: http://teejeetech.blogspot.in/
+
+Added GPU specific info.
 # **********************************************************************
 
 
@@ -9,6 +11,9 @@ background yes
 double_buffer yes
 
 alignment top_right
+
+default_graph_width=180,
+default_graph_height=100,
 
 border_width 1
 cpu_avg_samples 2
@@ -63,8 +68,8 @@ ${goto 6}Machine: ${alignr} $machine
 ${goto 6}Kernel: ${alignr} ${kernel}
 
 ${font Ubuntu:size=12}${color2}CPU ${color0} ${cpu cpu0}%  ${color3}${cpubar cpu0 10,} 
-${cpugraph cpu0 100,300}${voffset -19}
-${cpugraph cpu1 50,150}${cpugraph cpu2 50,150}${voffset -19}
+${cpugraph cpu0 100,300}${voffset -10}
+${cpugraph cpu1 50,150}${cpugraph cpu2 50,150}${voffset -10}
 ${cpugraph cpu3 50,150}${cpugraph cpu4 50,150}
 ${font Ubuntu:size=10}${voffset -110}${color3}${goto 10}1 ${goto 160}2 ${goto 0} ${voffset 50} ${goto 10}3 ${goto 160}4
 ${font Ubuntu:size=8}${voffset -67}${color3}${goto 108}${freq_g (1)}GHz ${goto 258}${freq_g (2)}GHz ${goto 0}${voffset 50}${goto 108}${freq_g (3)}GHz ${goto 258}${freq_g (4)}GHz 
@@ -80,10 +85,10 @@ ${goto 6}${voffset 5}${font conkycolors:size=16}${font}${voffset -6}${goto 2}\
 Memory:${alignr}${exec nvidia-smi --query-gpu=memory.used --format=csv,noheader} / ${exec nvidia-smi --query-gpu=memory.total --format=csv,noheader}
 ${goto 6}${voffset 5}${font conkycolors:size=16}${font}${voffset -6}${goto 2}\
 Utilization Gpu/Mem:${alignr}${exec nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader} / ${exec nvidia-smi --query-gpu=utilization.memory --format=csv,noheader}
+${execgraph nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader 100,300}
 ${else}\
 ${goto 6}${voffset 5}${font conkycolors:size=16}r${font}${voffset -6}${goto 2}OFF
 ${endif}\
-
 ${color2}CPU ${color0}${alignr}${cpu cpu0}%
 ${cpubar cpu0 5,}
 ${top name 1} $alignr ${top cpu 1}%
@@ -99,4 +104,3 @@ ${top_mem name 2} $alignr ${top_mem mem_res 2}
 ${top_mem name 3} $alignr ${top_mem mem_res 3}
 ${top_mem name 4} $alignr ${top_mem mem_res 4}
 ${top_mem name 5} $alignr ${top_mem mem_res 5}
-
