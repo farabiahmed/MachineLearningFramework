@@ -32,11 +32,26 @@ def strToValue(str):
 
 def init_model(config):
                 
-    rep = DeepQNetwork_PrioritizedReplay                   (gridsize            = strToValue(config["NUMBER_OF_ROWS"]),
+#     rep = DeepQNetwork_PrioritizedReplay                   (gridsize            = strToValue(config["NUMBER_OF_ROWS"]),
+#                                                             actionspaceperagent = 5,
+#                                                             numberofagent       = strToValue(config["NUMBER_OF_AGENTS"]),
+#                                                             #hidden_unit=[256, 512, 256],
+#                                                             hidden_unit         = strToValue(config["HIDDEN_LAYERS"]),
+#                                                             learning_rate       = strToValue(config["ETA_LEARNING_RATE"]),
+#                                                             batch_size          = strToValue(config["BATCH_SIZE"]),
+#                                                             trainpass           = strToValue(config["TRAINING_PASS_PER_BATCH"]),
+#                                                             experiencebuffer    = strToValue(config["EXPERIENCE_REPLAY_BUFFER"]),
+#                                                             statePreprocessType = 'Vector',
+#                                                             convolutionLayer    = False,
+#                                                             modelId             = config["MODEL_ID"],
+#                                                             logfolder           = config["TIME_STAMP"],
+#                                                             )
+
+    rep = DeepActorCritic_PrioritizedReplay                 (gridsize            = strToValue(config["NUMBER_OF_ROWS"]),
                                                             actionspaceperagent = 5,
                                                             numberofagent       = strToValue(config["NUMBER_OF_AGENTS"]),
-                                                            #hidden_unit=[256, 512, 256],
-                                                            hidden_unit         = strToValue(config["HIDDEN_LAYERS"]),
+                                                            actor_hidden_unit   = strToValue(config["HIDDEN_LAYERS"]),
+                                                            critic_hidden_unit  = strToValue(config["CRITIC_HIDDEN_LAYERS"]),
                                                             learning_rate       = strToValue(config["ETA_LEARNING_RATE"]),
                                                             batch_size          = strToValue(config["BATCH_SIZE"]),
                                                             trainpass           = strToValue(config["TRAINING_PASS_PER_BATCH"]),

@@ -1,6 +1,7 @@
 
 import os.path
 import random
+from time import sleep
 
 import numpy as np
 import tensorflow as tf
@@ -16,7 +17,9 @@ from Representation import Representation
 class DeepActorCritic_PrioritizedReplay(Representation):
 
     def __init__(self,gridsize=5,actionspaceperagent=5,numberofagent=2,
-                 hidden_unit=[12,12],learning_rate=0.1,
+                 actor_hidden_unit=[12,12],
+                 critic_hidden_unit=[12,12],
+                 learning_rate=0.1,
                  batch_size=32,trainpass=25,experiencebuffer=128,
                  train_period=1,
                  gamma = 0.99,
@@ -24,12 +27,13 @@ class DeepActorCritic_PrioritizedReplay(Representation):
                  statePreprocessType = "Tensor",
                  convolutionLayer= False,
                  modelId = "noid",
-                 logfolder = ""):
+                 logfolder = "no_time_stamp"):
 
         self.Gamma = gamma
         self.batchsize = batch_size
         self.trainPass = trainpass
-        self.hidden_unit = hidden_unit
+        self.actor_hidden_unit = actor_hidden_unit
+        self.critic_hidden_unit = critic_hidden_unit
         self.learningrate = learning_rate
         self.statePreprocessType = statePreprocessType
         self.convolutionLayer = convolutionLayer
@@ -53,32 +57,53 @@ class DeepActorCritic_PrioritizedReplay(Representation):
         self.modelId = modelId
         self.logfolder = logfolder
         
-        # create model
+        # Build Actor Model
         self.model_actor = Sequential()
+        
+        self.model_actor.add(Dense(self.actor_hidden_unit[0], activation='tanh', input_dim = self.size_of_input_units ))
+
+        for i in range(1, len(actor_hidden_unit)):
+            self.model_actor.add(Dense(self.actor_hidden_unit[i], activation='tanh'))
+        self.model_actor.add(Dense(self.output_unit, activation='sigmoid'))
+
+        # Build Critic Model
         self.model_critic = Sequential()
+        
+        self.model_critic.add(Dense(self.critic_hidden_unit[0], activation='tanh', input_dim = self.size_of_input_units ))
 
-        self.model.add(Dense(self.hidden_unit[0], activation='tanh', input_dim = self.size_of_input_units ))
-
-        for i in range(1, len(hidden_unit)):
-            self.model.add(Dense(self.hidden_unit[i], activation='tanh'))
-        self.model.add(Dense(self.output_unit, activation=LeakyReLU(0.3)))
-
+        for i in range(1, len(critic_hidden_unit)):
+            self.model_critic.add(Dense(self.critic_hidden_unit[i], activation='tanh'))
+        self.model_critic.add(Dense(1, activation=LeakyReLU(0.3)))
+        
         # Compile model
-        self.model.compile(loss='mse', optimizer='sgd', metrics=['accuracy'])
-        self.model._make_predict_function()
+        self.model_actor.compile(loss='mse', optimizer='sgd', metrics=['accuracy'])
+        self.model_actor._make_predict_function()
 
+        self.model_critic.compile(loss='mse', optimizer='sgd', metrics=['accuracy'])
+        self.model_critic._make_predict_function()
+        
         #save the TensorFlow graph:
         self.graph = tf.get_default_graph()
 
-        self.model.summary()
+        self.model_actor.summary()
+        print("Model Output Shape")
+        print(self.model_actor.output_shape[1])
+        sleep(1)
+        
+        self.model_critic.summary()
+        print("Model Output Shape")
+        print(self.model_critic.output_shape[1])
+        sleep(1)
 
-        if os.path.isfile("log/"+self.logfolder+"/modeltrained.h5"):
-            self.model.load_weights("log/"+self.logfolder+"/modeltrained.h5")
+        if os.path.isfile("log/"+self.logfolder+"/model_actor_trained.h5") and os.path.isfile("log/"+self.logfolder+"/model_critic_trained.h5"):
+            self.model_actor.load_weights("log/"+self.logfolder+"/model_actor_trained.h5")
+            self.model_critic.load_weights("log/"+self.logfolder+"/model_critic_trained.h5")
             print("###############################")
             print("Existing model loaded.......")
             print("###############################")
 
-        self.model.save_weights("log/"+self.logfolder+"/modelinit_"+self.modelId+".h5")
+        self.model_actor.save_weights("log/"+self.logfolder+"/model_actor_init_"+self.modelId+".h5")
+        self.model_critic.save_weights("log/"+self.logfolder+"/model_critic_init_"+self.modelId+".h5")
 
         # Reset the batch
         self.Reset_Batch()
@@ -114,10 +139,11 @@ class DeepActorCritic_PrioritizedReplay(Representation):
     def Get_Greedy_Pair(self,state):
         # Backward compability: Preprocess state input if needed.
         if np.size(state) != self.size_of_input_units:
-            values = self.ForwardPass(self.Convert_State_To_Input(state))
+            values = self.ForwardPass(self.model_actor, self.Convert_State_To_Input(state))
         else:
-            values = self.ForwardPass(state)
+            values = self.ForwardPass(self.model_actor, state)
 
+        # TODO: Add SoftMax Here
         # Get the maximums
         arg = values.argmax()
         valmax = values.max()
@@ -126,14 +152,14 @@ class DeepActorCritic_PrioritizedReplay(Representation):
 
     def Get_Value(self,state,action):
 
-        values = self.ForwardPass(self.Convert_State_To_Input(state))
-        index = self.Get_Action_Index(action)
-        temp = values[index]
+        value = self.ForwardPass(self.model_critic, self.Convert_State_To_Input(state))
+        #index = self.Get_Action_Index(action)
+        #temp = values[index]
 
-        return temp
+        return value[0]
 
 
-    def ForwardPass(self,input):
+    def ForwardPass(self,model, input):
 
       # Form Input Values
         if self.convolutionLayer == True:
@@ -143,9 +169,9 @@ class DeepActorCritic_PrioritizedReplay(Representation):
 
         # Prediction of the model
         with self.graph.as_default():
-            hypothesis = self.model.predict(input)
+            hypothesis = model.predict(input)
 
-        values = np.asarray(hypothesis).reshape(self.output_unit)
+        values = np.asarray(hypothesis).reshape(model.output_shape[1])
 
         return values
 
@@ -166,17 +192,23 @@ class DeepActorCritic_PrioritizedReplay(Representation):
         state = self.Convert_State_To_Input(state)
 
         # Update label
-        values = self.ForwardPass(state)
+        values = self.ForwardPass(self.model_actor, state)
         index = self.Get_Action_Index(action)
 
         # Calculate error for Prioritized Experience Replay
-        error = abs(values[index] - value)
+        critic_value = self.Get_Value(state, action)
+        error = value - critic_value
 
-        values[index] = value
-
+        # Calculate Label for Actor
+        values[index] = values[index] + self.learningrate * error
+        
+        # Calculate Label for Critic
+        #critic = critic_value + self.learningrate * error
+        critic = value
+        
         # Append new sample to Memory of Experiences
         # Don't worry about its size, since it is a queue
-        self.memory.add(error,(state, values))
+        self.memory.add(abs(error),(state, values, critic))
 
         #if self.fresh_experience_counter == self.batchsize :
         if self.memory.length() >= self.batchsize :
@@ -187,16 +219,19 @@ class DeepActorCritic_PrioritizedReplay(Representation):
             # Get Unique Samples from memory as much as batchsize
             minibatch = self.memory.sample(self.batchsize)
 
-            batchSamplesX = []
-            batchSamplesY = []
+            batchSamplesX = [] # states
+            batchSamplesY = [] # actor values
+            batchSamplesZ = [] # critic
 
             for i in np.arange(len(minibatch)):
-                idx, (X, Y) = minibatch[i]
+                idx, (X, Y, Z) = minibatch[i]
                 batchSamplesX.append(X)
                 batchSamplesY.append(Y)
+                batchSamplesZ.append(Z)
 
             with self.graph.as_default():
-                self.model.fit(np.array(batchSamplesX), np.array(batchSamplesY), epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
+                self.model_actor.fit(np.array(batchSamplesX), np.array(batchSamplesY), epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
+                self.model_critic.fit(np.array(batchSamplesX), np.array(batchSamplesZ), epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
 
             # for i in np.arange(len(minibatch)):
             #     idx, (X, Y) = minibatch[i]
@@ -204,7 +239,7 @@ class DeepActorCritic_PrioritizedReplay(Representation):
             #     self.batchSamplesY = np.vstack((self.batchSamplesY, Y))
             #
             # with self.graph.as_default():
-            #     self.model.fit(self.batchSamplesX, self.batchSamplesY, epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
+            #     self.model_actor.fit(self.batchSamplesX, self.batchSamplesY, epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
             # self.Reset_Batch()
 
     def Reset_Batch(self):
@@ -226,7 +261,8 @@ class DeepActorCritic_PrioritizedReplay(Representation):
 
     def Save_Model(self):
         with self.graph.as_default():
-            self.model.save_weights("log/"+self.logfolder+"/modelOutput_"+self.modelId+".h5")
+            self.model_critic.save_weights("log/"+self.logfolder+"/model_critic_Output_"+self.modelId+".h5")
+            self.model_actor.save_weights("log/"+self.logfolder+"/model_actor_Output_"+self.modelId+".h5")
             print("###############################")
             print("Model saved.......")
             print("###############################")
