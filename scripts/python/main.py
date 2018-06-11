@@ -32,36 +32,37 @@ def strToValue(str):
 
 def init_model(config):
                 
-#     rep = DeepQNetwork_PrioritizedReplay                   (gridsize            = strToValue(config["NUMBER_OF_ROWS"]),
-#                                                             actionspaceperagent = 5,
-#                                                             numberofagent       = strToValue(config["NUMBER_OF_AGENTS"]),
-#                                                             #hidden_unit=[256, 512, 256],
-#                                                             hidden_unit         = strToValue(config["HIDDEN_LAYERS"]),
-#                                                             learning_rate       = strToValue(config["ETA_LEARNING_RATE"]),
-#                                                             batch_size          = strToValue(config["BATCH_SIZE"]),
-#                                                             trainpass           = strToValue(config["TRAINING_PASS_PER_BATCH"]),
-#                                                             experiencebuffer    = strToValue(config["EXPERIENCE_REPLAY_BUFFER"]),
-#                                                             statePreprocessType = 'Vector',
-#                                                             convolutionLayer    = False,
-#                                                             modelId             = config["MODEL_ID"],
-#                                                             logfolder           = config["TIME_STAMP"],
-#                                                             )
-
-    rep = DeepActorCritic_PrioritizedReplay                 (gridsize            = strToValue(config["NUMBER_OF_ROWS"]),
-                                                            actionspaceperagent = 5,
-                                                            numberofagent       = strToValue(config["NUMBER_OF_AGENTS"]),
-                                                            actor_hidden_unit   = strToValue(config["HIDDEN_LAYERS"]),
-                                                            critic_hidden_unit  = strToValue(config["CRITIC_HIDDEN_LAYERS"]),
-                                                            learning_rate       = strToValue(config["ETA_LEARNING_RATE"]),
-                                                            batch_size          = strToValue(config["BATCH_SIZE"]),
-                                                            trainpass           = strToValue(config["TRAINING_PASS_PER_BATCH"]),
-                                                            experiencebuffer    = strToValue(config["EXPERIENCE_REPLAY_BUFFER"]),
-                                                            statePreprocessType = 'Vector',
-                                                            convolutionLayer    = False,
-                                                            modelId             = config["MODEL_ID"],
-                                                            logfolder           = config["TIME_STAMP"],
-                                                            )
-
+    if config["DEEP_ALGO_TYPE"] ==  "DeepQNetwork_PrioritizedReplay":               
+        rep = DeepQNetwork_PrioritizedReplay                   (gridsize            = strToValue(config["NUMBER_OF_ROWS"]),
+                                                                actionspaceperagent = 5,
+                                                                numberofagent       = strToValue(config["NUMBER_OF_AGENTS"]),
+                                                                #hidden_unit=[256, 512, 256],
+                                                                hidden_unit         = strToValue(config["HIDDEN_LAYERS"]),
+                                                                learning_rate       = strToValue(config["ETA_LEARNING_RATE"]),
+                                                                batch_size          = strToValue(config["BATCH_SIZE"]),
+                                                                trainpass           = strToValue(config["TRAINING_PASS_PER_BATCH"]),
+                                                                experiencebuffer    = strToValue(config["EXPERIENCE_REPLAY_BUFFER"]),
+                                                                statePreprocessType = 'Vector',
+                                                                convolutionLayer    = False,
+                                                                modelId             = config["MODEL_ID"],
+                                                                logfolder           = config["TIME_STAMP"],
+                                                                )
+    elif config["DEEP_ALGO_TYPE"] ==  "DeepActorCritic_PrioritizedReplay":   
+        rep = DeepActorCritic_PrioritizedReplay                 (gridsize            = strToValue(config["NUMBER_OF_ROWS"]),
+                                                                actionspaceperagent = 5,
+                                                                numberofagent       = strToValue(config["NUMBER_OF_AGENTS"]),
+                                                                actor_hidden_unit   = strToValue(config["HIDDEN_LAYERS"]),
+                                                                critic_hidden_unit  = strToValue(config["CRITIC_HIDDEN_LAYERS"]),
+                                                                learning_rate       = strToValue(config["ETA_LEARNING_RATE"]),
+                                                                batch_size          = strToValue(config["BATCH_SIZE"]),
+                                                                trainpass           = strToValue(config["TRAINING_PASS_PER_BATCH"]),
+                                                                experiencebuffer    = strToValue(config["EXPERIENCE_REPLAY_BUFFER"]),
+                                                                statePreprocessType = 'Vector',
+                                                                convolutionLayer    = False,
+                                                                modelId             = config["MODEL_ID"],
+                                                                logfolder           = config["TIME_STAMP"],
+                                                                )
+    
     return rep
 
 # rep = Representation_Keras_MultiAgent_TensorInput      (gridsize=3,
@@ -91,7 +92,7 @@ def init_model(config):
 #                                                         learning_rate=0.1,
 #                                                         batch_size=32,
 #                                                         trainpass=10,
-#                                                         experiencebuffer=64)
+#               end                                          experiencebuffer=64)
 
 
 # rep = Representation_Tensorflow_ExperienceReplay(       inputs=6,

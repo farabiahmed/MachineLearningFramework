@@ -7,6 +7,7 @@ import numpy as np
 import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import *
+from keras.optimizers import Adam
 
 from Memory.Memory_SumTree import Memory_SumTree
 from Memory import Memory_UniformRandom
@@ -64,7 +65,7 @@ class DeepActorCritic_PrioritizedReplay(Representation):
 
         for i in range(1, len(actor_hidden_unit)):
             self.model_actor.add(Dense(self.actor_hidden_unit[i], activation='tanh'))
-        self.model_actor.add(Dense(self.output_unit, activation='sigmoid'))
+        self.model_actor.add(Dense(self.output_unit, activation='softmax'))
 
         # Build Critic Model
         self.model_critic = Sequential()
@@ -76,11 +77,11 @@ class DeepActorCritic_PrioritizedReplay(Representation):
         self.model_critic.add(Dense(1, activation=LeakyReLU(0.3)))
         
         # Compile model
-        self.model_actor.compile(loss='mse', optimizer='sgd', metrics=['accuracy'])
-        self.model_actor._make_predict_function()
+        self.model_actor.compile(loss='categorical_crossentropy', optimizer=Adam(lr=self.learningrate))
+        #self.model_actor._make_predict_function()
 
-        self.model_critic.compile(loss='mse', optimizer='sgd', metrics=['accuracy'])
-        self.model_critic._make_predict_function()
+        self.model_critic.compile(loss='mse', optimizer=Adam(lr=self.learningrate))
+        #self.model_critic._make_predict_function()
         
         #save the TensorFlow graph:
         self.graph = tf.get_default_graph()
@@ -160,8 +161,7 @@ class DeepActorCritic_PrioritizedReplay(Representation):
 
 
     def ForwardPass(self,model, input):
-
-      # Form Input Values
+        # Form Input Values
         if self.convolutionLayer == True:
             input = np.reshape(input, (1, input.shape[0], input.shape[1], input.shape[2]))
         else:
@@ -190,9 +190,11 @@ class DeepActorCritic_PrioritizedReplay(Representation):
 
         # Preprocess State
         state = self.Convert_State_To_Input(state)
-
+        
+        #actor = np.zeros(self.output_unit)
+        
         # Update label
-        values = self.ForwardPass(self.model_actor, state)
+        actor = self.ForwardPass(self.model_actor, state)
         index = self.Get_Action_Index(action)
 
         # Calculate error for Prioritized Experience Replay
@@ -200,7 +202,8 @@ class DeepActorCritic_PrioritizedReplay(Representation):
         error = value - critic_value
 
         # Calculate Label for Actor
-        values[index] = values[index] + self.learningrate * error
+        #actor[index] = 1 if error > 0 else 0
+        actor[index] = actor[index] + self.learningrate * error
         
         # Calculate Label for Critic
         #critic = critic_value + self.learningrate * error
@@ -208,7 +211,7 @@ class DeepActorCritic_PrioritizedReplay(Representation):
         
         # Append new sample to Memory of Experiences
         # Don't worry about its size, since it is a queue
-        self.memory.add(abs(error),(state, values, critic))
+        self.memory.add(abs(error),(state, actor, critic))
 
         #if self.fresh_experience_counter == self.batchsize :
         if self.memory.length() >= self.batchsize :
@@ -228,10 +231,11 @@ class DeepActorCritic_PrioritizedReplay(Representation):
                 batchSamplesX.append(X)
                 batchSamplesY.append(Y)
                 batchSamplesZ.append(Z)
-
-            with self.graph.as_default():
-                self.model_actor.fit(np.array(batchSamplesX), np.array(batchSamplesY), epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
-                self.model_critic.fit(np.array(batchSamplesX), np.array(batchSamplesZ), epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
+            
+            with tf.device('/gpu:0'):   
+                with self.graph.as_default():
+                    self.model_actor.fit(np.array(batchSamplesX), np.array(batchSamplesY), epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
+                    self.model_critic.fit(np.array(batchSamplesX), np.array(batchSamplesZ), epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
 
             # for i in np.arange(len(minibatch)):
             #     idx, (X, Y) = minibatch[i]
