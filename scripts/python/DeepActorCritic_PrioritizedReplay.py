@@ -20,7 +20,8 @@ class DeepActorCritic_PrioritizedReplay(Representation):
     def __init__(self,gridsize=5,actionspaceperagent=5,numberofagent=2,
                  actor_hidden_unit=[12,12],
                  critic_hidden_unit=[12,12],
-                 learning_rate=0.1,
+                 actor_learning_rate=0.01,
+                 critic_learning_rate=0.1,
                  batch_size=32,trainpass=25,experiencebuffer=128,
                  train_period=1,
                  gamma = 0.99,
@@ -35,7 +36,8 @@ class DeepActorCritic_PrioritizedReplay(Representation):
         self.trainPass = trainpass
         self.actor_hidden_unit = actor_hidden_unit
         self.critic_hidden_unit = critic_hidden_unit
-        self.learningrate = learning_rate
+        self.actorlearningrate = actor_learning_rate
+        self.criticlearningrate = critic_learning_rate
         self.statePreprocessType = statePreprocessType
         self.convolutionLayer = convolutionLayer
 
@@ -61,11 +63,11 @@ class DeepActorCritic_PrioritizedReplay(Representation):
         # Build Actor Model
         self.model_actor = Sequential()
         
-        self.model_actor.add(Dense(self.actor_hidden_unit[0], activation='tanh', input_dim = self.size_of_input_units ))
+        self.model_actor.add(Dense(self.actor_hidden_unit[0], activation='relu', input_dim = self.size_of_input_units))
 
         for i in range(1, len(actor_hidden_unit)):
-            self.model_actor.add(Dense(self.actor_hidden_unit[i], activation='tanh'))
-        self.model_actor.add(Dense(self.output_unit, activation='softmax'))
+            self.model_actor.add(Dense(self.actor_hidden_unit[i], activation='relu',kernel_initializer='he_uniform'))
+        self.model_actor.add(Dense(self.output_unit, activation='softmax', kernel_initializer='he_uniform'))
 
         # Build Critic Model
         self.model_critic = Sequential()
@@ -77,10 +79,10 @@ class DeepActorCritic_PrioritizedReplay(Representation):
         self.model_critic.add(Dense(1, activation=LeakyReLU(0.3)))
         
         # Compile model
-        self.model_actor.compile(loss='categorical_crossentropy', optimizer=Adam(lr=self.learningrate))
+        self.model_actor.compile(loss='categorical_crossentropy', optimizer=Adam(lr=self.actorlearningrate))
         #self.model_actor._make_predict_function()
 
-        self.model_critic.compile(loss='mse', optimizer=Adam(lr=self.learningrate))
+        self.model_critic.compile(loss='mse', optimizer=Adam(lr=self.criticlearningrate))
         #self.model_critic._make_predict_function()
         
         #save the TensorFlow graph:
@@ -153,7 +155,10 @@ class DeepActorCritic_PrioritizedReplay(Representation):
 
     def Get_Value(self,state,action):
 
-        value = self.ForwardPass(self.model_critic, self.Convert_State_To_Input(state))
+        
+        #value = self.ForwardPass(self.model_critic, self.Convert_State_To_Input(state))#TODO
+        value = self.ForwardPass(self.model_actor, self.Convert_State_To_Input(state))
+        
         #index = self.Get_Action_Index(action)
         #temp = values[index]
 
@@ -198,16 +203,19 @@ class DeepActorCritic_PrioritizedReplay(Representation):
         index = self.Get_Action_Index(action)
 
         # Calculate error for Prioritized Experience Replay
-        critic_value = self.Get_Value(state, action)
-        error = value - critic_value
+        #critic_value = self.Get_Value(state, action)#TODO
+        #error = value - critic_value#TODO
+        error = actor[index] - value
 
         # Calculate Label for Actor
         #actor[index] = 1 if error > 0 else 0
-        actor[index] = actor[index] + self.learningrate * error
+        #actor[index] = actor[index] + self.learningrate * error #TODO
+        #actor[index] = -error
+        actor[index] = value
         
         # Calculate Label for Critic
         #critic = critic_value + self.learningrate * error
-        critic = value
+        critic = value#TODO
         
         # Append new sample to Memory of Experiences
         # Don't worry about its size, since it is a queue
