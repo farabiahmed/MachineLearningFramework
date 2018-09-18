@@ -62,7 +62,14 @@ class DeepActorCritic_PrioritizedReplay(Representation):
         self.counter_modelReset = model_reset_counter
         self.modelId = modelId
         self.logfolder = logfolder
-
+        
+        
+        self.action_bound = 1
+        self.s_dim = self.size_of_input_units
+        self.a_dim = actionspaceperagent**numberofagent
+        
+        
+        
         ########################################
         # Build Actor Model
         ########################################
@@ -82,46 +89,115 @@ class DeepActorCritic_PrioritizedReplay(Representation):
         self.actor_scaled_out = tf.multiply(self.actor_out, self.action_bound)
         #return inputs, out, scaled_out
 
-
-
-        self.model_actor = Sequential()
-        
-        self.model_actor.add(Dense(self.actor_hidden_unit[0], activation='relu', input_dim = self.size_of_input_units))
-
-        for i in range(1, len(actor_hidden_unit)):
-            self.model_actor.add(Dense(self.actor_hidden_unit[i], activation='relu',kernel_initializer='he_uniform'))
-        self.model_actor.add(Dense(self.output_unit, activation='softmax', kernel_initializer='he_uniform'))
-
-        # Compile model
-        self.model_actor.compile(loss='categorical_crossentropy', optimizer=Adam(lr=self.actorlearningrate))
-        #######################################
-
+        self.actor_network_params = tf.trainable_variables()
+    
         ########################################
         # Build Critic Model
         ########################################
-        self.model_critic = Sequential()
         
-        self.model_critic.add(Dense(self.critic_hidden_unit[0], activation='tanh', input_dim = self.size_of_input_units ))
+        self.critic_inputs = tflearn.input_data(shape=[None, self.s_dim])
+        self.critic_action = tflearn.input_data(shape=[None, self.a_dim])
+        net = tflearn.fully_connected(self.critic_inputs, 400)
+        net = tflearn.layers.normalization.batch_normalization(net)
+        net = tflearn.activations.relu(net)
 
-        for i in range(1, len(critic_hidden_unit)):
-            self.model_critic.add(Dense(self.critic_hidden_unit[i], activation='tanh'))
-        self.model_critic.add(Dense(1, activation=LeakyReLU(0.3)))
+        # Add the action tensor in the 2nd hidden layer
+        # Use two temp layers to get the corresponding weights and biases
+        t1 = tflearn.fully_connected(net, 300)
+        t2 = tflearn.fully_connected(self.critic_action, 300)
 
-        self.model_critic.compile(loss='mse', optimizer=Adam(lr=self.criticlearningrate))
-        #######################################
+        net = tflearn.activation(
+            tf.matmul(net, t1.W) + tf.matmul(action, t2.W) + t2.b, activation='relu')
 
+        # linear layer connected to 1 output representing Q(s,a)
+        # Weights are init to Uniform[-3e-3, 3e-3]
+        w_init = tflearn.initializations.uniform(minval=-0.003, maxval=0.003)
+        self.critic_out = tflearn.fully_connected(net, 1, weights_init=w_init)        
         
+        self.critic_network_params = tf.trainable_variables()
+        
+        
+        ########################################
+        # Gradients for Actor Model
+        ########################################
+        # This gradient will be provided by the critic network
+        self.action_gradient = tf.placeholder(tf.float32, [None, self.a_dim])
+        
+        # Combine the gradients, dividing by the batch size to 
+        # account for the fact that the gradients are summed over the 
+        # batch by tf.gradients 
+        self.unnormalized_actor_gradients = tf.gradients(
+            self.actor_scaled_out, self.network_params, -self.action_gradient)
+        self.actor_gradients = list(map(lambda x: tf.div(x, self.batch_size), self.unnormalized_actor_gradients))
+        
+        # Optimization Op
+        self.actor_optimize = tf.train.AdamOptimizer(self.actor_learning_rate).\
+            apply_gradients(zip(self.actor_gradients, self.actor_network_params))
+            
+            
+        ########################################
+        # Gradients for Critic Model
+        ########################################   
+                 
+        # Network target (y_i)
+        # Obtained from the target networks
+        self.predicted_q_value = tf.placeholder(tf.float32, [None, 1])
+        
+        # Define loss and optimization Op
+        self.critic_loss = tflearn.mean_square(self.predicted_q_value, self.critic_out)
+        self.critic_optimize = tf.train.AdamOptimizer(self.critic_learning_rate).minimize(self.critic_loss)
+        
+        # Get the gradient of the net w.r.t. the action
+        self.action_grads = tf.gradients(self.critic_out, self.critic_action)
+            
+            
+            
+            
+        
+#         ########################################
+#         self.model_actor = Sequential()
+#         
+#         self.model_actor.add(Dense(self.actor_hidden_unit[0], activation='relu', input_dim = self.size_of_input_units))
+# 
+#         for i in range(1, len(actor_hidden_unit)):
+#             self.model_actor.add(Dense(self.actor_hidden_unit[i], activation='relu',kernel_initializer='he_uniform'))
+#         self.model_actor.add(Dense(self.output_unit, activation='softmax', kernel_initializer='he_uniform'))
+# 
+#         # Compile model
+#         self.model_actor.compile(loss='categorical_crossentropy', optimizer=Adam(lr=self.actorlearningrate))
+#         #######################################
+# 
+#         ########################################
+#         # Build Critic Model
+#         ########################################
+#         self.model_critic = Sequential()
+#         
+#         self.model_critic.add(Dense(self.critic_hidden_unit[0], activation='tanh', input_dim = self.size_of_input_units ))
+# 
+#         for i in range(1, len(critic_hidden_unit)):
+#             self.model_critic.add(Dense(self.critic_hidden_unit[i], activation='tanh'))
+#         self.model_critic.add(Dense(1, activation=LeakyReLU(0.3)))
+# 
+#         self.model_critic.compile(loss='mse', optimizer=Adam(lr=self.criticlearningrate))
+#         #######################################
+# 
+#         
+#         #save the TensorFlow graph:
+#         self.graph = tf.get_default_graph()
+# 
+#         self.model_actor.summary()
+#         print("Model Output Shape")
+#         print(self.model_actor.output_shape[1])
+#         sleep(1)
+#         
+#         self.model_critic.summary()
+#         print("Model Output Shape")
+#         print(self.model_critic.output_shape[1])
+
+
         #save the TensorFlow graph:
         self.graph = tf.get_default_graph()
 
-        self.model_actor.summary()
-        print("Model Output Shape")
-        print(self.model_actor.output_shape[1])
-        sleep(1)
-        
-        self.model_critic.summary()
-        print("Model Output Shape")
-        print(self.model_critic.output_shape[1])
         sleep(1)
 
         # Reset the batch

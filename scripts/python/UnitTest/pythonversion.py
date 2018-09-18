@@ -70,3 +70,12 @@ try:
 	print('sklearn: %s' % sklearn.__version__)
 except:
 	print('Scikit-learn not found')
+
+
+try:
+	# tflearn
+	import tflearn
+	print('tflearn: %s' % tflearn.__version__)
+except:
+	print('tflearn not found')
+	

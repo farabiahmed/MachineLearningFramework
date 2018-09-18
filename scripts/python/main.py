@@ -7,6 +7,7 @@ from Representation_Keras_MultiAgent_TensorInput import Representation_Keras_Mul
 from DeepQNetwork import DeepQNetwork
 from DeepQNetwork_PrioritizedReplay import DeepQNetwork_PrioritizedReplay
 from DeepActorCritic_PrioritizedReplay import DeepActorCritic_PrioritizedReplay
+from DeepActorCritic_PrioritizedReplay_tflearn import DeepActorCritic_PrioritizedReplay_tflearn
 from Representation import Representation
 from command_parser import command_parser, config_parser
 
@@ -48,7 +49,7 @@ def init_model(config):
                                                                 logfolder           = config["TIME_STAMP"],
                                                                 )
     elif config["DEEP_ALGO_TYPE"] ==  "DeepActorCritic_PrioritizedReplay":   
-        rep = DeepActorCritic_PrioritizedReplay                 (gridsize            = strToValue(config["NUMBER_OF_ROWS"]),
+        rep = DeepActorCritic_PrioritizedReplay_tflearn        (gridsize            = strToValue(config["NUMBER_OF_ROWS"]),
                                                                 actionspaceperagent = 5,
                                                                 numberofagent       = strToValue(config["NUMBER_OF_AGENTS"]),
                                                                 actor_hidden_unit   = strToValue(config["HIDDEN_LAYERS"]),
