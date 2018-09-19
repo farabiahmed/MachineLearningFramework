@@ -236,22 +236,24 @@ class DeepActorCritic_PrioritizedReplay(Representation):
     def Get_Greedy_Pair(self,state):
         # Backward compability: Preprocess state input if needed.
         if np.size(state) != self.size_of_input_units:
-            values = self.ForwardPass(self.model_actor, self.Convert_State_To_Input(state))
+            action, value = self.ForwardPass(self.Convert_State_To_Input(state))
         else:
-            values = self.ForwardPass(self.model_actor, state)
+            action, value = self.ForwardPass(state)
 
         # TODO: Add SoftMax Here
         # Get the maximums
-        arg = values.argmax()
-        valmax = values.max()
-
+        #arg = values.argmax()
+        #valmax = values.max()
+        arg = self.Get_Action_Index(action)
+        valmax = value 
+        
         return arg,valmax
 
     def Get_Value(self,state,action):
 
         
         #value = self.ForwardPass(self.model_critic, self.Convert_State_To_Input(state))#TODO
-        value = self.ForwardPass(self.model_actor, self.Convert_State_To_Input(state))
+        actor, value = self.ForwardPass(self.Convert_State_To_Input(state))
         
         #index = self.Get_Action_Index(action)
         #temp = values[index]
@@ -259,7 +261,7 @@ class DeepActorCritic_PrioritizedReplay(Representation):
         return value[0]
 
 
-    def ForwardPass(self,model, input):
+    def ForwardPass(self,input):
         # Form Input Values
         if self.convolutionLayer == True:
             input = np.reshape(input, (1, input.shape[0], input.shape[1], input.shape[2]))
@@ -268,11 +270,22 @@ class DeepActorCritic_PrioritizedReplay(Representation):
 
         # Prediction of the model
         with self.graph.as_default():
-            hypothesis = model.predict(input)
+            #hypothesis = model.predict(input)
+            
+            # Predict Actor
+            action = self.sess.run(self.actor_scaled_out, feed_dict={
+                                self.actor_inputs: input
+                                })
+            
+            # Predict Critic
+            q_value = self.sess.run(self.critic_out, feed_dict={
+                                self.critic_inputs: input,
+                                self.critic_action: action
+                                })
 
-        values = np.asarray(hypothesis).reshape(model.output_shape[1])
+        #values = np.asarray(hypothesis).reshape(model.output_shape[1])
 
-        return values
+        return action, q_value
 
 
     def Get_Action_Index(self, action):
@@ -366,13 +379,14 @@ class DeepActorCritic_PrioritizedReplay(Representation):
         self.Set_Value(state,action,QValue)
 
     def Save_Model(self):
-        with self.graph.as_default():
-            self.model_critic.save_weights("log/"+self.logfolder+"/model_critic_Output_"+self.modelId+".h5")
-            self.model_actor.save_weights("log/"+self.logfolder+"/model_actor_Output_"+self.modelId+".h5")
-            print("###############################")
-            print("Model saved.......")
-            print("###############################")
-
+        # with self.graph.as_default():
+        #    self.model_critic.save_weights("log/"+self.logfolder+"/model_critic_Output_"+self.modelId+".h5")
+        #    self.model_actor.save_weights("log/"+self.logfolder+"/model_actor_Output_"+self.modelId+".h5")
+        #    print("###############################")
+        #    print("Model saved.......")
+        #    print("###############################")
+        print("Model Save is Not Implemented Yet.......")
+        
     def __del__(self):
         self.Save_Model()
         print('Representation object died.')
