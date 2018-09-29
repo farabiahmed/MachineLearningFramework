@@ -15,7 +15,7 @@ from Memory import Memory_UniformRandom
 from Representation import Representation
 
 
-class DeepActorCritic_PrioritizedReplay(Representation):
+class DeepActorCritic_PrioritizedReplay_tflearn(Representation):
 
     def __init__(self,gridsize=5,actionspaceperagent=5,numberofagent=2,
                  actor_hidden_unit=[12,12],
@@ -107,7 +107,7 @@ class DeepActorCritic_PrioritizedReplay(Representation):
         t2 = tflearn.fully_connected(self.critic_action, 300)
 
         net = tflearn.activation(
-            tf.matmul(net, t1.W) + tf.matmul(action, t2.W) + t2.b, activation='relu')
+            tf.matmul(net, t1.W) + tf.matmul(self.critic_action, t2.W) + t2.b, activation='relu')
 
         # linear layer connected to 1 output representing Q(s,a)
         # Weights are init to Uniform[-3e-3, 3e-3]
@@ -127,11 +127,11 @@ class DeepActorCritic_PrioritizedReplay(Representation):
         # account for the fact that the gradients are summed over the 
         # batch by tf.gradients 
         self.unnormalized_actor_gradients = tf.gradients(
-            self.actor_scaled_out, self.network_params, -self.action_gradient)
-        self.actor_gradients = list(map(lambda x: tf.div(x, self.batch_size), self.unnormalized_actor_gradients))
+            self.actor_scaled_out, self.actor_network_params, -self.action_gradient)
+        self.actor_gradients = list(map(lambda x: tf.div(x, self.batchsize), self.unnormalized_actor_gradients))
         
         # Optimization Op
-        self.actor_optimize = tf.train.AdamOptimizer(self.actor_learning_rate).\
+        self.actor_optimize = tf.train.AdamOptimizer(self.actorlearningrate).\
             apply_gradients(zip(self.actor_gradients, self.actor_network_params))
             
             
@@ -145,7 +145,7 @@ class DeepActorCritic_PrioritizedReplay(Representation):
         
         # Define loss and optimization Op
         self.critic_loss = tflearn.mean_square(self.predicted_q_value, self.critic_out)
-        self.critic_optimize = tf.train.AdamOptimizer(self.critic_learning_rate).minimize(self.critic_loss)
+        self.critic_optimize = tf.train.AdamOptimizer(self.criticlearningrate).minimize(self.critic_loss)
         
         # Get the gradient of the net w.r.t. the action
         self.action_grads = tf.gradients(self.critic_out, self.critic_action)
@@ -201,7 +201,7 @@ class DeepActorCritic_PrioritizedReplay(Representation):
         sleep(1)
 
         # Reset the batch
-        self.Reset_Batch()
+        # self.Reset_Batch()
 
 
 
@@ -303,30 +303,24 @@ class DeepActorCritic_PrioritizedReplay(Representation):
         # Preprocess State
         state = self.Convert_State_To_Input(state)
         
-        #actor = np.zeros(self.output_unit)
-        
-        # Update label
-        actor = self.ForwardPass(self.model_actor, state)
-        index = self.Get_Action_Index(action)
+        # Run Networks Forward
+        actor, critic = self.ForwardPass(state)
+        #index = self.Get_Action_Index(actor)
 
         # Calculate error for Prioritized Experience Replay
         #critic_value = self.Get_Value(state, action)#TODO
         #error = value - critic_value#TODO
-        error = actor[index] - value
+        error = critic - value
 
         # Calculate Label for Actor
         #actor[index] = 1 if error > 0 else 0
         #actor[index] = actor[index] + self.learningrate * error #TODO
         #actor[index] = -error
-        actor[index] = value
-        
-        # Calculate Label for Critic
-        #critic = critic_value + self.learningrate * error
-        critic = value#TODO
+        #actor[index] = value
         
         # Append new sample to Memory of Experiences
         # Don't worry about its size, since it is a queue
-        self.memory.add(abs(error),(state, actor, critic))
+        self.memory.add(abs(error),(state, action, value, actor))
 
         #if self.fresh_experience_counter == self.batchsize :
         if self.memory.length() >= self.batchsize :
@@ -337,20 +331,40 @@ class DeepActorCritic_PrioritizedReplay(Representation):
             # Get Unique Samples from memory as much as batchsize
             minibatch = self.memory.sample(self.batchsize)
 
-            batchSamplesX = [] # states
-            batchSamplesY = [] # actor values
-            batchSamplesZ = [] # critic
+            batch_state = [] # states
+            batch_action = [] # action
+            batch_qval = [] # value
+            batch_actor = [] # actor
 
             for i in np.arange(len(minibatch)):
-                idx, (X, Y, Z) = minibatch[i]
-                batchSamplesX.append(X)
-                batchSamplesY.append(Y)
-                batchSamplesZ.append(Z)
+                idx, (p1, p2, p3, p4) = minibatch[i]
+                batch_state.append(p1)
+                batch_action.append(p2)
+                batch_qval.append(p3)
+                batch_actor.append(p4)
             
             with tf.device('/gpu:0'):   
                 with self.graph.as_default():
-                    self.model_actor.fit(np.array(batchSamplesX), np.array(batchSamplesY), epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
-                    self.model_critic.fit(np.array(batchSamplesX), np.array(batchSamplesZ), epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
+                    #self.model_actor.fit(np.array(batchSamplesX), np.array(batchSamplesY), epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
+                    #self.model_critic.fit(np.array(batchSamplesX), np.array(batchSamplesZ), epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
+                    
+                    # Update the critic given the targets
+                    self.sess.run([self.critic_out, self.critic_optimize], feed_dict={
+                                    self.inputs: np.array(batch_state),
+                                    self.action: np.array(batch_action),
+                                    self.predicted_q_value: np.array(batch_qval)
+                                })
+
+                    # Update the actor policy using the sampled gradient
+                    grads = self.sess.run(self.action_grads, feed_dict={
+                            self.inputs: np.array(batch_state),
+                            self.action: np.array(batch_actor)
+                    })
+                    
+                    self.sess.run(self.actor_optimize, feed_dict={
+                            self.inputs: np.array(batch_state),
+                            self.action_gradient: grads[0]
+                    })
 
             # for i in np.arange(len(minibatch)):
             #     idx, (X, Y) = minibatch[i]
@@ -361,15 +375,15 @@ class DeepActorCritic_PrioritizedReplay(Representation):
             #     self.model_actor.fit(self.batchSamplesX, self.batchSamplesY, epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
             # self.Reset_Batch()
 
-    def Reset_Batch(self):
-        # Reset the batch
-        if self.convolutionLayer == True :
-            self.batchSamplesX = np.array([], dtype=np.float).reshape(0, self.numberofagent, self.gridsize, self.gridsize)
-            self.batchSamplesY = np.array([], dtype=np.float).reshape(0, self.output_unit)
-        else:
-            self.batchSamplesX = np.array([], dtype=np.float).reshape(0, self.size_of_input_units)
-            self.batchSamplesY = np.array([], dtype=np.float).reshape(0, self.output_unit)
-
+#     def Reset_Batch(self):
+#         # Reset the batch
+#         if self.convolutionLayer == True :
+#             self.batchSamplesX = np.array([], dtype=np.float).reshape(0, self.numberofagent, self.gridsize, self.gridsize)
+#             self.batchSamplesY = np.array([], dtype=np.float).reshape(0, self.output_unit)
+#         else:
+#             self.batchSamplesX = np.array([], dtype=np.float).reshape(0, self.size_of_input_units)
+#             self.batchSamplesY = np.array([], dtype=np.float).reshape(0, self.output_unit)
+     
     def Add_Experience(self,state,action,nextstate,reward,status):
 
         # WORKING
