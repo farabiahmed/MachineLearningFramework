@@ -16,6 +16,8 @@ make (sudo apt install make)
 Python3 (sudo apt install python3-dev python3-pip)
 matplotlib (pip3 install -U matplotlib)
 tensorflow (pip3 install --upgrade tensorflow)
+pandas (pip3 install pandas)
+python3-tk (sudo apt-get install python3-tk)
 openCL
 ```
 ### Checking Installations of Python
