@@ -6,16 +6,21 @@ Dynamic Programming applications.
 
 ## Getting Started
 
+
 ### Prerequisites
 In order to utilize most of this project, currently you need to make those
 softwares ready on your system. 
 ```
 g++ (sudo apt install g++)
 make (sudo apt install make)
-Python3 (sudo apt install python-dev)
-matplotlib
-tensorflow
+Python3 (sudo apt install python3-dev python3-pip)
+matplotlib (pip3 install -U matplotlib)
+tensorflow (pip3 install --upgrade tensorflow)
 openCL
+```
+### Checking Installations of Python
+```
+pip3 list
 ```
 ### Java
 ```
