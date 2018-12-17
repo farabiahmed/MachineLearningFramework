@@ -22,6 +22,10 @@ openCL
 ```
 pip3 list
 ```
+### Installation of PyCharm Python IDE
+```
+sudo snap install pycharm-community --classic
+```
 ### Java
 ```
 sudo add-apt-repository ppa:webupd8team/java
