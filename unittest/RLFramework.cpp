@@ -100,7 +100,11 @@ int main(int argc, char* argv[])
 	//environment->Display_Policy(*value);
 
 	//Get Report
-	agent->Get_Report("log/"+clp.GetOption<string>("TIME_STAMP"),"agentReport_" + clp.GetOption<string>("MODEL_ID") +".csv");
+	agent->Get_Report("log/" +
+						cfg.GetValueOfKey<string>("TIME_STAMP","00000000_000000"),
+						"agentReport_" +
+						cfg.GetValueOfKey<string>("MODEL_ID", "0") +
+						".csv");
 
 	//Get Report
 	//value->Get_Report("log/"+timeStamp,"representationReport.csv");

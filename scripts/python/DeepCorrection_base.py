@@ -15,7 +15,7 @@ from Memory import Memory_UniformRandom
 from Representation import Representation
 
 
-class DeepQNetwork_PrioritizedReplay(Representation):
+class DeepCorrection_base(Representation):
 
     def __init__(self,gridsize=5,actionspaceperagent=5,numberofagent=2,
                  hidden_unit=[12,12],learning_rate=0.1,
@@ -55,41 +55,11 @@ class DeepQNetwork_PrioritizedReplay(Representation):
         self.modelId = modelId
         self.logfolder = logfolder
 
-        if os.path.isfile("log/model_0.h5"):
-            self.model = load_model("log/model_0.h5")
+        if os.path.isfile("models/model_0.h5"):
+            self.model = load_model("models/model_0.h5")
             print("###############################")
             print("Existing model loaded.......")
             print("###############################")
-
-        if self.model is None:
-
-            # create model
-            self.model = Sequential()
-
-            if self.convolutionLayer==True:
-                self.convolution_input = ( self.numberofagent, self.gridsize, self.gridsize)
-                self.model.add(Conv2D(16, (2, 2), strides=(1, 1), activation='relu', input_shape=(self.convolution_input),
-                                 data_format='channels_first'))
-                self.model.add(Conv2D(32, (2, 2), strides=(1, 1), activation='relu'))
-                #self.model.add(Conv2D(64, (3, 3), activation='relu'))
-                self.model.add(Flatten())
-                self.model.add(Dense(self.hidden_unit[0], activation='tanh'))
-            else:
-                self.model.add(Dense(self.hidden_unit[0], activation='tanh', input_dim = self.size_of_input_units ))
-
-            for i in range(1, len(hidden_unit)):
-                self.model.add(Dense(self.hidden_unit[i], activation='tanh'))
-            self.model.add(Dense(self.output_unit, activation='relu'))
-
-            # Compile model
-            self.model.compile(loss='mse', optimizer='sgd', metrics=['accuracy'])
-            self.model._make_predict_function()
-
-            if os.path.isfile("log/"+self.logfolder+"/modeltrained.h5"):
-                self.model.load_weights("log/"+self.logfolder+"/modeltrained.h5")
-                print("###############################")
-                print("Existing model params are loaded.......")
-                print("###############################")
 
         # save the TensorFlow graph:
         self.graph = tf.get_default_graph()
@@ -97,7 +67,6 @@ class DeepQNetwork_PrioritizedReplay(Representation):
         self.model.summary()
 
         self.Save_Model()
-        # self.model.save_weights("log/"+self.logfolder+"/modelinit_"+self.modelId+".h5")
 
         # Reset the batch
         self.Reset_Batch()
@@ -181,50 +150,7 @@ class DeepQNetwork_PrioritizedReplay(Representation):
 
     def Set_Value(self,state,action,value):
 
-        # Preprocess State
-        state = self.Convert_State_To_Input(state)
-
-        # Update label
-        values = self.ForwardPass(state)
-        index = self.Get_Action_Index(action)
-
-        # Calculate error for Prioritized Experience Replay
-        error = abs(values[index] - value)
-
-        values[index] = value
-
-        # Append new sample to Memory of Experiences
-        # Don't worry about its size, since it is a queue
-        self.memory.add(error,(state, values))
-
-        #if self.fresh_experience_counter == self.batchsize :
-        if self.memory.length() >= self.batchsize :
-
-            self.trainingepochtotal += self.trainPass
-            # print('Training Epoch:', self.trainingepochtotal)
-
-            # Get Unique Samples from memory as much as batchsize
-            minibatch = self.memory.sample(self.batchsize)
-
-            batchSamplesX = []
-            batchSamplesY = []
-
-            for i in np.arange(len(minibatch)):
-                idx, (X, Y) = minibatch[i]
-                batchSamplesX.append(X)
-                batchSamplesY.append(Y)
-
-            with self.graph.as_default():
-                self.model.fit(np.array(batchSamplesX), np.array(batchSamplesY), epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
-
-            # for i in np.arange(len(minibatch)):
-            #     idx, (X, Y) = minibatch[i]
-            #     self.batchSamplesX = np.vstack((self.batchSamplesX, (X)))
-            #     self.batchSamplesY = np.vstack((self.batchSamplesY, Y))
-            #
-            # with self.graph.as_default():
-            #     self.model.fit(self.batchSamplesX, self.batchSamplesY, epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
-            # self.Reset_Batch()
+        return;
 
     def Reset_Batch(self):
         # Reset the batch
