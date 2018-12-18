@@ -1,17 +1,9 @@
 
 import os
 import os.path
-import random
-
 import numpy as np
 import tensorflow as tf
-from keras.models import Sequential
-from keras.layers.advanced_activations import LeakyReLU
-from keras.layers import *
-from keras.models import load_model
 from Memory.Memory_SumTree import Memory_SumTree
-from Memory import Memory_UniformRandom
-
 from Representation import Representation
 
 
@@ -33,13 +25,9 @@ class DeepCorrection_base(Representation):
         self.trainPass = trainpass
         self.hidden_unit = hidden_unit
         self.learningrate = learning_rate
-        self.statePreprocessType = statePreprocessType
         self.convolutionLayer = convolutionLayer
 
-        if(statePreprocessType=="Tensor") :
-            self.size_of_input_units = gridsize * gridsize * numberofagent
-        elif (statePreprocessType=="Vector"):
-            self.size_of_input_units = 2 * numberofagent; # (x,y,a) for each agent
+        self.size_of_input_units = 3 * numberofagent; # (x,y,a) for each agent
         self.gridsize = gridsize
 
         self.memory = Memory_SumTree(experiencebuffer)
@@ -56,15 +44,36 @@ class DeepCorrection_base(Representation):
         self.logfolder = logfolder
 
         if os.path.isfile("models/model_0.h5"):
-            self.model = load_model("models/model_0.h5")
             print("###############################")
             print("Existing model loaded.......")
             print("###############################")
 
+            for i in range(self.numberofagent):
+                print("\nLoading model for agent #" + i)
+                print("###############################")
+                self.model[i] = load_model("models/model_0.h5")
+                self.model[i].summary()
+
         # save the TensorFlow graph:
         self.graph = tf.get_default_graph()
 
-        self.model.summary()
+
+
+        # Create Correction Model With Tensorflow
+        model_correction_input  = tf.placeholder(tf.float32, [None, self.size_of_input_units])   # input state+action
+        model_correction_label = tf.placeholder(tf.float32, [None, 1])                          # label y
+
+        # neural network layers
+        model_correction_layers = []
+
+        model_correction_layers.append(tf.layers.dense(model_correction_input, hidden_unit[0], tf.nn.tanh))  # input layer
+
+        for i in range(1, len(hidden_unit)):
+            model_correction_layers.append(tf.layers.dense(model_correction_layers[i-1], hidden_unit[1], tf.nn.tanh))  # hidden layer
+
+        model_correction_layers.append(tf.layers.dense(model_correction_layers[len(hidden_unit)-1], 1, tf.nn.relu))  # output layer, 1, only Q value
+
+        BLA BLA BAL
 
         self.Save_Model()
 
@@ -152,15 +161,6 @@ class DeepCorrection_base(Representation):
 
         return;
 
-    def Reset_Batch(self):
-        # Reset the batch
-        if self.convolutionLayer == True :
-            self.batchSamplesX = np.array([], dtype=np.float).reshape(0, self.numberofagent, self.gridsize, self.gridsize)
-            self.batchSamplesY = np.array([], dtype=np.float).reshape(0, self.output_unit)
-        else:
-            self.batchSamplesX = np.array([], dtype=np.float).reshape(0, self.size_of_input_units)
-            self.batchSamplesY = np.array([], dtype=np.float).reshape(0, self.output_unit)
-
     def Add_Experience(self,state,action,nextstate,reward,status):
 
         # WORKING
@@ -175,8 +175,9 @@ class DeepCorrection_base(Representation):
             if not os.path.exists("log/"+self.logfolder):
                 os.makedirs("log/"+self.logfolder)
 
-            self.model.save("log/" + self.logfolder + "/model_" + self.modelId + ".h5")
-            self.model.save_weights("log/"+self.logfolder+"/model_weight_"+self.modelId+".h5")
+            self.model_correction.save("log/" + self.logfolder + "/model_correction_" + self.modelId + ".h5")
+            self.model_correction.save_weights("log/"+self.logfolder+"/model_correction_weight_"+self.modelId+".h5")
+
             print("###############################")
             print("Model saved: " + "log/" + self.logfolder)
             print("###############################")
