@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 # 0. Set Simulation Constants
 # ===============================
 learning_rate = 0.01
-training_epochs = 500
+training_epochs = 5000
 display_step = 1
 
 # 1. Prepare Fake Data
@@ -14,10 +14,10 @@ display_step = 1
 # fake data
 x_data = np.linspace(-1, 1, 100)[:, np.newaxis]          # shape (100, 1)
 
-noise = np.random.normal(0, 0.1, size=x_data.shape)
+noise = np.random.normal(0, 0.5, size=x_data.shape)
 y_data = 5 * x_data + noise                          # shape (100, 1) + some noise
 
-plt.plot(x_data,y_data,color='Blue')
+plt.scatter(x_data,y_data,color='Blue')
 
 
 # 2. Prepare Model Structure
