@@ -18,7 +18,7 @@ class DeepCorrection_base(Representation):
                  train_period=1,
                  gamma = 0.99,
                  model_reset_counter=32,
-                 statePreprocessType = "Tensor",
+                 fusion_model = "MAX_SUM", # MAX_SUM or MAX_MIN
                  convolutionLayer= False,
                  modelId = "noid",
                  logfolder = ""):
@@ -29,7 +29,7 @@ class DeepCorrection_base(Representation):
         self.hidden_unit = hidden_unit
         self.learningrate = learning_rate
         self.convolutionLayer = convolutionLayer
-
+        self.fusion_model = fusion_model
         self.size_of_input_units = 3 * numberofagent; # (x,y,a) for each agent
         self.gridsize = gridsize
 
@@ -38,7 +38,7 @@ class DeepCorrection_base(Representation):
         self.fresh_experience_counter = 0
         self.actionspaceforagent = actionspaceperagent
         self.numberofagent = numberofagent
-        self.output_unit = actionspaceperagent**numberofagent
+        self.output_unit = 1 #actionspaceperagent**numberofagent
         self.trainingepochtotal = 0
         self.train_period = train_period # After how many new experience we will run fitting/training.
         self.counter_experience = 0 # A counter to hold how many tuple experienced
@@ -78,22 +78,25 @@ class DeepCorrection_base(Representation):
 
         with tf.name_scope('Model_Correction'):
             # Create Correction Model With Tensorflow
-            model_correction_input  = tf.placeholder(tf.float32, [None, self.size_of_input_units])   # input state+action
-            model_correction_label = tf.placeholder(tf.float32, [None, 1])                          # label y
+            self.model_correction_input  = tf.placeholder(tf.float32, [None, self.size_of_input_units])   # input state+action
+            self.model_correction_label = tf.placeholder(tf.float32, [None, 1])                          # label y
 
             # neural network layers
-            model_correction_layers = []
+            self.model_correction_layers = []
 
-            model_correction_layers.append(tf.layers.dense(model_correction_input, hidden_unit[0], tf.nn.tanh))  # input layer
+            # First Layer
+            self.model_correction_layers.append(tf.layers.dense(self.model_correction_input, hidden_unit[0], tf.nn.tanh))  # input layer
 
+            # Hidden Layers
             for i in range(1, len(hidden_unit)):
-                model_correction_layers.append(tf.layers.dense(model_correction_layers[i-1], hidden_unit[1], tf.nn.tanh))  # hidden layer
+                self.model_correction_layers.append(tf.layers.dense(self.model_correction_layers[i-1], hidden_unit[1], tf.nn.tanh))  # hidden layer
 
-            model_correction_layers.append(tf.layers.dense(model_correction_layers[len(hidden_unit)-1], 1, tf.nn.relu))  # output layer, 1, only Q value
+            # Output Layer
+            self.model_correction_layers.append(tf.layers.dense(self.model_correction_layers[len(hidden_unit)-1], self.output_unit, tf.nn.relu))  # output layer, 1, only Q value
 
         with tf.name_scope('Model_Correction_Optimizer'):
             # Minimize error
-            model_correction_cost = tf.reduce_mean(tf.squared_difference(model_correction_label, model_correction_layers[-1]))
+            model_correction_cost = tf.reduce_mean(tf.squared_difference(self.model_correction_label, self.model_correction_layers[-1]))
 
             # Optimizer embedded in API
             model_correction_optimizer = tf.train.GradientDescentOptimizer(self.learningrate)
@@ -159,15 +162,32 @@ class DeepCorrection_base(Representation):
         model_vars = tf.trainable_variables()
         slim.model_analyzer.analyze_vars(model_vars, print_info=True)
 
-    def Convert_State_To_Input(self,state):
-        return state
+    def Convert_State_To_Input(self,state, action):
+
+        return np.concatenate((state,action))
 
     def Get_Greedy_Pair(self,state):
-        # Backward compability: Preprocess state input if needed.
-        if np.size(state) != self.size_of_input_units:
-            values = self.ForwardPass(self.Convert_State_To_Input(state))
-        else:
-            values = self.ForwardPass(state)
+
+        agent_model_outputs = [] #2D list, agentId and Outputs(array) of each Agent.
+        for i in range(self.numberofagent):
+            agent_model_outputs.append(self.ForwardPass_AgentModel(i,state))
+
+        values = np.zeros(1)
+        for action in self.actions:
+            input = self.Convert_State_To_Input(state, action);
+            action_index = self.Get_Action_Index(action)
+            correction_model_predicts = self.ForwardPass_CorrectionModel(input)
+
+            agent_model_predicts = [] #1D list, holds Q value of each agent for a given action
+            for i in range(self.numberofagent):
+                agent_model_predicts.append(agent_model_outputs[i][action_index])
+
+            out = self.Fusion_Models(
+                np.array(agent_model_predicts),
+                np.array(correction_model_predicts)
+            )
+
+            values = np.append(values, out)
 
         # Get the maximums
         arg = values.argmax()
@@ -177,29 +197,59 @@ class DeepCorrection_base(Representation):
 
     def Get_Value(self,state,action):
 
-        values = self.ForwardPass(self.Convert_State_To_Input(state))
-        index = self.Get_Action_Index(action)
-        temp = values[index]
+        input = self.Convert_State_To_Input(state, action);
+        action_index = self.Get_Action_Index(action)
 
-        return temp
+        agent_model_predicts = []
 
+        for i in range(self.numberofagent):
+            values = self.ForwardPass_AgentModel(i,state)
+            agent_model_predicts.append(values[action_index])
 
-    def ForwardPass(self,input):
+        correction_model_predicts = self.ForwardPass_CorrectionModel(input)
 
-      # Form Input Values
-        if self.convolutionLayer == True:
-            input = np.reshape(input, (1, input.shape[0], input.shape[1], input.shape[2]))
+        out = self.Fusion_Models(
+            np.array(agent_model_predicts),
+            np.array(correction_model_predicts)
+        )
+
+        return out
+
+    def Fusion_Models(self, agent_outputs, correction_output):
+
+        # max-sum
+        if (self.fusion_model == "MAX_SUM"):
+            return np.sum(agent_outputs) + correction_output
+
+        # max-min
+        elif(self.fusion_model == "MAX_MIN"):
+            return agent_outputs.min() + correction_output
+
         else:
-            input = np.reshape(input,(1,input.shape[0]))
+            raise NotImplementedError()
+
+    def ForwardPass_AgentModel(self,agent_id, input):
+
+        # Form Input Values
+        # input = np.reshape(input,(1,input.shape[0]))
 
         # Prediction of the model
         with self.graph.as_default():
-            hypothesis = self.model.predict(input)
+            prediction = self.model[agent_id].predict(input)
 
-        values = np.asarray(hypothesis).reshape(self.output_unit)
+        # values = np.asarray(hypothesis).reshape(self.output_unit)
 
-        return values
+        return prediction
 
+    def ForwardPass_CorrectionModel(self,input):
+
+        prediction = self.sess.run(self.model_correction_layers[-1], feed_dict={
+                                                                        self.model_correction_input: input
+                                                                    })
+
+        # values = np.asarray(prediction).reshape(self.output_unit)
+
+        return prediction
 
     def Get_Action_Index(self, action):
         sizeOfAction = action.shape[0]
@@ -209,7 +259,6 @@ class DeepCorrection_base(Representation):
             temp = temp + action[i] * (self.actionspaceforagent**(sizeOfAction-i-1))
 
         return temp;
-
 
     def Set_Value(self,state,action,value):
         #with tf.Session() as sess:
