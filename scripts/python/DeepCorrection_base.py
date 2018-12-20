@@ -19,7 +19,6 @@ class DeepCorrection_base(Representation):
                  gamma = 0.99,
                  model_reset_counter=32,
                  fusion_model = "MAX_SUM", # MAX_SUM or MAX_MIN
-                 convolutionLayer= False,
                  modelId = "noid",
                  logfolder = ""):
 
@@ -28,11 +27,11 @@ class DeepCorrection_base(Representation):
         self.trainPass = trainpass
         self.hidden_unit = hidden_unit
         self.learningrate = learning_rate
-        self.convolutionLayer = convolutionLayer
         self.fusion_model = fusion_model
         self.size_of_input_units = 3 * numberofagent; # (x,y,a) for each agent
         self.gridsize = gridsize
-
+        self.size_of_action_space = actionspaceperagent**numberofagent
+        self.action_count_per_agent = actionspaceperagent
         self.memory = Memory_SumTree(experiencebuffer)
 
         self.fresh_experience_counter = 0
@@ -46,7 +45,8 @@ class DeepCorrection_base(Representation):
         self.modelId = modelId
         self.logfolder = logfolder
 
-        self.graph = tf.get_default_graph()
+        self.actions = self.Get_Action_List()
+
         #self.graph = tf.reset_default_graph()
         #self.graph = tf.Graph()
         #with self.graph.as_default():
@@ -55,6 +55,8 @@ class DeepCorrection_base(Representation):
         # Tensorboard's Graph visualization more convenient
         # for example: with tf.name_scope('Loss'):
 
+        self.graph_agent = []
+        self.sess_agent = []
         self.model = [] # model holder for the agents
         if os.path.isfile("models/model_0.h5"):
             print("###############################")
@@ -64,9 +66,14 @@ class DeepCorrection_base(Representation):
             for i in range(self.numberofagent):
                 print("\nLoading model for agent #", '%d' % (i))
                 print("###############################")
-                with tf.name_scope('Model', '%d' % (i)):
-                    self.model.append(load_model("models/model_0.h5"))
-                    self.model[i].summary()
+
+                self.graph_agent.append(tf.Graph())
+                self.sess_agent.append(tf.Session(graph=self.graph_agent[i]))
+                with self.graph_agent[i].as_default(), self.sess_agent[i].as_default():
+                    with tf.name_scope('Model%d' % i):
+                        model = load_model("models/model_0.h5")
+                        self.model.append(model)
+                        self.model[i].summary()
         print("Loading is completed.")
 
         # Load model
@@ -76,71 +83,80 @@ class DeepCorrection_base(Representation):
         #     print("Model restored.")
         # save the TensorFlow graph:
 
-        with tf.name_scope('Model_Correction'):
-            # Create Correction Model With Tensorflow
-            self.model_correction_input  = tf.placeholder(tf.float32, [None, self.size_of_input_units])   # input state+action
-            self.model_correction_label = tf.placeholder(tf.float32, [None, 1])                          # label y
 
-            # neural network layers
-            self.model_correction_layers = []
+        self.graph_correction = tf.Graph()
+        with self.graph_correction.as_default():
+            with tf.name_scope('Model_Correction'):
+                # Create Correction Model With Tensorflow
+                self.model_correction_input  = tf.placeholder(tf.float32, [None, self.size_of_input_units], name="model_correction_input")   # input state+action
+                self.model_correction_label = tf.placeholder(tf.float32, [None, self.output_unit], name="model_correction_label")                          # label y
 
-            # First Layer
-            self.model_correction_layers.append(tf.layers.dense(self.model_correction_input, hidden_unit[0], tf.nn.tanh))  # input layer
+                # neural network layers
+                self.model_correction_layers = []
 
-            # Hidden Layers
-            for i in range(1, len(hidden_unit)):
-                self.model_correction_layers.append(tf.layers.dense(self.model_correction_layers[i-1], hidden_unit[1], tf.nn.tanh))  # hidden layer
+                # First Layer
+                self.model_correction_layers.append(tf.layers.dense(self.model_correction_input, hidden_unit[0], tf.nn.tanh))  # input layer
 
-            # Output Layer
-            self.model_correction_layers.append(tf.layers.dense(self.model_correction_layers[len(hidden_unit)-1], self.output_unit, tf.nn.relu))  # output layer, 1, only Q value
+                # Hidden Layers
+                for i in range(1, len(hidden_unit)):
+                    self.model_correction_layers.append(tf.layers.dense(self.model_correction_layers[i-1], hidden_unit[1], tf.nn.tanh))  # hidden layer
 
-        with tf.name_scope('Model_Correction_Optimizer'):
-            # Minimize error
-            model_correction_cost = tf.reduce_mean(tf.squared_difference(self.model_correction_label, self.model_correction_layers[-1]))
+                # Output Layer
+                self.model_correction_layers.append(tf.layers.dense(self.model_correction_layers[len(hidden_unit)-1], self.output_unit, tf.nn.relu))  # output layer, 1, only Q value
 
-            # Optimizer embedded in API
-            model_correction_optimizer = tf.train.GradientDescentOptimizer(self.learningrate)
+            with tf.name_scope('Model_Correction_Optimizer'):
+                # Minimize error
+                self.model_correction_cost = tf.reduce_mean(tf.squared_difference(self.model_correction_label, self.model_correction_layers[-1]))
 
-            # Add minimizer as trainer
-            self.model_correction_train = model_correction_optimizer.minimize(model_correction_cost)
+                # Optimizer embedded in API
+                model_correction_optimizer = tf.train.GradientDescentOptimizer(self.learningrate)
 
-        # Create a summary to monitor cost tensor
-        tf.summary.scalar("Model_Correction_Optimizer", model_correction_cost)
+                # Add minimizer as trainer
+                self.model_correction_train = model_correction_optimizer.minimize(self.model_correction_cost)
 
-        # Test Variables
-        with tf.name_scope('Test_Variables'):
-            test_variable = tf.Variable(42, name='foo')
-            test_assign = test_variable.assign(13)
+            # Create a summary to monitor cost tensor
+            tf.summary.scalar("Model_Correction_Optimizer", self.model_correction_cost)
 
-
-        # Add an op to initialize the variables.
-        model_correction_initialize = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
-        model_correction_initialize_g = tf.global_variables_initializer()
-        model_correction_initialize_a = tf.initialize_all_variables()
-        model_correction_initialize_l = tf.local_variables_initializer()
+            # Test Variables
+            with tf.name_scope('Test_Variables'):
+                test_variable = tf.Variable(42, name='foo')
+                test_assign = test_variable.assign(13)
 
 
-        # Add ops to save and restore all the variables.
-        self.saver = tf.train.Saver()
+            # Add an op to initialize the variables.
+            model_correction_initialize = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
+            model_correction_initialize_g = tf.global_variables_initializer()
+            model_correction_initialize_a = tf.initialize_all_variables()
+            model_correction_initialize_l = tf.local_variables_initializer()
 
-        # Inform the user about model
-        self.tf_model_summary()
 
-        # Start the Session
-        self.sess = tf.Session(graph=self.graph)
-        #self.sess = tf.Session()
-        # with tf.Session() as sess:
-        #     sess.run(model_correction_initialize)
-        #     print(sess.run(test_variable))
+            # Add ops to save and restore all the variables.
+            self.saver = tf.train.Saver()
 
-        # Intialize the Session
-        self.sess.run(model_correction_initialize)
+            # Inform the user about model
+            self.tf_model_summary()
+
+            # Start the Session
+            self.sess = tf.Session(graph=self.graph_correction)
+            #self.sess = tf.Session()
+            # with tf.Session() as sess:
+            #     sess.run(model_correction_initialize)
+            #     print(sess.run(test_variable))
+
+            # Intialize the Session
+            self.sess.run(model_correction_initialize)
+
+            print("###############################")
+            print("TEST RESULTS:")
+            print("###############################")
+            print(self.sess.run(test_variable))
+            print(self.sess.run(test_assign))
+            print("")
 
         print("###############################")
-        print("TEST RESULTS:")
+        print("ACTION SPACE:")
         print("###############################")
-        print(self.sess.run(test_variable))
-        print(self.sess.run(test_assign))
+        print(self.actions)
         print("")
 
         print("###############################")
@@ -170,9 +186,9 @@ class DeepCorrection_base(Representation):
 
         agent_model_outputs = [] #2D list, agentId and Outputs(array) of each Agent.
         for i in range(self.numberofagent):
-            agent_model_outputs.append(self.ForwardPass_AgentModel(i,state))
+            agent_model_outputs.append(self.ForwardPass_AgentModel(i,state[2*i:2*i+3]))
 
-        values = np.zeros(1)
+        values = []
         for action in self.actions:
             input = self.Convert_State_To_Input(state, action);
             action_index = self.Get_Action_Index(action)
@@ -180,14 +196,19 @@ class DeepCorrection_base(Representation):
 
             agent_model_predicts = [] #1D list, holds Q value of each agent for a given action
             for i in range(self.numberofagent):
-                agent_model_predicts.append(agent_model_outputs[i][action_index])
+                #print(agent_model_outputs)
+                #print("i:%d " % i, "action_index:%d" % action_index)
+                temp = agent_model_outputs[i][action_index]
+                agent_model_predicts.append(temp)
 
             out = self.Fusion_Models(
                 np.array(agent_model_predicts),
                 np.array(correction_model_predicts)
             )
 
-            values = np.append(values, out)
+            values.append(out)
+
+        values = np.array(values)
 
         # Get the maximums
         arg = values.argmax()
@@ -219,7 +240,9 @@ class DeepCorrection_base(Representation):
 
         # max-sum
         if (self.fusion_model == "MAX_SUM"):
-            return np.sum(agent_outputs) + correction_output
+            temp = agent_outputs.sum()
+            temp = temp + correction_output
+            return  temp
 
         # max-min
         elif(self.fusion_model == "MAX_MIN"):
@@ -232,24 +255,26 @@ class DeepCorrection_base(Representation):
 
         # Form Input Values
         # input = np.reshape(input,(1,input.shape[0]))
+        input = np.reshape(input, (1, input.shape[0]))
 
         # Prediction of the model
-        with self.graph.as_default():
+        with self.graph_agent[agent_id].as_default(), self.sess_agent[agent_id].as_default():
             prediction = self.model[agent_id].predict(input)
 
-        # values = np.asarray(hypothesis).reshape(self.output_unit)
-
-        return prediction
+        values = np.asarray(prediction).reshape(self.action_count_per_agent)
+        return values
 
     def ForwardPass_CorrectionModel(self,input):
 
-        prediction = self.sess.run(self.model_correction_layers[-1], feed_dict={
-                                                                        self.model_correction_input: input
-                                                                    })
+        input = np.expand_dims(input,axis=0)
+        with self.graph_correction.as_default():
+            prediction = self.sess.run(self.model_correction_layers[-1], feed_dict={
+                                                                                    self.model_correction_input: input
+                                                                                    })
 
-        # values = np.asarray(prediction).reshape(self.output_unit)
-
-        return prediction
+        #values = np.asarray(prediction).reshape(self.output_unit)
+        #return values
+        return prediction[0][0]
 
     def Get_Action_Index(self, action):
         sizeOfAction = action.shape[0]
@@ -260,9 +285,67 @@ class DeepCorrection_base(Representation):
 
         return temp;
 
+    def Get_Action_List(self):
+
+        actions = []
+        for i in range(self.size_of_action_space):
+
+            action = []
+            for j in range(self.numberofagent):
+                numberOfFieldsToPass = self.size_of_action_space ** (self.numberofagent - j - 1);
+                action.append ( int((i / numberOfFieldsToPass) % self.size_of_action_space) )
+
+            actions.append(action)
+
+        return np.array(actions)
+
     def Set_Value(self,state,action,value):
-        #with tf.Session() as sess:
-            #sess.run(init_op)
+
+        # Update label
+        network_out = self.Get_Value(state, action)
+
+        # Calculate error for Prioritized Experience Replay
+        error = abs(network_out - value)
+
+        # Append new sample to Memory of Experiences
+        # Don't worry about its size, since it is a queue
+        self.memory.add(error,(state, action, value))
+
+        #if self.fresh_experience_counter == self.batchsize :
+        if self.memory.length() >= self.batchsize :
+
+            self.trainingepochtotal += self.trainPass
+            # print('Training Epoch:', self.trainingepochtotal)
+
+            # Get Unique Samples from memory as much as batchsize
+            minibatch = self.memory.sample(self.batchsize)
+
+            states = []
+            actions = []
+            values = []
+            for i in np.arange(len(minibatch)):
+                idx, (s, a, v) = minibatch[i]
+                states.append(s)
+                actions.append(a)
+                values.append(v)
+
+            inputs = []
+            for i in range(len(states)):
+                input = self.Convert_State_To_Input(states[i], actions[i])
+                inputs.append(input)
+
+            inputs = np.array(inputs)
+            values = np.array(values)
+            values = np.reshape(values, (self.batchsize, 1))
+
+            with self.graph_correction.as_default():
+                cost, _  = self.sess.run([self.model_correction_cost, self.model_correction_train],
+                                                                    feed_dict={
+                                                                        self.model_correction_input: inputs,
+                                                                        self.model_correction_label: values
+                                                                    })
+
+            print(cost)
 
         return;
 
@@ -279,8 +362,9 @@ class DeepCorrection_base(Representation):
         if not os.path.exists("log/"+self.logfolder):
             os.makedirs("log/"+self.logfolder)
 
-        # Save the variables to disk.
-        save_path = self.saver.save(self.sess, "log/" + self.logfolder + "/model_correction_" + self.modelId + ".ckpt")
+        with self.graph_correction.as_default():
+            # Save the variables to disk.
+            save_path = self.saver.save(self.sess, "log/" + self.logfolder + "/model_correction_" + self.modelId + ".ckpt")
 
         print("###############################")
         print("Model saved in path: %s" % save_path)

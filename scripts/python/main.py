@@ -77,8 +77,7 @@ def init_model(config):
                                                                 batch_size          = strToValue(config["BATCH_SIZE"]),
                                                                 trainpass           = strToValue(config["TRAINING_PASS_PER_BATCH"]),
                                                                 experiencebuffer    = strToValue(config["EXPERIENCE_REPLAY_BUFFER"]),
-                                                                statePreprocessType = 'Vector',
-                                                                convolutionLayer    = False,
+                                                                fusion_model        = config["FUSION_MODEL"],
                                                                 modelId             = config["MODEL_ID"],
                                                                 logfolder           = config["TIME_STAMP"],
                                                                 )
