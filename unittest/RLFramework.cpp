@@ -66,10 +66,6 @@ int main(int argc, char* argv[])
 		cfg.UpdateContent(it.first,it.second);
 	}
 
-	/* Print updated configuration parameters */
-	cout<<endl<<"Updated Config Variables"<<endl;
-	cfg.Print_Arguments();
-
 	/* Add Time stamp if not exist */
 	if(!cfg.KeyExists("TIME_STAMP"))
 	{
@@ -82,6 +78,14 @@ int main(int argc, char* argv[])
 	{
 		cfg.AddContent(string("MODEL_ID"),string("0"));
 	}
+
+
+	/* Print updated configuration parameters */
+	cout<<endl<<"Updated Config Variables"<<endl;
+	cfg.Print_Arguments();
+	cfg.Export_Arguments("log/" +
+						cfg.GetValueOfKey<string>("TIME_STAMP","00000000_000000"),
+						"params_"+cfg.GetValueOfKey<string>("MODEL_ID", "0")+".txt");
 
 	/* Run Model Here */
 	Environment *environment 	= EnvironmentFactory::Create(clp.GetOption<string>("ENVIRONMENT"),cfg);

@@ -13,6 +13,7 @@
 #include <sstream>		// Conversion between string and primitives
 #include <map>			// Pair of key-value
 #include <fstream> 		// File Handling
+#include <cstdlib> 		// system command
 #include <typeinfo>
 #include <algorithm>
 #include "Miscellaneous/SmartVector.hpp"
@@ -47,6 +48,22 @@ public:
 		{
 			cout << it.first << " : " << it.second << endl;
 		}
+	}
+
+	void Export_Arguments(string filePath, string fileName) const
+	{
+		// Create File Directory First
+		system(("mkdir -p " + filePath).c_str());
+
+		//Csv Output for pyton plots
+		ofstream logger(filePath+"/"+fileName);
+
+		for (auto it : contents)
+		{
+			logger << it.first << " : " << it.second << endl;
+		}
+
+		logger.close();
 	}
 
 	//
