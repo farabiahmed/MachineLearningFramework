@@ -55,6 +55,8 @@ class DeepQNetwork_PrioritizedReplay(Representation):
         self.modelId = modelId
         self.logfolder = logfolder
 
+        self.model = None
+
         if os.path.isfile("log/model_0.h5"):
             self.model = load_model("log/model_0.h5")
             print("###############################")
