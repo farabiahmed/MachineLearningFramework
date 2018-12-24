@@ -22,6 +22,7 @@ class DeepCorrection_base(Representation):
                  modelId = "noid",
                  logfolder = ""):
 
+        self.model_agent_file = "models/model_0_20181224_091433.h5"
         self.Gamma = gamma
         self.batchsize = batch_size
         self.trainPass = trainpass
@@ -58,7 +59,7 @@ class DeepCorrection_base(Representation):
         self.graph_agent = []
         self.sess_agent = []
         self.model = [] # model holder for the agents
-        if os.path.isfile("models/model_0.h5"):
+        if os.path.isfile(self.model_agent_file):
             print("###############################")
             print("Existing models are getting loaded...")
             print("###############################")
@@ -71,7 +72,7 @@ class DeepCorrection_base(Representation):
                 self.sess_agent.append(tf.Session(graph=self.graph_agent[i]))
                 with self.graph_agent[i].as_default(), self.sess_agent[i].as_default():
                     with tf.name_scope('Model%d' % i):
-                        model = load_model("models/model_0.h5")
+                        model = load_model(self.model_agent_file)
                         self.model.append(model)
                         self.model[i].summary()
         print("Loading is completed.")
@@ -186,7 +187,7 @@ class DeepCorrection_base(Representation):
 
         agent_model_outputs = [] #2D list, agentId and Outputs(array) of each Agent.
         for i in range(self.numberofagent):
-            agent_model_outputs.append(self.ForwardPass_AgentModel(i,state[2*i:2*i+3]))
+            agent_model_outputs.append(self.ForwardPass_AgentModel(i,state[2*i:2*i+2]))
 
         values = []
         for action in self.actions:
@@ -197,8 +198,8 @@ class DeepCorrection_base(Representation):
             agent_model_predicts = [] #1D list, holds Q value of each agent for a given action
             for i in range(self.numberofagent):
                 #print(agent_model_outputs)
-                #print("i:%d " % i, "action_index:%d" % action_index)
-                temp = agent_model_outputs[i][action_index]
+                #print("i:%d " % i, "action_index:%d" % action_index, "Action:%s" % action)
+                temp = agent_model_outputs[i][action[i]]
                 agent_model_predicts.append(temp)
 
             out = self.Fusion_Models(
@@ -219,13 +220,13 @@ class DeepCorrection_base(Representation):
     def Get_Value(self,state,action):
 
         input = self.Convert_State_To_Input(state, action);
-        action_index = self.Get_Action_Index(action)
+        #action_index = self.Get_Action_Index(action)
 
         agent_model_predicts = []
 
         for i in range(self.numberofagent):
-            values = self.ForwardPass_AgentModel(i,state)
-            agent_model_predicts.append(values[action_index])
+            values = self.ForwardPass_AgentModel(i,state[2*i:2*i+2])
+            agent_model_predicts.append(values[action[i]])
 
         correction_model_predicts = self.ForwardPass_CorrectionModel(input)
 
@@ -266,14 +267,14 @@ class DeepCorrection_base(Representation):
 
     def ForwardPass_CorrectionModel(self,input):
 
+        #prediction = np.zeros((1,1))
+
         input = np.expand_dims(input,axis=0)
         with self.graph_correction.as_default():
             prediction = self.sess.run(self.model_correction_layers[-1], feed_dict={
                                                                                     self.model_correction_input: input
                                                                                     })
 
-        #values = np.asarray(prediction).reshape(self.output_unit)
-        #return values
         return prediction[0][0]
 
     def Get_Action_Index(self, action):
@@ -292,8 +293,8 @@ class DeepCorrection_base(Representation):
 
             action = []
             for j in range(self.numberofagent):
-                numberOfFieldsToPass = self.size_of_action_space ** (self.numberofagent - j - 1);
-                action.append ( int((i / numberOfFieldsToPass) % self.size_of_action_space) )
+                numberOfFieldsToPass = self.action_count_per_agent ** (self.numberofagent - j - 1);
+                action.append ( int((i / numberOfFieldsToPass) % self.action_count_per_agent) )
 
             actions.append(action)
 
@@ -344,7 +345,11 @@ class DeepCorrection_base(Representation):
                                                                         self.model_correction_input: inputs,
                                                                         self.model_correction_label: values
                                                                     })
-
+                # cost  = self.sess.run(self.model_correction_cost,
+                #                                                     feed_dict={
+                #                                                         self.model_correction_input: inputs,
+                #                                                         self.model_correction_label: values
+                #                                                     })
             print(cost)
 
         return;
