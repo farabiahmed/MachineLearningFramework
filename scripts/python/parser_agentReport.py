@@ -55,7 +55,9 @@ if len(inputFolder) < 1:
     inputFolder = subdirectories[-1]
 
 if not os.path.exists(path + '/' + inputFolder):
-    print ('Check input params')
+    print (path)
+    print (inputFolder)
+    print ('Check input params, file not found!')
     sys.exit(2)
     
 print("Current Simulation To Process:", path + '/' + inputFolder)    
@@ -126,7 +128,8 @@ for filename in modelFiles:
     plt.xlabel('Number of Bellman Update')
     plt.ylabel('Cumulative Reward')
     plt.savefig('log/'+inputFolder+"/"+splitext(basename(filename))[0]+".svg", format="svg")
-    
+    plt.savefig('log/' + inputFolder + "/" + splitext(basename(filename))[0] + ".png", format="png", dpi=250)
+
     plt.close(f1)
     
     plt.figure(1)
