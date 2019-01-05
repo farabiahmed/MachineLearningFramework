@@ -78,6 +78,7 @@ def init_model(config):
                                                                 trainpass           = strToValue(config["TRAINING_PASS_PER_BATCH"]),
                                                                 experiencebuffer    = strToValue(config["EXPERIENCE_REPLAY_BUFFER"]),
                                                                 fusion_model        = config["FUSION_MODEL"],
+                                                                correction_model_type = config["CORRECTION_MODEL_TYPE"],
                                                                 modelId             = config["MODEL_ID"],
                                                                 logfolder           = config["TIME_STAMP"],
                                                                 )
