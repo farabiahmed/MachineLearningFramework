@@ -84,6 +84,7 @@ To test other unittest examples
 This python script will produce all figures in '''log''' folder with related date.  
 ```
 python3 scripts/python/parser_agentReport.py 
+python3 scripts/python/parser_agentReport.py -i 20181228_230617 -s 250
 ```
 
 ## Developped Modules
