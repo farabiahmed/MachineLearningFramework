@@ -17,7 +17,6 @@ import getopt
 
 # Get The Newest Folder form given path
 path = "log"
-skipline = 1
 inputFolder = ""
 
 print(sys.argv)
@@ -81,7 +80,7 @@ for filename in modelFiles:
     ###################################
     # Report #i
     ###################################
-    
+    skipline = None
     index = index + 1
     
     # Get related file and read via pandas
@@ -95,11 +94,12 @@ for filename in modelFiles:
     # Loop through each data and scatter
     records = arr.shape[0]
     print('Total Records',records)
-    
-    if records>100 :
-        skipline = (records // 100)
-    else :
-        skipline = 1
+
+    if skipline is None:
+        if records>100 :
+            skipline = (records // 100)
+        else :
+            skipline = 1
     
     print('Skipline:',skipline)
     indexlist = np.arange(0,records,skipline)
@@ -141,7 +141,8 @@ plt.legend()
 plt.title('Performance Of The Models')
 plt.xlabel('Game Number')
 plt.ylabel('Cumulative Reward')
-plt.savefig('log/'+inputFolder+"/"+"combined"+".svg", format="svg")        
+plt.savefig('log/'+inputFolder+"/"+"combined"+".svg", format="svg")
+plt.savefig('log/'+inputFolder+"/"+"combined"+".png", format="png", dpi=250)
 plt.close(f2)  
 ###################################
 # Report #2
