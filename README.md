@@ -30,6 +30,10 @@ sudo snap install pycharm-community --classic
 ```
 ### Java
 ```
+sudo apt install default-jre
+```
+
+```
 sudo add-apt-repository ppa:webupd8team/java
 sudo apt-get update
 sudo apt-get install oracle-java8-installer

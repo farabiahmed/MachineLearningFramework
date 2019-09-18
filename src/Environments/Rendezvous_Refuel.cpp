@@ -13,6 +13,10 @@ Rendezvous_Refuel::Rendezvous_Refuel(const ConfigParser& cfg)
 	number_of_agents = cfg.GetValueOfKey<int>("NUMBER_OF_AGENTS");
 
 	initial_state = cfg.GetValueOfKey<vector<SmartVector>>("INITIAL_STATE");
+
+	for (size_t i = 0; i < number_of_agents; ++i) {
+		initial_state[i].elements[2] = fuel_max;
+	}
 }
 
 Rendezvous_Refuel::~Rendezvous_Refuel()
@@ -20,22 +24,27 @@ Rendezvous_Refuel::~Rendezvous_Refuel()
 
 }
 
-
+// FIXED: Fix for multi state agents: x,y,fuel,
+// TODO: get the states from base class and get their combination.
 vector<SmartVector> Rendezvous_Refuel::Get_All_Possible_States() const
 {
+	const static int DIMENSION_FOR_AGENT = 3; // x,y,fuel
+
 	static vector<SmartVector> states;		//Cache states since it is expensive to calculate
 
 	int index=0;
 
+	int dimension_fuel = fuel_max + 1;
+
 	if(states.size()==0)
 	{
-		size_t size_of_states = pow(number_of_rows * number_of_columns, number_of_agents);
+		size_t size_of_states = pow(number_of_rows * number_of_columns * dimension_fuel, number_of_agents);
 
 		for (size_t i = 0; i < size_of_states; ++i)
 		{
-			SmartVector state(2 * number_of_agents);
+			SmartVector state(DIMENSION_FOR_AGENT * number_of_agents);
 
-			for (int j = 0; j < state.size(); j+=2) {
+			for (int j = 0; j < state.size(); j+=DIMENSION_FOR_AGENT) {
 
 				/*
 				 	* 3 Agent case
@@ -53,12 +62,13 @@ vector<SmartVector> Rendezvous_Refuel::Get_All_Possible_States() const
 					state.elements[3] = (i / 1) 									% number_of_columns;
 				 */
 
-				unsigned currentAgentId = j / 2;
+				unsigned currentAgentId = j / DIMENSION_FOR_AGENT;
 
-				unsigned numberOfFieldsToPass = pow(number_of_columns * number_of_rows, (number_of_agents - currentAgentId - 1));
+				unsigned numberOfFieldsToPass = pow(number_of_columns * number_of_rows * dimension_fuel, (number_of_agents - currentAgentId - 1));
 
-				state.elements[j] 	= (i / (numberOfFieldsToPass * number_of_columns) ) 	% number_of_rows;
-				state.elements[j+1] = (i / numberOfFieldsToPass) 						% number_of_columns;
+				state.elements[j] 	= (i / (numberOfFieldsToPass * number_of_columns * dimension_fuel) ) 	% number_of_rows;
+				state.elements[j+1] = (i / (numberOfFieldsToPass * dimension_fuel))							% number_of_columns;
+				state.elements[j+2] = (i / numberOfFieldsToPass) 											% dimension_fuel;
 			}
 
 			if(!Check_Blocked_State(state))
@@ -132,7 +142,8 @@ bool Rendezvous_Refuel::Check_Terminal_State(const SmartVector& state) const
 	return false;
 }
 
-//TODO needs to be fixed for multiblock and multiagent case -> multiagent-FIXED
+//TODO: needs to be fixed for multiblock
+//Fixed: needs to be fixed for multiagent case
 bool Rendezvous_Refuel::Check_Blocked_State(const SmartVector& state) const
 {
 	vector<SmartVector> splittedStates = SmartVector::Split(state,number_of_agents);
@@ -210,7 +221,7 @@ vector<SmartVector> Rendezvous_Refuel::Get_Action_List(const SmartVector& state)
 
 }
 
-//TODO: Fix for multiagent case. - FIXED
+//FIXED: Fix for multiagent case. - FIXED
 //TODO: Fix for multi terminal state case.
 //TODO: Uncomment Distributed Reward for huge state spaces.
 double Rendezvous_Refuel::Get_Reward(const SmartVector& currentState, const SmartVector& action, const SmartVector& nextState)
@@ -294,7 +305,7 @@ double Rendezvous_Refuel::Get_Reward(const SmartVector& currentState, const Smar
 	return reward+cost_action;
 }
 
-//TODO: Fix to multiagent case for n>2
+//FIXED: Fix to multiagent case for n>2
 SmartVector Rendezvous_Refuel::Get_Initial_State()
 {
 	SmartVector vec;
@@ -362,6 +373,8 @@ int Rendezvous_Refuel::Get_State_Index(const SmartVector& state) const
 
 	cout<<endl<<endl<<"INVALID STATE!"<<endl<<endl;
 
+	state.Print();
+
 	cout<<"Controlled Abort..."<<endl;
 	abort();
 	return -1;
@@ -396,100 +409,19 @@ SmartVector Rendezvous_Refuel::Get_Next_State(const SmartVector& state, const Sm
 
 void Rendezvous_Refuel::Display_Policy(const Representation& rep)  const
 {
-	cout<<endl<<endl<<"Displaying Policy Status:"<<endl<<endl;
-
-	int Policy[number_of_agents][number_of_rows][number_of_columns];
-	double maxQValue=0;
-
-	vector<SmartVector> states = Get_All_Possible_States();
-	vector<SmartVector> actions;
-
-	for (unsigned i = 0; i < states.size(); ++i) {
-
-		maxQValue = std::numeric_limits<double>::lowest();
-
-		actions = Get_Action_List(states[i]);
-
-		for (unsigned j = 0; j < actions.size(); ++j) {
-
-			double temp = rep.Get_Value(states[i],actions[j]);
-			if(temp>maxQValue)
-			{
-				//maxQValue = rep.Qvalue[i][j];
-				maxQValue = temp;
-
-				for (unsigned agent = 0; agent < number_of_agents; ++agent)
-				{
-					int policy = actions[j].elements[agent];
-					unsigned r = (unsigned) states[i].elements[agent*2 + 0];
-					unsigned c = (unsigned) states[i].elements[agent*2 + 1];
-
-					Policy[agent][r][c] = policy;
-				}
-			}
-		}
-	}
-
+	cout<<endl<<endl<<"NOT IMPLEMENTED YET"<<endl<<endl;
 }
 
 void Rendezvous_Refuel::Display_State(const SmartVector& state) const
 {
-	char ch;
-
 	vector<SmartVector> agent_states = SmartVector::Split(state,number_of_agents);
 
-	for (int r = 0; r < number_of_rows; r++)
-	{
-		for (int c = 0; c < number_of_columns; c++)
-		{
-			ch = ' ';
-			SmartVector state(2);
-			state.elements[0] = r;
-			state.elements[1] = c;
+	for (unsigned a = 0; a < number_of_agents; ++a) {
 
-			for (unsigned a = 0; a < number_of_agents; ++a) {
-				if(state==agent_states[a])
-					ch = 'A' + a;
-			}
+		cout<<"Displaying State for Agent #"<<a<<endl;
 
+		Gridworld_Refuel::Display_State(agent_states[a]);
 
-			for (unsigned i = 0; i < blocked_states.size(); ++i) {
-				if(state == blocked_states[i])
-					ch = 'x';
-			}
-
-			for (unsigned i = 0; i < terminal_states.size(); ++i) {
-				if(state == terminal_states[i])
-				{
-					if(rewards_of_terminal_states[i]>0)
-						ch = '+';
-					else if(rewards_of_terminal_states[i]<0)
-						ch = '-';
-				}
-			}
-
-			// For more unicode characters: http://shapecatcher.com/
-			if(ch=='_')
-				cout<<"\u2193";
-			else if(ch=='<')
-				cout<<"\u2190";
-			else if(ch=='^')
-				cout<<"\u2191";
-			else if(ch=='>')
-				cout<<"\u2192";
-			else if(ch=='x')
-				cout<<"\033[33m\u2612\033[0m"; // Yellow Blocked Cross
-			else if(ch=='+')
-				cout<<"\033[32m\u2714\033[0m"; // Green Tick
-			else if(ch=='-')
-				cout<<"\033[31m\u2620\033[0m"; // Red Skull with bones
-			else if(ch==' ')
-				cout<<"\u2317";
-			else
-				cout<<ch;
-
-			cout << " ";
-		}
-		cout << " " << endl;
+		cout<<endl<<endl;
 	}
 }

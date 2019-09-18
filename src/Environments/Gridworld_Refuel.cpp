@@ -487,8 +487,7 @@ void Gridworld_Refuel::Display_State(const SmartVector& agent)  const
 	// Future Use For MultiAgent:
 	// Numbered items: 2781 and 278B
 
-	cout<<endl<<endl<<"Displaying Current Status:"<<endl;
-
+	cout<<"Displaying Current Status:"<<endl;
 
 	//for (int r = number_of_rows-1; r >= 0; r--)
 	for (int r = 0; r < number_of_rows; r++)
@@ -575,7 +574,7 @@ position_placed:
 		cout << " " << endl;
 	}
 
-	cout<<endl<<"Current Fuel: "<<agent.elements[2]<<endl;
+	cout<<"Current Fuel: "<<agent.elements[2]<<endl;
 }
 
 void Gridworld_Refuel::Display_Action(const SmartVector& action) const
