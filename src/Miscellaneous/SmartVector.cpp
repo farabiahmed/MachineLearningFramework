@@ -168,15 +168,15 @@ void SmartVector::Print() const
 	cout<< endl <<"Printing Elements of The Vector:"<<endl;
 
 	// Print Index of vector in its own space
-	cout<<"Index in its space: " << index << endl;
+	cout<<"	Index in its space: " << index << endl;
 
 	// Print each element of the vector
 	for (int var = 0; var < dimension; ++var) {
-		cout<<"Element " << var << " :" << elements[var] << endl;
+		cout<<"	Element " << var << " :" << elements[var] << endl;
 	}
 
 	// Inform user that it is the end.
-	cout<<"End of vector."<<endl<<endl;
+	cout<<"	End of vector."<<endl<<endl;
 }
 
 // Destructor (Rule Of Three #1)

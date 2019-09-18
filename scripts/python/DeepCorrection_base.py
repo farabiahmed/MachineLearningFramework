@@ -19,17 +19,19 @@ class DeepCorrection_base(Representation):
                  gamma = 0.99,
                  model_reset_counter=32,
                  fusion_model = "MAX_SUM", # MAX_SUM or MAX_MIN
+                 correction_model_type="MULTIPLE_OUT",  # MULTIPLE_OUT, SINGLE_OUT
                  modelId = "noid",
                  logfolder = ""):
 
-        self.model_agent_file = "models/model_0_20181224_091433.h5"
+        self.model_agent_file = "models/model_0_20181224_091433.h5" #low quality
+        #self.model_agent_file = "models/model_0_20181217_173349.h5" # high quality
         self.Gamma = gamma
         self.batchsize = batch_size
         self.trainPass = trainpass
         self.hidden_unit = hidden_unit
         self.learningrate = learning_rate
         self.fusion_model = fusion_model
-        self.size_of_input_units = 3 * numberofagent; # (x,y,a) for each agent
+        self.correction_model_type = correction_model_type
         self.gridsize = gridsize
         self.size_of_action_space = actionspaceperagent**numberofagent
         self.action_count_per_agent = actionspaceperagent
@@ -38,13 +40,19 @@ class DeepCorrection_base(Representation):
         self.fresh_experience_counter = 0
         self.actionspaceforagent = actionspaceperagent
         self.numberofagent = numberofagent
-        self.output_unit = 1 #actionspaceperagent**numberofagent
         self.trainingepochtotal = 0
         self.train_period = train_period # After how many new experience we will run fitting/training.
         self.counter_experience = 0 # A counter to hold how many tuple experienced
         self.counter_modelReset = model_reset_counter
         self.modelId = modelId
         self.logfolder = logfolder
+
+        if (self.correction_model_type == "MULTIPLE_OUT"):
+            self.output_unit = actionspaceperagent**numberofagent
+            self.size_of_input_units = 2 * numberofagent  # (x,y) for each agent
+        else:
+            self.output_unit = 1
+            self.size_of_input_units = 3 * numberofagent  # (x,y,a) for each agent
 
         self.actions = self.Get_Action_List()
 
@@ -103,7 +111,7 @@ class DeepCorrection_base(Representation):
                     self.model_correction_layers.append(tf.layers.dense(self.model_correction_layers[i-1], hidden_unit[1], tf.nn.tanh))  # hidden layer
 
                 # Output Layer
-                self.model_correction_layers.append(tf.layers.dense(self.model_correction_layers[len(hidden_unit)-1], self.output_unit, tf.nn.relu))  # output layer, 1, only Q value
+                self.model_correction_layers.append(tf.layers.dense(self.model_correction_layers[len(hidden_unit)-1], self.output_unit, activation=self.my_leaky_relu))  # output layer, 1, only Q value
 
             with tf.name_scope('Model_Correction_Optimizer'):
                 # Minimize error
@@ -180,8 +188,12 @@ class DeepCorrection_base(Representation):
         slim.model_analyzer.analyze_vars(model_vars, print_info=True)
 
     def Convert_State_To_Input(self,state, action):
-
+        if (self.correction_model_type == "MULTIPLE_OUT"):
+            return state
         return np.concatenate((state,action))
+
+    def my_leaky_relu(self, x):
+        return tf.nn.leaky_relu(x, alpha=0.3)
 
     def Get_Greedy_Pair(self,state):
 
@@ -189,25 +201,33 @@ class DeepCorrection_base(Representation):
         for i in range(self.numberofagent):
             agent_model_outputs.append(self.ForwardPass_AgentModel(i,state[2*i:2*i+2]))
 
+        if (self.correction_model_type == "MULTIPLE_OUT"):
+            input = self.Convert_State_To_Input(state, self.actions[0]);
+            correction_model_predicts = self.ForwardPass_CorrectionModel(input)
+
         values = []
         for action in self.actions:
-            input = self.Convert_State_To_Input(state, action);
-            action_index = self.Get_Action_Index(action)
-            correction_model_predicts = self.ForwardPass_CorrectionModel(input)
+
+            if (self.correction_model_type == "SINGLE_OUT"):
+                input = self.Convert_State_To_Input(state, action);
+                correction_model_predicts = self.ForwardPass_CorrectionModel(input)
 
             agent_model_predicts = [] #1D list, holds Q value of each agent for a given action
             for i in range(self.numberofagent):
-                #print(agent_model_outputs)
-                #print("i:%d " % i, "action_index:%d" % action_index, "Action:%s" % action)
-                temp = agent_model_outputs[i][action[i]]
-                agent_model_predicts.append(temp)
+                agent_model_predicts.append(agent_model_outputs[i][action[i]])
 
             out = self.Fusion_Models(
                 np.array(agent_model_predicts),
-                np.array(correction_model_predicts)
             )
 
-            values.append(out)
+            if (self.correction_model_type == "SINGLE_OUT"):
+                correction_model_predict = correction_model_predicts
+                value = out + correction_model_predict
+            else:
+                action_index = self.Get_Action_Index(action)
+                value = out + correction_model_predicts[action_index]
+
+            values.append(value)
 
         values = np.array(values)
 
@@ -220,34 +240,55 @@ class DeepCorrection_base(Representation):
     def Get_Value(self,state,action):
 
         input = self.Convert_State_To_Input(state, action);
-        #action_index = self.Get_Action_Index(action)
 
         agent_model_predicts = []
 
         for i in range(self.numberofagent):
             values = self.ForwardPass_AgentModel(i,state[2*i:2*i+2])
             agent_model_predicts.append(values[action[i]])
+            #if (self.correction_model_type == "MULTIPLE_OUT"):
+            #    agent_model_predicts.append(values)
+            #else:
+            #    agent_model_predicts.append(values[action[i]])
 
-        correction_model_predicts = self.ForwardPass_CorrectionModel(input)
 
         out = self.Fusion_Models(
             np.array(agent_model_predicts),
-            np.array(correction_model_predicts)
         )
 
-        return out
+        correction_model_predicts = self.ForwardPass_CorrectionModel(input)
 
-    def Fusion_Models(self, agent_outputs, correction_output):
+        if (self.correction_model_type == "MULTIPLE_OUT"):
+            action_index = self.Get_Action_Index(action)
+            #out = out + correction_model_predicts[action_index]
+
+            self.correction_model_predicts = correction_model_predicts
+            correction_model_predicts[action_index] += out
+            self.fusioned_model_predicts = out
+            #self.combined_model_predicts = correction_model_predicts
+            return correction_model_predicts[action_index]
+        else:
+            correction_model_predict = correction_model_predicts
+            out = out + correction_model_predict
+
+            return out
+
+    def Fusion_Models(self, agent_outputs):
 
         # max-sum
         if (self.fusion_model == "MAX_SUM"):
-            temp = agent_outputs.sum()
-            temp = temp + correction_output
-            return  temp
+            # if (self.correction_model_type == "MULTIPLE_OUT"):
+            #     sum = agent_outputs[0]
+            #     for i in range(1, len(agent_outputs)) :
+            #         sum = sum + agent_outputs[i]
+            #     return sum
+            # else:
+            #     return agent_outputs.sum()
+            return agent_outputs.sum()
 
         # max-min
         elif(self.fusion_model == "MAX_MIN"):
-            return agent_outputs.min() + correction_output
+            return agent_outputs.min()
 
         else:
             raise NotImplementedError()
@@ -274,8 +315,10 @@ class DeepCorrection_base(Representation):
             prediction = self.sess.run(self.model_correction_layers[-1], feed_dict={
                                                                                     self.model_correction_input: input
                                                                                     })
-
-        return prediction[0][0]
+        if (self.correction_model_type == "SINGLE_OUT"):
+            return prediction[0][0]
+        else:
+            return prediction[0]
 
     def Get_Action_Index(self, action):
         sizeOfAction = action.shape[0]
@@ -305,12 +348,20 @@ class DeepCorrection_base(Representation):
         # Update label
         network_out = self.Get_Value(state, action)
 
-        # Calculate error for Prioritized Experience Replay
+        if (self.correction_model_type == "SINGLE_OUT"):
+            label = network_out
+        else:
+            action_index = self.Get_Action_Index(action)
+            #self.fusioned_model_predicts
+            #self.combined_model_predicts
+            self.correction_model_predicts[action_index] = value - self.fusioned_model_predicts
+            label = self.correction_model_predicts
+
         error = abs(network_out - value)
 
         # Append new sample to Memory of Experiences
         # Don't worry about its size, since it is a queue
-        self.memory.add(error,(state, action, value))
+        self.memory.add(error,(state, action, label))
 
         #if self.fresh_experience_counter == self.batchsize :
         if self.memory.length() >= self.batchsize :
@@ -337,10 +388,11 @@ class DeepCorrection_base(Representation):
 
             inputs = np.array(inputs)
             values = np.array(values)
-            values = np.reshape(values, (self.batchsize, 1))
+            values = np.reshape(values, (self.batchsize, self.output_unit))
 
             with self.graph_correction.as_default():
-                cost, _  = self.sess.run([self.model_correction_cost, self.model_correction_train],
+                for i in range(self.trainPass):
+                    cost, _  = self.sess.run([self.model_correction_cost, self.model_correction_train],
                                                                     feed_dict={
                                                                         self.model_correction_input: inputs,
                                                                         self.model_correction_label: values

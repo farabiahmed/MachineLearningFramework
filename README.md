@@ -30,6 +30,10 @@ sudo snap install pycharm-community --classic
 ```
 ### Java
 ```
+sudo apt install default-jre
+```
+
+```
 sudo add-apt-repository ppa:webupd8team/java
 sudo apt-get update
 sudo apt-get install oracle-java8-installer
@@ -84,6 +88,7 @@ To test other unittest examples
 This python script will produce all figures in '''log''' folder with related date.  
 ```
 python3 scripts/python/parser_agentReport.py 
+python3 scripts/python/parser_agentReport.py -i 20181228_230617 -s 250
 ```
 
 ## Developped Modules

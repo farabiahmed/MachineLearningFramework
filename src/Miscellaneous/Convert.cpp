@@ -14,14 +14,25 @@ SmartVector Convert::string_to_T <SmartVector> (string const &val)
 	if(val=="N/A")
 		return SmartVector();
 
-	vector<string> tokens = Parse_String(val,',');
-	SmartVector ret(tokens.size());
+	try{
+		vector<string> tokens = Parse_String(val,',');
+		SmartVector ret(tokens.size());
 
-	for (unsigned i = 0; i < tokens.size(); ++i) {
-		ret.elements[i] = (double)stod(tokens[i]);
+		for (unsigned i = 0; i < tokens.size(); ++i) {
+			ret.elements[i] = (double)stod(tokens[i]);
+		}
+
+
+		return ret;
+	}
+	catch (int e)
+	{
+		cout << "An exception occurred. Exception Code: " << e << '\n';
+		cout << "Inputs: " << val << '\n';
+
+		exit(0);
 	}
 
-	return ret;
 }
 
 template <>
