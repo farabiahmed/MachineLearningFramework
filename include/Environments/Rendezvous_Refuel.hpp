@@ -26,6 +26,8 @@ public:
 
 	//SmartVector Get_Random_State();
 
+	bool ComparePosition(const SmartVector& state1, const SmartVector& state2) const;
+
 	double Get_Reward(const SmartVector& currentState, const SmartVector& action, const SmartVector& nextState);
 
 	vector<pair<SmartVector,double>> Get_Transition_Probability(const SmartVector& currentState, const SmartVector& action);
@@ -51,6 +53,8 @@ private:
 	unsigned number_of_agents;
 
 	vector<SmartVector> initial_state;
+
+	const int DIMENSION_FOR_AGENT;
 };
 
 #endif /* ENVIRONMENTS_RENDEZVOUS_REFUEL_HPP_ */

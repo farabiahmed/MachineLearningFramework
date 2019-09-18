@@ -8,7 +8,8 @@
 #include <Environments/Rendezvous_Refuel.hpp>
 
 Rendezvous_Refuel::Rendezvous_Refuel(const ConfigParser& cfg)
-:Gridworld_Refuel(cfg)
+:Gridworld_Refuel(cfg),
+ DIMENSION_FOR_AGENT(3)// x,y,fuel
 {
 	number_of_agents = cfg.GetValueOfKey<int>("NUMBER_OF_AGENTS");
 
@@ -28,8 +29,6 @@ Rendezvous_Refuel::~Rendezvous_Refuel()
 // TODO: get the states from base class and get their combination.
 vector<SmartVector> Rendezvous_Refuel::Get_All_Possible_States() const
 {
-	const static int DIMENSION_FOR_AGENT = 3; // x,y,fuel
-
 	static vector<SmartVector> states;		//Cache states since it is expensive to calculate
 
 	int index=0;
@@ -121,7 +120,7 @@ vector<SmartVector> Rendezvous_Refuel::Get_All_Possible_States() const
 	return states;
 }
 
-//TODO: needs to be updated for parametric multiagent case. -> FIXED
+//FIXED: needs to be updated for parametric multiagent case.
 //TODO: It is currently just for single terminal state. Needs to be updated for
 //multiple terminal states.
 bool Rendezvous_Refuel::Check_Terminal_State(const SmartVector& state) const
@@ -133,7 +132,7 @@ bool Rendezvous_Refuel::Check_Terminal_State(const SmartVector& state) const
 		terminalState = SmartVector::Combine(terminalState,terminal_states[0]);
 	}
 
-	if(state == terminalState)
+	if(ComparePosition(state, terminalState) )
 	{
 		return true;
 	}
@@ -159,7 +158,7 @@ bool Rendezvous_Refuel::Check_Blocked_State(const SmartVector& state) const
 	return false;
 }
 
-//TODO needs to be updated for parametric multiagent case.
+//Fixed: needs to be updated for parametric multiagent case.
 vector<SmartVector> Rendezvous_Refuel::Get_Action_List(const SmartVector& state) const
 {
 	/*
@@ -221,6 +220,22 @@ vector<SmartVector> Rendezvous_Refuel::Get_Action_List(const SmartVector& state)
 
 }
 
+bool Rendezvous_Refuel::ComparePosition(const SmartVector& state1, const SmartVector& state2) const
+{
+	for (size_t i = 0; i < number_of_agents; ++i) {
+		if(!(
+			(state1.elements[i*DIMENSION_FOR_AGENT]==state2.elements[i*DIMENSION_FOR_AGENT]) &&
+			(state1.elements[i*DIMENSION_FOR_AGENT+1]==state2.elements[i*DIMENSION_FOR_AGENT+1])
+			)
+		  )
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+
 //FIXED: Fix for multiagent case. - FIXED
 //TODO: Fix for multi terminal state case.
 //TODO: Uncomment Distributed Reward for huge state spaces.
@@ -272,7 +287,7 @@ double Rendezvous_Refuel::Get_Reward(const SmartVector& currentState, const Smar
 	 * Model 2 Single
 	 */
 
-	if(nextState == terminalState)
+	if(ComparePosition(nextState,terminalState))
 	{
 		reward = rewards_of_terminal_states[0];
 	}
@@ -326,6 +341,8 @@ SmartVector Rendezvous_Refuel::Get_Random_State()
 	return Get_Initial_State();
 }
 */
+
+// TODO:FAILURE FOR 3AGENT!
 vector<pair<SmartVector,double>> Rendezvous_Refuel::Get_Transition_Probability(const SmartVector& currentState, const SmartVector& action)
 {
 	// Create Instance of return variable
@@ -345,7 +362,7 @@ vector<pair<SmartVector,double>> Rendezvous_Refuel::Get_Transition_Probability(c
 		state_probability_decomposed.push_back(prob);
 	}
 
-	//TODO needs to be updated for parametric multiagent case.
+	//TODO:  needs to be updated for parametric multiagent case.
 	//Compose transition probabilities:
 	for (unsigned i = 0; i < state_probability_decomposed[0].size(); ++i)
 	{
@@ -364,6 +381,8 @@ vector<pair<SmartVector,double>> Rendezvous_Refuel::Get_Transition_Probability(c
 //TODO Use Hashmaps instead of bruteforce search
 int Rendezvous_Refuel::Get_State_Index(const SmartVector& state) const
 {
+	return -1;
+
 	vector<SmartVector> states = Rendezvous_Refuel::Get_All_Possible_States();
 
 	for (unsigned i = 0; i < states.size(); ++i) {
