@@ -173,7 +173,7 @@ class DeepCorrection_base(Representation):
         print("###############################")
         print("")
 
-        self.Save_Model()
+#        self.Save_Model()
 
     def tf_model_summary(self):
         model_vars = tf.trainable_variables()
@@ -377,7 +377,7 @@ class DeepCorrection_base(Representation):
         print("")
 
     def __del__(self):
-        self.Save_Model()
+        #self.Save_Model()
 
         # Close the session
         self.sess.close()
