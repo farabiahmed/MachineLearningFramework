@@ -12,6 +12,7 @@
 #include "Environments/Gridworld.hpp"
 #include "Environments/Blocksworld.hpp"
 #include "Environments/Rendezvous.hpp"
+#include "Environments/Rendezvous_Refuel.hpp"
 #include "Miscellaneous/ConfigParser.hpp"
 
 class EnvironmentFactory
@@ -20,10 +21,11 @@ public:
 
 	static Environment* Create(string type, const ConfigParser& config)
 	{
-			if(type == "blocksworld") 		return new Blocksworld(config);
-			else if(type == "gridworld")	return new Gridworld(config);
-			else if(type == "rendezvous")	return new Rendezvous(config);
-			else							return NULL;
+			if(type == "blocksworld") 				return new Blocksworld(config);
+			else if(type == "gridworld")			return new Gridworld(config);
+			else if(type == "rendezvous")			return new Rendezvous(config);
+			else if(type == "rendezvous_refuel")	return new Rendezvous_Refuel(config);
+			else									return NULL;
 	}
 };
 
