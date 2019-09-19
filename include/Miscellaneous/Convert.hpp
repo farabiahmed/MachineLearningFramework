@@ -39,7 +39,7 @@ class Convert {
 		T returnVal;
 
 		if (!(istr >> returnVal))
-			exitWithError("Config File Parser: Not a valid " + (string)typeid(T).name() + " received!\n");
+			exitWithError("Config File Parser: Not a valid " + (string)typeid(T).name() + " received! :"+ val +"\n");
 
 		return returnVal;
 	}

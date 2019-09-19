@@ -88,9 +88,9 @@ int main(int argc, char* argv[])
 						"params_"+cfg.GetValueOfKey<string>("MODEL_ID", "0")+".txt");
 
 	/* Run Model Here */
-	Environment *environment 	= EnvironmentFactory::Create(clp.GetOption<string>("ENVIRONMENT"),cfg);
-	Representation *value		= RepresentationFactory::Create(clp.GetOption<string>("REPRESENTATION"), environment, cfg);
-	Agent *agent 				= AgentFactory::Create(clp.GetOption<string>("AGENT"), environment, value, cfg);
+	Environment *environment 	= EnvironmentFactory::Create(cfg.GetValueOfKey<string>("ENVIRONMENT"),cfg);
+	Representation *value		= RepresentationFactory::Create(cfg.GetValueOfKey<string>("REPRESENTATION"), environment, cfg);
+	Agent *agent 				= AgentFactory::Create(cfg.GetValueOfKey<string>("AGENT"), environment, value, cfg);
 
 	//environment->Display_State(environment->Get_Initial_State());
 

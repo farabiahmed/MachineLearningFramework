@@ -29,7 +29,13 @@ public:
 	template <typename ValueType>
 	ValueType GetOption(const string&  param)
 	{
-		return Convert::string_to_T<ValueType>(dictionary[param]);
+		if (dictionary.find(param) != dictionary.end())
+			return Convert::string_to_T<ValueType>(dictionary[param]);
+		else
+		{
+			cout << "Requested Key does not exist : " << param << endl;
+			abort();
+		}
 	}
 
 	void Print_Arguments(void);
