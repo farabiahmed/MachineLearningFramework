@@ -24,7 +24,7 @@ public:
 
 	SmartVector Get_Initial_State();
 
-	//SmartVector Get_Random_State();
+	SmartVector Get_Random_State();
 
 	bool ComparePosition(const SmartVector& state1, const SmartVector& state2) const;
 

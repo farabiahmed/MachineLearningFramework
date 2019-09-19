@@ -39,7 +39,7 @@ class DeepQNetwork_PrioritizedReplay(Representation):
         if(statePreprocessType=="Tensor") :
             self.size_of_input_units = gridsize * gridsize * numberofagent
         elif (statePreprocessType=="Vector"):
-            self.size_of_input_units = 2 * numberofagent; # (x,y,a) for each agent
+            self.size_of_input_units = 3 * numberofagent; # (x,y,a) for each agent
         self.gridsize = gridsize
 
         self.memory = Memory_SumTree(experiencebuffer)

@@ -340,12 +340,12 @@ SmartVector Rendezvous_Refuel::Get_Initial_State()
 	return vec;
 }
 
-/*
-SmartVector Rendezvous_Refuel::Get_Random_State()
+// Random state should be active. Otherwise, some state from all possible states can be choosen even it has zero fuel. 
+SmartVector Rendezvous_Refuel::Get_Random_State() 
 {
 	return Get_Initial_State();
 }
-*/
+
 
 // TODO:FAILURE FOR 3AGENT!
 vector<pair<SmartVector,double>> Rendezvous_Refuel::Get_Transition_Probability(const SmartVector& currentState, const SmartVector& action)
