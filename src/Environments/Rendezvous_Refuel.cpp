@@ -15,6 +15,8 @@ Rendezvous_Refuel::Rendezvous_Refuel(const ConfigParser& cfg)
 
 	initial_state = cfg.GetValueOfKey<vector<SmartVector>>("INITIAL_STATE");
 
+	representation_model = cfg.GetValueOfKey<string>("REPRESENTATION");
+
 	for (size_t i = 0; i < number_of_agents; ++i) {
 		initial_state[i].elements[2] = fuel_max;
 	}
@@ -299,7 +301,10 @@ double Rendezvous_Refuel::Get_Reward(const SmartVector& currentState, const Smar
 		double temp=0;
 		for (unsigned i = 0; i < number_of_agents; ++i)
 		{
-			SmartVector diff_nextstate = terminal_states[0] - nextstates[i];
+			SmartVector diff_nextstate(2);
+			diff_nextstate.elements[0] = terminal_states[0].elements[0] - nextstates[i].elements[0];
+			diff_nextstate.elements[1] = terminal_states[0].elements[1] - nextstates[i].elements[1];
+
 			//SmartVector diff_currstate = terminal_states[0] - currentstates[i];
 
 			double dist_next = diff_nextstate.Magnitude();
@@ -381,7 +386,8 @@ vector<pair<SmartVector,double>> Rendezvous_Refuel::Get_Transition_Probability(c
 //TODO Use Hashmaps instead of bruteforce search
 int Rendezvous_Refuel::Get_State_Index(const SmartVector& state) const
 {
-	return -1;
+	if(representation_model != "TabularStateActionPair")
+		return -1;
 
 	vector<SmartVector> states = Rendezvous_Refuel::Get_All_Possible_States();
 

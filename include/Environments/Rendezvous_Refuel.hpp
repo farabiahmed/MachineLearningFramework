@@ -55,6 +55,8 @@ private:
 	vector<SmartVector> initial_state;
 
 	const int DIMENSION_FOR_AGENT;
+
+	string representation_model;
 };
 
 #endif /* ENVIRONMENTS_RENDEZVOUS_REFUEL_HPP_ */
