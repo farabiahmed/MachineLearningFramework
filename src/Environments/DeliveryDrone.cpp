@@ -378,26 +378,30 @@ vector<SmartVector> DeliveryDrone::Get_All_Possible_States() const
 									if(r_packet>=0 && (r_deliverypoint==-1))
 										continue;
 
+									// Check Packet and Delivery Point overlapped
+									if(r_packet == r_deliverypoint && c_packet == c_deliverypoint && r_packet>-1)
+										continue;
+
 									// Check whether the position on the blocked state
 									bool invalid = false;
 									for (size_t i = 0; i < blocked_states.size(); ++i)
 									{
 										if( r == blocked_states[i].elements[0] && c == blocked_states[i].elements[1])
 										{
-											break;
 											invalid = true;
+											break;
 										}
 
 										if( r_packet == blocked_states[i].elements[0] && c_packet == blocked_states[i].elements[1])
 										{
-											break;
 											invalid = true;
+											break;
 										}
 
 										if( r_deliverypoint == blocked_states[i].elements[0] && c_deliverypoint == blocked_states[i].elements[1])
 										{
-											break;
 											invalid = true;
+											break;
 										}
 									}
 									if(invalid) continue;

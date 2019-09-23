@@ -42,7 +42,7 @@ void Agent::Get_Cumulative_Rewards(unsigned numberof_bellmanupdate)
 	vector<double> rewards;
 
 	//cout<<endl<<endl<<"Game Simulation: #"<< game_played++;
-	cout<<" Sim: #"<< game_played++;
+	cout<<" Sim: #"<< setw(6) << game_played++;
 
 	// Collect the performance of current session to draw a plot.
 	vector<pair<int, double>> sim_results;
@@ -95,6 +95,12 @@ pair<unsigned,double> Agent::Simulate(void)
 
 	// Current State of agent
 	SmartVector state = environment->Get_Random_State();
+
+	cout<<" Init: [";
+	for (int i = 0; i < state.dimension; ++i) {
+		cout<<setw(2)<<(int)state.elements[i]<<" ";
+	}
+	cout<<"] ";
 
 	SmartVector nextState;
 	SmartVector action;

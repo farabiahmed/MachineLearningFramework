@@ -97,7 +97,7 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 			valueFunction->Print_Value();
 		}
 
-		cout<<"Game #: " << num_of_iteration << flush;
+		cout<<"Game #: " << setw(6) << num_of_iteration << flush;
 
 		// Q Value Update Value (currentQ-expectedQ)
 		vector<double> diff;
