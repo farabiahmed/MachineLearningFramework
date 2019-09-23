@@ -133,7 +133,7 @@ int main()
 
 	vec10.Print();
 
-
+	cout<< "Serialized vec10: " << vec10.Serialize() << endl;
 
 	cout<<endl<<"End Of Test Program"<<endl;
 

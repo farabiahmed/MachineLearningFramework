@@ -12,6 +12,7 @@
 #include <stdexcept>
 #include <vector>
 #include <cmath>
+#include <sstream>
 
 using namespace std;
 
@@ -92,6 +93,17 @@ public:
 	// Calculate Magnitude of the vector
 	double Magnitude() const;
 
+	std::string Serialize() const
+	{
+		std::stringstream ss;
+		for (int i = 0; i < dimension; ++i) {
+			ss<<elements[i];
+
+			if(i!=dimension-1)
+				ss<<",";
+		}
+		return ss.str();
+	}
 	// Static Functions
 
 	// Returns Inner Product of the input vectors

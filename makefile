@@ -46,7 +46,7 @@
 CC 	:= g++ # This is the main compiler
 
 
-CFLAGS 	:= -g -O0 -std=c++11 -Wall
+CFLAGS 	:= -g -O0 -std=c++17 -Wall
 LIB 	:= -pthread -lpython2.7 -fopenmp
 INC 	:= -I include -I /usr/include/python2.7/ 
 

@@ -13,7 +13,7 @@ DeliveryDrone::DeliveryDrone(const ConfigParser& cfg) {
 
 	Name = "Grid World Refuel Environment";
 
-	terminal_states = cfg.GetValueOfKey< vector<SmartVector> >("TERMINAL_STATES");
+	//terminal_states = cfg.GetValueOfKey< vector<SmartVector> >("TERMINAL_STATES");
 
 	blocked_states = cfg.GetValueOfKey< vector<SmartVector> >("BLOCKED_STATES");
 
@@ -68,7 +68,19 @@ double DeliveryDrone::Get_Reward(const SmartVector& currentState, const SmartVec
 {
 	double reward = 0.0;
 
+	if(Check_Packet_Picked(nextState) && !Check_Packet_Picked(currentState))
+	{
+		reward += 0.2;
+	}
 
+	if(Check_Terminal_State(nextState))
+	{
+		reward += 1;
+	}
+
+	if(nextState.elements[StateIdx::Fuel] == 0) reward += -1;
+
+/*
 	for (unsigned i = 0; i < terminal_states.size(); ++i)
 	{
 		if(ComparePosition(nextState,terminal_states[i]))
@@ -76,7 +88,7 @@ double DeliveryDrone::Get_Reward(const SmartVector& currentState, const SmartVec
 			reward = rewards_of_terminal_states[i];
 		}
 	}
-
+*/
 	/*
 	 * Distributed Reward through distance to terminal
 	 */
@@ -105,14 +117,12 @@ SmartVector DeliveryDrone::BurnFuel(const SmartVector &state)
 {
 	SmartVector temp = state;
 
-	temp.elements[2]--;
+	temp.elements[StateIdx::Fuel]--;
 
 	if(Check_Refuel_State(temp))
 	{
-		temp.elements[2] = fuel_max;
+		temp.elements[StateIdx::Fuel] = fuel_max;
 	}
-
-	temp.index = Get_State_Index(temp);
 
 	return temp;
 }
@@ -135,7 +145,7 @@ vector<pair<SmartVector,double>> DeliveryDrone::Get_Transition_Probability(const
 	vector<SmartVector> actions = DeliveryDrone::Get_Action_List(currentState);
 
 	// Get all states
-	vector<SmartVector> states = DeliveryDrone::Get_All_Possible_States();
+	//vector<SmartVector> states = DeliveryDrone::Get_All_Possible_States();
 
 	// Create Instance of return variable
 	vector<pair<SmartVector,double>> state_probability;
@@ -143,13 +153,16 @@ vector<pair<SmartVector,double>> DeliveryDrone::Get_Transition_Probability(const
 	// Temporary Pair that holds next possible state and its probability.
 	pair<SmartVector,double> tempPair;
 
+	// State Candidate
+	SmartVector stateCandid(StateIdx::TotalNumberOfStates);
+
 	// North
 	if(action.elements[0]==0)
 	{
 
-		if ( Get_Feasibility_Of_Action(currentState,actions[0]) )
+		if ( Get_Feasibility_Of_Action(currentState,actions[0], stateCandid) )
 		{
-			tempPair = make_pair(BurnFuel(states[currentState.index-number_of_columns*(fuel_max+1)]),pDes);
+			tempPair = make_pair(BurnFuel(stateCandid),pDes);
 			state_probability.push_back(tempPair);
 		}
 		else
@@ -163,58 +176,58 @@ vector<pair<SmartVector,double>> DeliveryDrone::Get_Transition_Probability(const
 				state_probability.push_back(make_pair(states[currentState.index-number_of_columns],pDes)) :
 				state_probability.push_back(make_pair(currentState,pDes));
 		*/
-		Get_Feasibility_Of_Action(currentState,actions[1]) ?
-				state_probability.push_back(make_pair(BurnFuel(states[currentState.index+1*(fuel_max+1)]),pRight)) :
+		Get_Feasibility_Of_Action(currentState,actions[1], stateCandid) ?
+				state_probability.push_back(make_pair(BurnFuel(stateCandid),pRight)) :
 				state_probability.push_back(make_pair(currentState,pRight));
 
-		Get_Feasibility_Of_Action(currentState,actions[3]) ?
-				state_probability.push_back(make_pair(BurnFuel(states[currentState.index-1*(fuel_max+1)]),pLeft)) :
+		Get_Feasibility_Of_Action(currentState,actions[3], stateCandid) ?
+				state_probability.push_back(make_pair(BurnFuel(stateCandid),pLeft)) :
 				state_probability.push_back(make_pair(currentState,pLeft));
 
 	}
 	// East
 	else if (action.elements[0]==1)
 	{
-		Get_Feasibility_Of_Action(currentState,actions[1]) ?
-				state_probability.push_back(make_pair(BurnFuel(states[currentState.index+1*(fuel_max+1)]),pDes)) :
+		Get_Feasibility_Of_Action(currentState,actions[1], stateCandid) ?
+				state_probability.push_back(make_pair(BurnFuel(stateCandid),pDes)) :
 				state_probability.push_back(make_pair(currentState,pDes));
 
-		Get_Feasibility_Of_Action(currentState,actions[2]) ?
-				state_probability.push_back(make_pair(BurnFuel(states[currentState.index+number_of_columns*(fuel_max+1)]),pRight)) :
+		Get_Feasibility_Of_Action(currentState,actions[2], stateCandid) ?
+				state_probability.push_back(make_pair(BurnFuel(stateCandid),pRight)) :
 				state_probability.push_back(make_pair(currentState,pRight));
 
-		Get_Feasibility_Of_Action(currentState,actions[0]) ?
-				state_probability.push_back(make_pair(BurnFuel(states[currentState.index-number_of_columns*(fuel_max+1)]),pLeft)) :
+		Get_Feasibility_Of_Action(currentState,actions[0], stateCandid) ?
+				state_probability.push_back(make_pair(BurnFuel(stateCandid),pLeft)) :
 				state_probability.push_back(make_pair(currentState,pLeft));
 	}
 	// South
 	else if (action.elements[0]==2)
 	{
-		Get_Feasibility_Of_Action(currentState,actions[2]) ?
-				state_probability.push_back(make_pair(BurnFuel(states[currentState.index+number_of_columns*(fuel_max+1)]),pDes)) :
+		Get_Feasibility_Of_Action(currentState,actions[2], stateCandid) ?
+				state_probability.push_back(make_pair(BurnFuel(stateCandid),pDes)) :
 				state_probability.push_back(make_pair(currentState,pDes));
 
-		Get_Feasibility_Of_Action(currentState,actions[3]) ?
-				state_probability.push_back(make_pair(BurnFuel(states[currentState.index-1*(fuel_max+1)]),pRight)) :
+		Get_Feasibility_Of_Action(currentState,actions[3], stateCandid) ?
+				state_probability.push_back(make_pair(BurnFuel(stateCandid),pRight)) :
 				state_probability.push_back(make_pair(currentState,pRight));
 
-		Get_Feasibility_Of_Action(currentState,actions[1]) ?
-				state_probability.push_back(make_pair(BurnFuel(states[currentState.index+1*(fuel_max+1)]),pLeft)) :
+		Get_Feasibility_Of_Action(currentState,actions[1], stateCandid) ?
+				state_probability.push_back(make_pair(BurnFuel(stateCandid),pLeft)) :
 				state_probability.push_back(make_pair(currentState,pLeft));
 	}
 	// West
 	else if (action.elements[0]==3)
 	{
-		Get_Feasibility_Of_Action(currentState,actions[3]) ?
-				state_probability.push_back(make_pair(BurnFuel(states[currentState.index-1*(fuel_max+1)]),pDes)) :
+		Get_Feasibility_Of_Action(currentState,actions[3], stateCandid) ?
+				state_probability.push_back(make_pair(BurnFuel(stateCandid),pDes)) :
 				state_probability.push_back(make_pair(currentState,pDes));
 
-		Get_Feasibility_Of_Action(currentState,actions[0]) ?
-				state_probability.push_back(make_pair(BurnFuel(states[currentState.index-number_of_columns*(fuel_max+1)]),pRight)) :
+		Get_Feasibility_Of_Action(currentState,actions[0], stateCandid) ?
+				state_probability.push_back(make_pair(BurnFuel(stateCandid),pRight)) :
 				state_probability.push_back(make_pair(currentState,pRight));
 
-		Get_Feasibility_Of_Action(currentState,actions[2]) ?
-				state_probability.push_back(make_pair(BurnFuel(states[currentState.index+number_of_columns*(fuel_max+1)]),pLeft)) :
+		Get_Feasibility_Of_Action(currentState,actions[2], stateCandid) ?
+				state_probability.push_back(make_pair(BurnFuel(stateCandid),pLeft)) :
 				state_probability.push_back(make_pair(currentState,pLeft));
 	}
 	// Do Nothing
@@ -225,17 +238,32 @@ vector<pair<SmartVector,double>> DeliveryDrone::Get_Transition_Probability(const
 
 	// Get the index of returned state
 	for (unsigned i = 0; i < state_probability.size(); ++i) {
+
+		// If the new state is on packet or deliverystation, update the state accordingly.
+		if(Check_Packet_Picked(state_probability[i].first) && Check_Above_DeliveryPoint(state_probability[i].first))
+		{
+			state_probability[i].first.elements[StateIdx::Row_DeliveryPoint] = -1;
+			state_probability[i].first.elements[StateIdx::Col_DeliveryPoint] = -1;
+		}
+		else if(Check_Above_Packet(state_probability[i].first))
+		{
+			state_probability[i].first.elements[StateIdx::Row_Packet] = -1;
+			state_probability[i].first.elements[StateIdx::Col_Packet] = -1;
+		}
+
 		state_probability[i].first.index = DeliveryDrone::Get_State_Index(state_probability[i].first);
 	}
 
 	return state_probability;
 }
 
-bool DeliveryDrone::Get_Feasibility_Of_Action(const SmartVector& state, const SmartVector& action) const
+bool DeliveryDrone::Get_Feasibility_Of_Action(const SmartVector& state, const SmartVector& action, SmartVector& statecandidate) const
 {
-	int r = state.elements[0];
-	int c = state.elements[1];
-	int f = state.elements[2]; //fuel
+	statecandidate = state;
+
+	int r = state.elements[StateIdx::Row_Agent];
+	int c = state.elements[StateIdx::Col_Agent];
+	int f = state.elements[StateIdx::Fuel]; //fuel
 
 	int r_blocked;
 	int c_blocked;
@@ -254,6 +282,8 @@ bool DeliveryDrone::Get_Feasibility_Of_Action(const SmartVector& state, const Sm
 			if ((r==0) || (r==r_blocked+1 && c==c_blocked))
 				return false;
 		}
+
+		statecandidate.elements[StateIdx::Row_Agent]--;
 	}
 
 	// Action East
@@ -268,6 +298,8 @@ bool DeliveryDrone::Get_Feasibility_Of_Action(const SmartVector& state, const Sm
 			if ((c==number_of_columns-1) || (r==r_blocked && c==c_blocked-1))
 		        return false;
 		}
+
+		statecandidate.elements[StateIdx::Col_Agent]++;
 	}
 
 	// Action South
@@ -282,6 +314,8 @@ bool DeliveryDrone::Get_Feasibility_Of_Action(const SmartVector& state, const Sm
 			if ((r==number_of_rows-1) || (r==r_blocked-1 && c==c_blocked))
 		        return false;
 		}
+
+		statecandidate.elements[StateIdx::Row_Agent]++;
 	}
 
 	// Action West
@@ -296,66 +330,127 @@ bool DeliveryDrone::Get_Feasibility_Of_Action(const SmartVector& state, const Sm
 			if ((c==0) || (r==r_blocked && c==c_blocked+1))
 		        return false;
 		}
-	}
 
+		statecandidate.elements[StateIdx::Col_Agent]--;
+	}
 
 	return true;
 }
 
 vector<SmartVector> DeliveryDrone::Get_All_Possible_States() const
 {
-	vector<SmartVector> states;
+	static vector<SmartVector> states;
 
-	int index=0;
+	if(states.size()==0)
+	{
+		int index=0;
 
-	for (int r = 0; r < number_of_rows; r++) {
-		for (int c = 0; c < number_of_columns; c++) {
-			for (int f = fuel_max; f >= 0; f--) {
+		for (int r = 0; r < number_of_rows; r++) {
+			for (int c = 0; c < number_of_columns; c++) {
+				for (int f = fuel_max; f >= 0; f--) {
+					for (int r_packet = -1; r_packet < number_of_rows; r_packet++) { //-1 means packet picked
+						for (int c_packet = -1; c_packet < number_of_columns; c_packet++) {
+							for (int r_deliverypoint = -1; r_deliverypoint < number_of_rows; r_deliverypoint++) { // -1 means packet delivered
+								for (int c_deliverypoint = -1; c_deliverypoint < number_of_columns; c_deliverypoint++) {
 
-				SmartVector state(3);
-				state.elements[0] = r;
-				state.elements[1] = c;
-				state.elements[2] = f;
-				state.index = index;
-				states.push_back(state);
-				index++;
+									SmartVector state(StateIdx::TotalNumberOfStates);
+
+									state.elements[StateIdx::Row_Agent] = r;
+									state.elements[StateIdx::Col_Agent] = c;
+
+									state.elements[StateIdx::Fuel] = f;
+
+									state.elements[StateIdx::Row_Packet] = r_packet;
+									state.elements[StateIdx::Col_Packet] = c_packet;
+
+									state.elements[StateIdx::Row_DeliveryPoint] = r_deliverypoint;
+									state.elements[StateIdx::Col_DeliveryPoint] = c_deliverypoint;
+
+									// Check Packet Position is valid
+									if( (r_packet == -1 && c_packet>-1) || (c_packet == -1 && r_packet>-1))
+										continue;
+
+									// Check Delivery Position is valid
+									if( (r_deliverypoint == -1 && c_deliverypoint>-1) || (c_deliverypoint == -1 && r_deliverypoint>-1))
+										continue;
+
+									// If there is packet but no delivery station, skip it.
+									if(r_packet>=0 && (r_deliverypoint==-1))
+										continue;
+
+									// Check whether the position on the blocked state
+									bool invalid = false;
+									for (size_t i = 0; i < blocked_states.size(); ++i)
+									{
+										if( r == blocked_states[i].elements[0] && c == blocked_states[i].elements[1])
+										{
+											break;
+											invalid = true;
+										}
+
+										if( r_packet == blocked_states[i].elements[0] && c_packet == blocked_states[i].elements[1])
+										{
+											break;
+											invalid = true;
+										}
+
+										if( r_deliverypoint == blocked_states[i].elements[0] && c_deliverypoint == blocked_states[i].elements[1])
+										{
+											break;
+											invalid = true;
+										}
+									}
+									if(invalid) continue;
+
+									state_indexes.emplace(state.Serialize(), index);
+
+									state.index = index;
+									states.push_back(state);
+									index++;
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}
-
 	return states;
 }
 
 vector<SmartVector> DeliveryDrone::Get_Action_List(const SmartVector& state) const
 {
-	vector<SmartVector> actions;
+	static vector<SmartVector> actions;
 
-	SmartVector vec(1);
+	if(actions.size()==0)
+	{
+		SmartVector vec(1);
 
-	// Add North (0)
-	vec.elements[0] = 0;
-	vec.index = 0;
-	actions.push_back(vec);
+		// Add North (0)
+		vec.elements[0] = 0;
+		vec.index = 0;
+		actions.push_back(vec);
 
-	// Add East (1)
-	vec.elements[0] = 1;
-	vec.index = 1;
-	actions.push_back(vec);
+		// Add East (1)
+		vec.elements[0] = 1;
+		vec.index = 1;
+		actions.push_back(vec);
 
-	// Add South (2)
-	vec.elements[0] = 2;
-	vec.index = 2;
-	actions.push_back(vec);
+		// Add South (2)
+		vec.elements[0] = 2;
+		vec.index = 2;
+		actions.push_back(vec);
 
-	// Add West (3)
-	vec.elements[0] = 3;
-	vec.index = 3;
-	actions.push_back(vec);
+		// Add West (3)
+		vec.elements[0] = 3;
+		vec.index = 3;
+		actions.push_back(vec);
 
-	// Add DoNothing (4)
-	vec.elements[0] = 4;
-	vec.index = 4;
-	actions.push_back(vec);
+		// Add DoNothing (4)
+		vec.elements[0] = 4;
+		vec.index = 4;
+		actions.push_back(vec);
+	}
 
 	return actions;
 }
@@ -407,6 +502,19 @@ SmartVector DeliveryDrone::Get_Initial_State()
 	return vec;
 }
 
+SmartVector DeliveryDrone::Get_Random_State()
+{
+	SmartVector state;
+	state = Environment::Get_Random_State();
+
+	while(state.elements[StateIdx::Fuel] != fuel_max)
+	{
+		state = Environment::Get_Random_State();
+	}
+
+	return state;
+}
+
 bool DeliveryDrone::ComparePosition(const SmartVector& state1, const SmartVector& state2) const
 {
 	if( (state1.elements[0]==state2.elements[0]) && (state1.elements[1]==state2.elements[1]) )
@@ -419,6 +527,7 @@ bool DeliveryDrone::ComparePosition(const SmartVector& state1, const SmartVector
 
 bool DeliveryDrone::Check_Terminal_State(const SmartVector& state) const
 {
+	/*
 	for (unsigned i = 0; i < terminal_states.size(); ++i)
 	{
 		if(ComparePosition(state,terminal_states[i]))
@@ -426,7 +535,14 @@ bool DeliveryDrone::Check_Terminal_State(const SmartVector& state) const
 			return true;
 		}
 	}
-
+	*/
+	if(state.elements[StateIdx::Row_DeliveryPoint] == -1 &&
+		state.elements[StateIdx::Col_DeliveryPoint] == -1 &&
+		state.elements[StateIdx::Row_Packet] == -1 &&
+		state.elements[StateIdx::Col_Packet] == -1)
+		{
+			return true;
+		}
 	return false;
 }
 
@@ -451,6 +567,68 @@ bool DeliveryDrone::Check_Refuel_State(const SmartVector& state) const
 		{
 			return true;
 		}
+	}
+
+	return false;
+}
+
+bool DeliveryDrone::Check_Above_Packet(const SmartVector& state) const //whether you are on the packet or not
+{
+	SmartVector packetPos(2);
+	packetPos.elements[0] = state.elements[StateIdx::Row_Packet];
+	packetPos.elements[1] = state.elements[StateIdx::Col_Packet];
+
+	if(ComparePosition(state,packetPos))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool DeliveryDrone::Check_Packet_Picked(const SmartVector& state) const
+{
+	SmartVector packetPos(2);
+	packetPos.elements[0] = state.elements[StateIdx::Row_Packet];
+	packetPos.elements[1] = state.elements[StateIdx::Col_Packet];
+
+	if(packetPos.elements[0] < 0 && packetPos.elements[1] < 0)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+
+bool DeliveryDrone::Check_Above_DeliveryPoint(const SmartVector& state) const //whether you are on the deliverypoint or not
+{
+	SmartVector deliveryPos(2);
+	deliveryPos.elements[0] = state.elements[StateIdx::Row_DeliveryPoint];
+	deliveryPos.elements[1] = state.elements[StateIdx::Col_DeliveryPoint];
+
+	if(ComparePosition(state,deliveryPos))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool DeliveryDrone::Check_Packet_Delivered(const SmartVector& state) const
+{
+	SmartVector packetPos(2);
+	packetPos.elements[0] = state.elements[StateIdx::Row_Packet];
+	packetPos.elements[1] = state.elements[StateIdx::Col_Packet];
+
+	SmartVector deliveryPos(2);
+	deliveryPos.elements[0] = state.elements[StateIdx::Row_DeliveryPoint];
+	deliveryPos.elements[1] = state.elements[StateIdx::Col_DeliveryPoint];
+
+	if(packetPos.elements[0] < 0 && packetPos.elements[1] < 0 &&
+			deliveryPos.elements[0] < 0 && deliveryPos.elements[1] < 0)
+	{
+		return true;
 	}
 
 	return false;
@@ -484,36 +662,59 @@ void DeliveryDrone::Display_State(const SmartVector& agent)  const
 	// Occupied 25A0
 	// Empty 25A1
 
+	// PacketToBePicked 2609 - Sun - DotInTheMiddleOfCircle
+	// PacketDeliveryStation 26F6 - Square four corners - Not Working
+	// 25EC - White Up-Pointing Triangle with Dot
+
 	// Future Use For MultiAgent:
 	// Numbered items: 2781 and 278B
 
-	cout<<"Displaying Current Status:"<<endl;
+	// Emojis: https://apps.timwhitlock.info/emoji/tables/unicode
+	// 1F4E6 - Package
+	// 1F381 - Wrapped Present
+
+
+	SmartVector packetPos(2);
+	packetPos.elements[0] = agent.elements[StateIdx::Row_Packet];
+	packetPos.elements[1] = agent.elements[StateIdx::Col_Packet];
+
+	SmartVector deliveryPos(2);
+	deliveryPos.elements[0] = agent.elements[StateIdx::Row_DeliveryPoint];
+	deliveryPos.elements[1] = agent.elements[StateIdx::Col_DeliveryPoint];
+
+	cout<<"Displaying Current Status: [";
+	for (int i = 0; i < StateIdx::TotalNumberOfStates; ++i) {
+		cout<< " " << agent.elements[i];
+	}
+	cout<<" ] #"<<agent.index<<endl;
 
 	//for (int r = number_of_rows-1; r >= 0; r--)
 	for (int r = 0; r < number_of_rows; r++)
 	{
 		for (int c = 0; c < number_of_columns; c++)
 		{
-			SmartVector state(2);
-			state.elements[0] = r;
-			state.elements[1] = c;
+			SmartVector cursorPos(2);
+			cursorPos.elements[0] = r;
+			cursorPos.elements[1] = c;
 
+			// Blocked State
 			for (unsigned i = 0; i < blocked_states.size(); ++i)
 			{
-				if(ComparePosition(state, blocked_states[i]))
+				if(ComparePosition(cursorPos, blocked_states[i]))
 				{
 					cout<<"\u2612";
 					goto position_placed;
 				}
 			}
 
+			// Terminal State
 			for (unsigned i = 0; i < terminal_states.size(); ++i)
 			{
-				if(ComparePosition(state, terminal_states[i]))
+				if(ComparePosition(cursorPos, terminal_states[i]))
 				{
 					if(rewards_of_terminal_states[i]>0)
 					{
-						if(ComparePosition(agent, state))
+						if(ComparePosition(agent, cursorPos))
 						{
 							cout<<"\033[32m\u2611\033[0m"; // Green Square Tick
 							goto position_placed;
@@ -526,7 +727,7 @@ void DeliveryDrone::Display_State(const SmartVector& agent)  const
 					}
 					else if(rewards_of_terminal_states[i]<0)
 					{
-						if(ComparePosition(agent, state))
+						if(ComparePosition(agent, cursorPos))
 						{
 							cout<<"\033[31m\u2620\033[0m"; // Red Skull with bones
 							goto position_placed;
@@ -540,11 +741,12 @@ void DeliveryDrone::Display_State(const SmartVector& agent)  const
 				}
 			}
 
+			// Refuel State
 			for (unsigned i = 0; i < refuel_states.size(); ++i)
 			{
-				if(ComparePosition(state, refuel_states[i]))
+				if(ComparePosition(cursorPos, refuel_states[i]))
 				{
-					if(ComparePosition(agent, state))
+					if(ComparePosition(agent, cursorPos))
 					{
 						cout<<"\033[32m\u2B22\033[0m"; // Green Hexagon Filled
 						goto position_placed;
@@ -557,14 +759,45 @@ void DeliveryDrone::Display_State(const SmartVector& agent)  const
 				}
 			}
 
-			if(ComparePosition(agent, state))
+			// Packet
+			if(ComparePosition(cursorPos, packetPos))
 			{
-				cout<<"\033[32m\u25A0\033[0m"; // Green Hexagon Filled
+				if(ComparePosition(agent, cursorPos))
+				{
+					cout<<"\033[32m\u2609\033[0m"; // Green Sun
+					goto position_placed;
+				}
+				else
+				{
+					cout<<"\u2609"; // Sun
+					goto position_placed;
+				}
+			}
+
+			// Delivery Point
+			if(ComparePosition(cursorPos, deliveryPos))
+			{
+				if(ComparePosition(agent, cursorPos))
+				{
+					cout<<"\033[32m\u25EC\033[0m"; // Green Delivery Point
+					goto position_placed;
+				}
+				else
+				{
+					cout<<"\u25EC"; // Delivery Point
+					goto position_placed;
+				}
+			}
+
+			// Ordinary State
+			if(ComparePosition(agent, cursorPos))
+			{
+				cout<<"\033[32m\u25A0\033[0m"; // Ordinary State
 				goto position_placed;
 			}
 			else
 			{
-				cout<<"\u25A1"; // Hexagon Empty
+				cout<<"\u25A1"; // Ordinary State filled
 				goto position_placed;
 			}
 
@@ -662,12 +895,18 @@ void DeliveryDrone::Display_Policy(const Representation& rep)  const
 //TODO Use Hashmaps instead of bruteforce search
 int DeliveryDrone::Get_State_Index(const SmartVector& state) const
 {
+	/*
 	vector<SmartVector> states = DeliveryDrone::Get_All_Possible_States();
 
 	for (unsigned i = 0; i < states.size(); ++i) {
 		if(state == states[i])
 			return i;
 	}
+	*/
+
+	std::unordered_map<std::string,int>::iterator val = state_indexes.find(state.Serialize());
+
+	if(val!=state_indexes.end()) return val->second;
 
 	cout<<endl<<endl<<"INVALID STATE!"<<endl<<endl;
 	state.Print();

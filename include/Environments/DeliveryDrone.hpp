@@ -12,6 +12,9 @@
 #include "Miscellaneous/ConfigParser.hpp"
 #include "Representations/Representation.hpp"
 
+#include <unordered_map>
+#include <string>
+
 //class environment; //forward declaration
 
 /*
@@ -37,15 +40,22 @@ public:
 
 	vector<SmartVector> Get_Action_List(const SmartVector&) const;
 
-	bool Get_Feasibility_Of_Action(const SmartVector& state, const SmartVector& action) const;
+	bool Get_Feasibility_Of_Action(const SmartVector& state, const SmartVector& action, SmartVector& statecandidate) const;
 
 	SmartVector Get_Initial_State();
+
+	SmartVector Get_Random_State();
 
 	bool Check_Terminal_State(const SmartVector& state) const;
 
 	bool Check_Blocked_State(const SmartVector& state) const;
 
 	bool Check_Refuel_State(const SmartVector& state) const;
+
+	bool Check_Above_Packet(const SmartVector& state) const;
+	bool Check_Packet_Picked(const SmartVector& state) const;
+	bool Check_Above_DeliveryPoint(const SmartVector& state) const;
+	bool Check_Packet_Delivered(const SmartVector& state) const;
 
 	SmartVector Get_Next_State(const SmartVector& state, const SmartVector& action);
 
@@ -60,6 +70,19 @@ public:
 	void Test(void);
 
 protected:
+
+	enum StateIdx
+	{
+	    Row_Agent,
+		Col_Agent,
+	    Fuel,
+		Row_Packet,
+		Col_Packet,
+		Row_DeliveryPoint,
+		Col_DeliveryPoint,
+
+		TotalNumberOfStates,
+	};
 
 	vector<SmartVector> terminal_states;
 
@@ -80,6 +103,8 @@ protected:
 	int fuel_initial;
 
 	int fuel_max;
+
+	mutable std::unordered_map<string, int> state_indexes;
 };
 
 #endif /* DELIVERY_DRONE_HPP_ */
