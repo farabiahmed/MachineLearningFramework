@@ -90,6 +90,8 @@ protected:
 
 	vector<SmartVector> refuel_states;
 
+	SmartVector initial_state;
+
 	vector<double> rewards_of_terminal_states;
 
 	double cost_action;

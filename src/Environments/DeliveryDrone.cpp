@@ -15,6 +15,8 @@ DeliveryDrone::DeliveryDrone(const ConfigParser& cfg) {
 
 	//terminal_states = cfg.GetValueOfKey< vector<SmartVector> >("TERMINAL_STATES");
 
+	initial_state = cfg.GetValueOfKey<SmartVector>("INITIAL_STATE");
+
 	blocked_states = cfg.GetValueOfKey< vector<SmartVector> >("BLOCKED_STATES");
 
 	cout<<"Total Number Of Blocked States:" << blocked_states.size() << endl;
@@ -57,6 +59,11 @@ DeliveryDrone::DeliveryDrone(const ConfigParser& cfg) {
 
 	number_of_actions = 5;
 
+	Get_All_Possible_States();
+
+	if(initial_state.dimension>0 && initial_state.index==-1) initial_state.index = Get_State_Index(initial_state);
+
+	initial_state.Print();
 }
 
 DeliveryDrone::~DeliveryDrone() {
@@ -130,7 +137,7 @@ SmartVector DeliveryDrone::BurnFuel(const SmartVector &state)
 vector<pair<SmartVector,double>> DeliveryDrone::Get_Transition_Probability(const SmartVector& currentState, const SmartVector& action)
 {
 	// our model is a discrete probability transition function f_hat-> busoni,Algorithm 2.2
-
+#define DOUBLE_EPSILON 0.0005
 	//action 0: North
 	//action 1: East
 	//action 2: South
@@ -176,10 +183,12 @@ vector<pair<SmartVector,double>> DeliveryDrone::Get_Transition_Probability(const
 				state_probability.push_back(make_pair(states[currentState.index-number_of_columns],pDes)) :
 				state_probability.push_back(make_pair(currentState,pDes));
 		*/
+		if(pRight>DOUBLE_EPSILON)
 		Get_Feasibility_Of_Action(currentState,actions[1], stateCandid) ?
 				state_probability.push_back(make_pair(BurnFuel(stateCandid),pRight)) :
 				state_probability.push_back(make_pair(currentState,pRight));
 
+		if(pLeft>DOUBLE_EPSILON)
 		Get_Feasibility_Of_Action(currentState,actions[3], stateCandid) ?
 				state_probability.push_back(make_pair(BurnFuel(stateCandid),pLeft)) :
 				state_probability.push_back(make_pair(currentState,pLeft));
@@ -192,10 +201,12 @@ vector<pair<SmartVector,double>> DeliveryDrone::Get_Transition_Probability(const
 				state_probability.push_back(make_pair(BurnFuel(stateCandid),pDes)) :
 				state_probability.push_back(make_pair(currentState,pDes));
 
+		if(pRight>DOUBLE_EPSILON)
 		Get_Feasibility_Of_Action(currentState,actions[2], stateCandid) ?
 				state_probability.push_back(make_pair(BurnFuel(stateCandid),pRight)) :
 				state_probability.push_back(make_pair(currentState,pRight));
 
+		if(pLeft>DOUBLE_EPSILON)
 		Get_Feasibility_Of_Action(currentState,actions[0], stateCandid) ?
 				state_probability.push_back(make_pair(BurnFuel(stateCandid),pLeft)) :
 				state_probability.push_back(make_pair(currentState,pLeft));
@@ -207,10 +218,12 @@ vector<pair<SmartVector,double>> DeliveryDrone::Get_Transition_Probability(const
 				state_probability.push_back(make_pair(BurnFuel(stateCandid),pDes)) :
 				state_probability.push_back(make_pair(currentState,pDes));
 
+		if(pRight>DOUBLE_EPSILON)
 		Get_Feasibility_Of_Action(currentState,actions[3], stateCandid) ?
 				state_probability.push_back(make_pair(BurnFuel(stateCandid),pRight)) :
 				state_probability.push_back(make_pair(currentState,pRight));
 
+		if(pLeft>DOUBLE_EPSILON)
 		Get_Feasibility_Of_Action(currentState,actions[1], stateCandid) ?
 				state_probability.push_back(make_pair(BurnFuel(stateCandid),pLeft)) :
 				state_probability.push_back(make_pair(currentState,pLeft));
@@ -222,10 +235,12 @@ vector<pair<SmartVector,double>> DeliveryDrone::Get_Transition_Probability(const
 				state_probability.push_back(make_pair(BurnFuel(stateCandid),pDes)) :
 				state_probability.push_back(make_pair(currentState,pDes));
 
+		if(pRight>DOUBLE_EPSILON)
 		Get_Feasibility_Of_Action(currentState,actions[0], stateCandid) ?
 				state_probability.push_back(make_pair(BurnFuel(stateCandid),pRight)) :
 				state_probability.push_back(make_pair(currentState,pRight));
 
+		if(pLeft>DOUBLE_EPSILON)
 		Get_Feasibility_Of_Action(currentState,actions[2], stateCandid) ?
 				state_probability.push_back(make_pair(BurnFuel(stateCandid),pLeft)) :
 				state_probability.push_back(make_pair(currentState,pLeft));
@@ -508,15 +523,23 @@ SmartVector DeliveryDrone::Get_Initial_State()
 
 SmartVector DeliveryDrone::Get_Random_State()
 {
-	SmartVector state;
-	state = Environment::Get_Random_State();
-
-	while(state.elements[StateIdx::Fuel] != fuel_max)
+	if(initial_state.dimension>0)
 	{
-		state = Environment::Get_Random_State();
+		return initial_state;
 	}
+	else
+	{
+		SmartVector state;
 
-	return state;
+		state = Environment::Get_Random_State();
+
+		while(state.elements[StateIdx::Fuel] != fuel_max)
+		{
+			state = Environment::Get_Random_State();
+		}
+
+		return state;
+	}
 }
 
 bool DeliveryDrone::ComparePosition(const SmartVector& state1, const SmartVector& state2) const
