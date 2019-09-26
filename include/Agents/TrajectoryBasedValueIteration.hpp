@@ -44,6 +44,8 @@ protected:
 
 	double epsilon;
 
+	double epsilonProbabilitySetValue;
+
 	double epsilonProbability; 			/// Explore-Exploit Parameter.
 										/// Probability that balances exploration and exploitation
 
