@@ -85,7 +85,7 @@ double DeliveryDrone::Get_Reward(const SmartVector& currentState, const SmartVec
 		reward += 1;
 	}
 
-	if(nextState.elements[StateIdx::Fuel] == 0) reward += -1;
+//	if(nextState.elements[StateIdx::Fuel] == 0) reward += -1;
 
 /*
 	for (unsigned i = 0; i < terminal_states.size(); ++i)
@@ -420,6 +420,23 @@ vector<SmartVector> DeliveryDrone::Get_All_Possible_States() const
 										}
 									}
 									if(invalid) continue;
+
+									for (size_t i = 0; i < refuel_states.size(); ++i)
+									{
+										if( r_packet == refuel_states[i].elements[0] && c_packet == refuel_states[i].elements[1])
+										{
+											invalid = true;
+											break;
+										}
+
+										if( r_deliverypoint == refuel_states[i].elements[0] && c_deliverypoint == refuel_states[i].elements[1])
+										{
+											invalid = true;
+											break;
+										}
+									}
+									if(invalid) continue;
+
 
 									state_indexes.emplace(state.Serialize(), index);
 

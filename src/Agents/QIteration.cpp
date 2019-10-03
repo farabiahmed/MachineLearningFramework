@@ -56,6 +56,10 @@ bool QIteration::Start_Execution()
 
 	for (int num_of_iteration = 0; num_of_iteration < max_number_of_iterations; num_of_iteration++)
 	{
+		// Test controller performance.
+		Get_Cumulative_Rewards(numberof_bellmanupdate);
+		cout << endl;
+
 		if(userControl.GetMessage()=="stop")
 		{
 			break;
@@ -120,9 +124,9 @@ bool QIteration::Start_Execution()
 
 					numberof_bellmanupdate++;
 
-					if((numberof_bellmanupdate % bellman_stride_forsimulation)==0)
+					//if((numberof_bellmanupdate % bellman_stride_forsimulation)==0)
 						// Get the cumulative rewards for the current bellman update.
-						Get_Cumulative_Rewards(numberof_bellmanupdate);
+						//Get_Cumulative_Rewards(numberof_bellmanupdate);
 
 				}
 			}// End of action loop

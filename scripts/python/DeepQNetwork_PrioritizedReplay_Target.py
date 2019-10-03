@@ -9,14 +9,14 @@ from keras.models import Sequential
 from keras.layers.advanced_activations import LeakyReLU
 from keras.layers import *
 from keras.models import load_model
+from keras.models import clone_model
 from Memory.Memory_SumTree import Memory_SumTree
 from Memory import Memory_UniformRandom
-from keras import optimizers
 
 from Representation import Representation
 
 
-class DeepQNetwork_PrioritizedReplay(Representation):
+class DeepQNetwork_PrioritizedReplay_Target(Representation):
 
     def __init__(self,gridsize=5,actionspaceperagent=5,numberofagent=2,
                  hidden_unit=[12,12],learning_rate=0.1,
@@ -56,13 +56,16 @@ class DeepQNetwork_PrioritizedReplay(Representation):
         self.modelId = modelId
         self.logfolder = logfolder
 
-        self.model = None
+        self.update_target_interval = 10000
 
-        if os.path.isfile("log/model_0.h5"):
-            self.model = load_model("log/model_0.h5")
-            print("###############################")
-            print("Existing model loaded.......")
-            print("###############################")
+        self.model = None
+        self.model_target = None
+
+        #if os.path.isfile("log/model_0.h5"):
+        #self.model = load_model("log/model_0.h5")
+        #print("###############################")
+        #print("Existing model loaded.......")
+        #print("###############################")
 
         if self.model is None:
 
@@ -85,9 +88,7 @@ class DeepQNetwork_PrioritizedReplay(Representation):
             self.model.add(Dense(self.output_unit, activation='relu'))
 
             # Compile model
-            # optimizer = optimizers.Adam(learning_rate=self.learningrate, beta_1=0.9, beta_2=0.999, amsgrad=False)
-            self.optimizer = optimizers.SGD(lr=self.learningrate)
-            self.model.compile(loss='mse', optimizer=self.optimizer, metrics=['accuracy'])
+            self.model.compile(loss='mse', optimizer='sgd', metrics=['accuracy'])
             self.model._make_predict_function()
 
             if os.path.isfile("log/"+self.logfolder+"/modeltrained.h5"):
@@ -101,16 +102,19 @@ class DeepQNetwork_PrioritizedReplay(Representation):
 
         self.model.summary()
 
-        print(self.model.optimizer.get_config())
-
-        print("Learning Rate: ")
-        print(K.eval(self.model.optimizer.lr))
+        self.model_target = clone_model(self.model)
+        self.Update_target()
 
         self.Save_Model()
         # self.model.save_weights("log/"+self.logfolder+"/modelinit_"+self.modelId+".h5")
 
         # Reset the batch
         self.Reset_Batch()
+
+    def Update_target(self):
+        print('Updating Target Network')
+        model_weights = self.model.get_weights()
+        self.model_target.set_weights(model_weights)
 
     def Convert_State_To_Input(self,state):
 
@@ -137,8 +141,6 @@ class DeepQNetwork_PrioritizedReplay(Representation):
 
         elif (self.statePreprocessType=="Vector"):
             return state
-
-
 
     def Get_Greedy_Pair(self,state):
         # Backward compability: Preprocess state input if needed.
@@ -172,7 +174,7 @@ class DeepQNetwork_PrioritizedReplay(Representation):
 
         # Prediction of the model
         with self.graph.as_default():
-            hypothesis = self.model.predict(input)
+            hypothesis = self.model_target.predict(input)
 
         values = np.asarray(hypothesis).reshape(self.output_unit)
 
@@ -227,6 +229,8 @@ class DeepQNetwork_PrioritizedReplay(Representation):
             with self.graph.as_default():
                 self.model.fit(np.array(batchSamplesX), np.array(batchSamplesY), epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
 
+            if not self.trainingepochtotal % self.update_target_interval:
+                self.Update_target()
             # for i in np.arange(len(minibatch)):
             #     idx, (X, Y) = minibatch[i]
             #     self.batchSamplesX = np.vstack((self.batchSamplesX, (X)))
