@@ -67,7 +67,6 @@ modelFiles = [filename for filename in os.listdir(path + '/' + inputFolder) if f
 if len(modelFiles) == 0:
     modelFiles = ["agentReport.csv"]
 else:
-    print(modelFiles)
     modelFiles.sort(key=lambda str: int(splitext(basename(str))[0].split('_')[1]))
     
 print(modelFiles)
@@ -114,7 +113,11 @@ for filename in modelFiles:
     # Plot using matplotlib
 
     # Draw mean values
-    ax1.plot(arr[::skipline,0],np.mean(arr[::skipline,1:], axis=1))
+    avgArr = [np.sum(arr[i:i + skipline,1]) / skipline if i + skipline < records else np.sum(arr[i:,1]) / (records - i) for i in
+         np.arange(0, records, skipline)]
+
+    #ax1.plot(arr[::skipline,0],np.mean(arr[::skipline,1:], axis=1))
+    ax1.plot(arr[::skipline], avgArr)
 
     # filter_coef = 0.95
     # #filtered = np.zeros([indexlist.shape[0],1])
@@ -134,8 +137,8 @@ for filename in modelFiles:
     
     plt.figure(1)
     # skipline = 1
-    ax2.plot(range(0,records,skipline),np.mean(arr[::skipline,1:], axis=1), label = 'Model #'+ str(index))
-    
+    ax2.plot(range(0,records,skipline),avgArr, label = 'Model #'+ str(index))
+
 plt.figure(1)
 plt.legend()
 plt.title('Performance Of The Models')
@@ -143,7 +146,9 @@ plt.xlabel('Game Number')
 plt.ylabel('Cumulative Reward')
 plt.savefig('log/'+inputFolder+"/"+"combined"+".svg", format="svg")
 plt.savefig('log/'+inputFolder+"/"+"combined"+".png", format="png", dpi=250)
-plt.close(f2)  
+plt.close(f2)
+
+
 ###################################
 # Report #2
 ###################################
@@ -168,8 +173,7 @@ if os.path.isfile(reportfilename):
 		skipline = 1
 	print('Total Records',records)
 
-	f2= plt.figure()
-	ax2 = f2.add_subplot(111)
+	f2= plt.figure(2)
 
 	# Draw Moves vs Game
 	plt.plot(arr[::skipline,0],arr[::skipline,1],color='LimeGreen')
@@ -180,11 +184,11 @@ if os.path.isfile(reportfilename):
 
 
 
-	f3= plt.figure()
+	#f3= plt.figure(3)
 
-	plt.plot(arr[::skipline,0],arr[::skipline,2],color='OrangeRed')
-	plt.title('Exploration-Exploitation Parameter')
-	plt.xlabel('Game #')
-	plt.ylabel('E-Greedy Epsilon')
-	plt.savefig('log/'+inputFolder+"/agentReport_epsilon.svg", format="svg")
+	#plt.plot(arr[::skipline,0],arr[::skipline,2],color='OrangeRed')
+	#plt.title('Exploration-Exploitation Parameter')
+	#plt.xlabel('Game #')
+	#plt.ylabel('E-Greedy Epsilon')
+	#plt.savefig('log/'+inputFolder+"/agentReport_epsilon.svg", format="svg")
 
