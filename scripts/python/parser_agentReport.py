@@ -18,11 +18,13 @@ import getopt
 # Get The Newest Folder form given path
 path = "log"
 inputFolder = ""
+upperlimit = 0
+lowerlimit = 0
 
 print(sys.argv)
 
 try:
-   opts, args = getopt.getopt(sys.argv[1:],"hi:s:")
+   opts, args = getopt.getopt(sys.argv[1:],"hi:s:l:u:")
 except getopt.GetoptError:
    print ('Check input params')
    sys.exit(2)
@@ -35,6 +37,10 @@ for opt, arg in opts:
        inputFolder = arg
     elif opt in ("-s", "--skip"):
        skipline = int(arg)
+    elif opt in ("-u", "--upper"):
+        upperlimit = int(arg)
+    elif opt in ("-l", "--lower"):
+        lowerlimit = int(arg)
 
 print('ARGV      :', sys.argv[1:])
 print('OPTIONS   :', opts)
@@ -92,7 +98,15 @@ for filename in modelFiles:
     
     # Loop through each data and scatter
     records = arr.shape[0]
+    if upperlimit == 0 : upperlimit = records
+    if upperlimit > records: upperlimit = records
+    if lowerlimit > upperlimit : lowerlimit = 0
+
     print('Total Records',records)
+    print('Lower Limit', lowerlimit)
+    print('Upper Limit', upperlimit)
+
+    records = upperlimit - lowerlimit
 
     if skipline is None:
         if records>100 :
@@ -101,23 +115,30 @@ for filename in modelFiles:
             skipline = 1
     
     print('Skipline:',skipline)
-    indexlist = np.arange(0,records,skipline)
+    indexlist = np.arange(lowerlimit,upperlimit,skipline)
     
     f1 = plt.figure(0)
     ax1 = f1.add_subplot(111)
     
-    for xe in indexlist:
-        for ye in arr[xe,1:]:
-            plt.scatter(arr[xe,0],ye,color='purple', alpha=0.1)
+    #for xe in indexlist:
+    #    for ye in arr[xe,1:]:
+    #        plt.scatter(arr[xe,0],ye,color='purple', alpha=0.1)
     
     # Plot using matplotlib
 
     # Draw mean values
-    avgArr = [np.sum(arr[i:i + skipline,1]) / skipline if i + skipline < records else np.sum(arr[i:,1]) / (records - i) for i in
-         np.arange(0, records, skipline)]
+    avgArr = [np.sum(arr[i:i + skipline, 1]) / skipline if i + skipline < upperlimit else np.sum(arr[i:upperlimit,1]) / (upperlimit - i) for i in
+         np.arange(lowerlimit, upperlimit, skipline)]
+
+    avgArr_min = [np.min(arr[i:i + skipline, 1]) for i in np.arange(lowerlimit, upperlimit, skipline)]
+
+    avgArr_max = [np.max(arr[i:i + skipline, 1]) for i in np.arange(lowerlimit, upperlimit, skipline)]
 
     #ax1.plot(arr[::skipline,0],np.mean(arr[::skipline,1:], axis=1))
-    ax1.plot(arr[::skipline], avgArr)
+    ax1.plot(arr[lowerlimit:upperlimit:skipline,0], avgArr)
+
+    # It is too wide to draw.
+    #ax1.fill_between(arr[::skipline,0], avgArr_min, avgArr_max, color='gray', alpha=0.2)
 
     # filter_coef = 0.95
     # #filtered = np.zeros([indexlist.shape[0],1])
@@ -132,12 +153,12 @@ for filename in modelFiles:
     plt.ylabel('Cumulative Reward')
     plt.savefig('log/'+inputFolder+"/"+splitext(basename(filename))[0]+".svg", format="svg")
     plt.savefig('log/' + inputFolder + "/" + splitext(basename(filename))[0] + ".png", format="png", dpi=250)
-
     plt.close(f1)
-    
+
+
     plt.figure(1)
     # skipline = 1
-    ax2.plot(range(0,records,skipline),avgArr, label = 'Model #'+ str(index))
+    ax2.plot(range(lowerlimit,upperlimit,skipline),avgArr, label = 'Model #'+ str(index))
 
 plt.figure(1)
 plt.legend()
@@ -173,22 +194,21 @@ if os.path.isfile(reportfilename):
 		skipline = 1
 	print('Total Records',records)
 
-	f2= plt.figure(2)
-
+	plt.figure(2)
 	# Draw Moves vs Game
 	plt.plot(arr[::skipline,0],arr[::skipline,1],color='LimeGreen')
 	plt.title('Performance Of The Agent')
 	plt.xlabel('Game #')
 	plt.ylabel('Player Moves')
 	plt.savefig('log/'+inputFolder+"/agentReport_gamevsmove.svg", format="svg")
+    #plt.close(f3)
 
 
-
-	#f3= plt.figure(3)
-
+	#f4= plt.figure(3)
 	#plt.plot(arr[::skipline,0],arr[::skipline,2],color='OrangeRed')
 	#plt.title('Exploration-Exploitation Parameter')
 	#plt.xlabel('Game #')
 	#plt.ylabel('E-Greedy Epsilon')
 	#plt.savefig('log/'+inputFolder+"/agentReport_epsilon.svg", format="svg")
+    #plt.close(f4)
 
