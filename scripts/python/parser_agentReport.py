@@ -20,11 +20,13 @@ path = "log"
 inputFolder = ""
 upperlimit = 0
 lowerlimit = 0
+band = False;
+skipline = None
 
 print(sys.argv)
 
 try:
-   opts, args = getopt.getopt(sys.argv[1:],"hi:s:l:u:")
+   opts, args = getopt.getopt(sys.argv[1:],"hbi:s:l:u:")
 except getopt.GetoptError:
    print ('Check input params')
    sys.exit(2)
@@ -41,6 +43,8 @@ for opt, arg in opts:
         upperlimit = int(arg)
     elif opt in ("-l", "--lower"):
         lowerlimit = int(arg)
+    elif opt in ("-b", "--band"):
+        band = True
 
 print('ARGV      :', sys.argv[1:])
 print('OPTIONS   :', opts)
@@ -85,7 +89,6 @@ for filename in modelFiles:
     ###################################
     # Report #i
     ###################################
-    skipline = None
     index = index + 1
     
     # Get related file and read via pandas
@@ -130,15 +133,16 @@ for filename in modelFiles:
     avgArr = [np.sum(arr[i:i + skipline, 1]) / skipline if i + skipline < upperlimit else np.sum(arr[i:upperlimit,1]) / (upperlimit - i) for i in
          np.arange(lowerlimit, upperlimit, skipline)]
 
-    avgArr_min = [np.min(arr[i:i + skipline, 1]) for i in np.arange(lowerlimit, upperlimit, skipline)]
-
-    avgArr_max = [np.max(arr[i:i + skipline, 1]) for i in np.arange(lowerlimit, upperlimit, skipline)]
-
     #ax1.plot(arr[::skipline,0],np.mean(arr[::skipline,1:], axis=1))
     ax1.plot(arr[lowerlimit:upperlimit:skipline,0], avgArr)
 
-    # It is too wide to draw.
-    #ax1.fill_between(arr[::skipline,0], avgArr_min, avgArr_max, color='gray', alpha=0.2)
+    if band :
+        avgArr_min = [np.min(arr[i:i + skipline, 1]) for i in np.arange(lowerlimit, upperlimit, skipline)]
+
+        avgArr_max = [np.max(arr[i:i + skipline, 1]) for i in np.arange(lowerlimit, upperlimit, skipline)]
+
+        # It is too wide to draw.
+        ax1.fill_between(arr[::skipline,0], avgArr_min, avgArr_max, color='gray', alpha=0.2)
 
     # filter_coef = 0.95
     # #filtered = np.zeros([indexlist.shape[0],1])
@@ -178,37 +182,35 @@ reportfilename = 'log/'+inputFolder+'/agentReport2.csv'
 
 if os.path.isfile(reportfilename):
 
-	# Get related file and read via pandas
-	df = pd.read_csv(reportfilename)
-	arr = df.values
+    # Get related file and read via pandas
+    df = pd.read_csv(reportfilename)
+    arr = df.values
 
-	# Inform The User
-	print("REPORT Type#2");
-	print("Related File:", inputFolder,"/agentReport2.csv")
+    # Inform The User
+    print("REPORT Type#2");
+    print("Related File:", inputFolder,"/agentReport2.csv")
 
-	# Loop through each data and scatter
-	records = arr.shape[0]
-	if records>100 :
-		skipline = (records // 100)
-	else :
-		skipline = 1
-	print('Total Records',records)
+    # Loop through each data and scatter
+    records = arr.shape[0]
+    if records>100 :
+        skipline = (records // 100)
+    else :
+        skipline = 1
+    print('Total Records',records)
 
-	plt.figure(2)
-	# Draw Moves vs Game
-	plt.plot(arr[::skipline,0],arr[::skipline,1],color='LimeGreen')
-	plt.title('Performance Of The Agent')
-	plt.xlabel('Game #')
-	plt.ylabel('Player Moves')
-	plt.savefig('log/'+inputFolder+"/agentReport_gamevsmove.svg", format="svg")
-    #plt.close(f3)
+    plt.figure(2)
+    # Draw Moves vs Game
+    plt.plot(arr[::skipline,0],arr[::skipline,1],color='LimeGreen')
+    plt.title('Performance Of The Agent')
+    plt.xlabel('Game #')
+    plt.ylabel('Player Moves')
+    plt.savefig('log/'+inputFolder+"/agentReport_gamevsmove.svg", format="svg")
 
-
-	#f4= plt.figure(3)
-	#plt.plot(arr[::skipline,0],arr[::skipline,2],color='OrangeRed')
-	#plt.title('Exploration-Exploitation Parameter')
-	#plt.xlabel('Game #')
-	#plt.ylabel('E-Greedy Epsilon')
-	#plt.savefig('log/'+inputFolder+"/agentReport_epsilon.svg", format="svg")
-    #plt.close(f4)
+    plt.figure(3)
+    plt.plot(arr[::skipline,0],arr[::skipline,2],color='OrangeRed')
+    plt.title('Exploration-Exploitation Parameter')
+    plt.xlabel('Game #')
+    plt.ylabel('E-Greedy Epsilon')
+    plt.savefig('log/'+inputFolder+"/agentReport_epsilon.svg", format="svg")
+    plt.close()
 
