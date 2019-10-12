@@ -29,6 +29,10 @@ class DeepQNetwork_PrioritizedReplay_Target(Representation):
                  modelId = "noid",
                  logfolder = ""):
 
+        print("###############################")
+        print("DeepQNetwork_PrioritizedReplay_Target")
+        print("###############################")
+
         self.Gamma = gamma
         self.batchsize = batch_size
         self.trainPass = trainpass
@@ -61,11 +65,17 @@ class DeepQNetwork_PrioritizedReplay_Target(Representation):
         self.model = None
         self.model_target = None
 
-        #if os.path.isfile("log/model_0.h5"):
-        #self.model = load_model("log/model_0.h5")
-        #print("###############################")
-        #print("Existing model loaded.......")
-        #print("###############################")
+        print("log/" + logfolder + "/model_0.h5")
+        if os.path.isfile("log/"+self.logfolder+"/model_0.h5"):
+            print("###############################")
+            print("Existing model is being loaded.......")
+            print("###############################")
+            self.model = load_model("log/" + self.logfolder + "/model_0.h5")
+        else :
+            print("###############################")
+            print("Not Any Existing model found.......")
+            print("###############################")
+
 
         if self.model is None:
 
@@ -91,8 +101,8 @@ class DeepQNetwork_PrioritizedReplay_Target(Representation):
             self.model.compile(loss='mse', optimizer='sgd', metrics=['accuracy'])
             self.model._make_predict_function()
 
-            if os.path.isfile("log/"+self.logfolder+"/modeltrained.h5"):
-                self.model.load_weights("log/"+self.logfolder+"/modeltrained.h5")
+            if os.path.isfile("log/"+self.logfolder+"/model_weight_0.h5"):
+                self.model.load_weights("log/"+self.logfolder+"/model_weight_0.h5")
                 print("###############################")
                 print("Existing model params are loaded.......")
                 print("###############################")
@@ -105,8 +115,8 @@ class DeepQNetwork_PrioritizedReplay_Target(Representation):
         self.model_target = clone_model(self.model)
         self.Update_target()
 
-        self.Save_Model()
-        # self.model.save_weights("log/"+self.logfolder+"/modelinit_"+self.modelId+".h5")
+        # self.Save_Model()
+        self.model.save_weights("log/"+self.logfolder+"/modelinit_"+self.modelId+".h5")
 
         # Reset the batch
         self.Reset_Batch()
