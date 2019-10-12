@@ -101,11 +101,11 @@ bool DeepQNetwork::Start_Execution()
 		cout<<numberof_bellmanupdate<<flush;
 		cout<<endl;
 
-		logger<<num_of_iteration<<",";
-		logger<<numberof_processedtrajectorysteps<<",";
-		logger<<epsilonProbability<<",";
-		logger<<numberof_bellmanupdate;
-		logger<<endl;
+		logger_agentStats<<num_of_iteration<<",";
+		logger_agentStats<<numberof_processedtrajectorysteps<<",";
+		logger_agentStats<<epsilonProbability<<",";
+		logger_agentStats<<numberof_bellmanupdate;
+		logger_agentStats<<endl;
 
 	}// End of iterations loop
 	return false;

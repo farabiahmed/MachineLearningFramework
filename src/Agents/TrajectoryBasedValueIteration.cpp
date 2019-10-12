@@ -68,18 +68,19 @@ TrajectoryBasedValueIteration::TrajectoryBasedValueIteration(const Environment* 
 	states = environment->Get_All_Possible_States();
 
 	// Put Header first
-	logger<<"game,moves,egreedy,bellman,diff"<<endl<<flush;
+	logger_agentStats<<"game,moves,egreedy,bellman,diff"<<endl<<flush;
 }
 
 TrajectoryBasedValueIteration::~TrajectoryBasedValueIteration()
 {
-	logger.close();
+	logger_agentStats.close();
 }
 
 bool TrajectoryBasedValueIteration::Start_Execution()
 {
 	unsigned numberof_bellmanupdate = 0;
 	unsigned numberof_processedtrajectorysteps = 0;
+	bool epsilonProbabilityAutoMode = true;
 
 	// Test initial controller performance.
 	//Get_Cumulative_Rewards(numberof_bellmanupdate);
@@ -94,6 +95,20 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 		if(userCommand=="stop")
 		{
 			break;
+		}
+		else if (!userCommand.substr(0,19).compare("EPSILON_PROBABILITY"))
+		{
+			 int pos = userCommand.find("=");
+			 if(pos != string::npos)
+			 {
+				 epsilonProbability = Convert::string_to_T<double>(userCommand.substr(pos + 1));
+			 	 cout << "New epsilon set probability: " << epsilonProbability << endl;
+			 	 epsilonProbabilityAutoMode = false;
+			 }
+			 else
+			 {
+				 epsilonProbabilityAutoMode = true;
+			 }
 		}
 		else if(userCommand=="qvalue")
 		{
@@ -218,12 +233,12 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 		cout<<" Diff: "<< setw(10) << setprecision(6) << mean_diff;
 
 
-		logger<<num_of_iteration<<",";
-		logger<<trajectory.size()<<",";
-		logger<<epsilonProbability<<",";
-		logger<<numberof_bellmanupdate<<",";
-		logger<<mean_diff;
-		logger<<endl;
+		logger_agentStats<<num_of_iteration<<",";
+		logger_agentStats<<trajectory.size()<<",";
+		logger_agentStats<<epsilonProbability<<",";
+		logger_agentStats<<numberof_bellmanupdate<<",";
+		logger_agentStats<<mean_diff;
+		logger_agentStats<<endl;
 
 		/*
 		// Check whether stopping criteria reached.
@@ -243,7 +258,7 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 		}
 		*/
 
-		if(epsilonProbability>epsilonProbabilitySetValue)
+		if(epsilonProbabilityAutoMode == true && epsilonProbability>epsilonProbabilitySetValue)
 		{
 			if(epsilonProbabilityDecayRate<1.0)
 				epsilonProbability *= epsilonProbabilityDecayRate;

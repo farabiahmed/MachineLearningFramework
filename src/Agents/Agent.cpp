@@ -28,12 +28,16 @@ userControl(UserControl::GetInstance())
 	// Create File Directory First
 	system(("mkdir -p " + log_file_path).c_str());
 
-	logger.open((log_file_path + "/agentReport2.csv").c_str(),fstream::out);
+	logger_agentStats.open((log_file_path + "/agentReport2.csv").c_str(),fstream::out);
 
+
+	logger_simResults.open((log_file_path + "/agentReport_" + cfg.GetValueOfKey<string>("MODEL_ID", "0") + ".csv").c_str(),fstream::out);
 }
 
 Agent::~Agent() {
 	// TODO Auto-generated destructor stub
+	logger_simResults.close();
+	logger_agentStats.close();
 }
 
 void Agent::Get_Cumulative_Rewards(unsigned numberof_bellmanupdate)
@@ -79,8 +83,19 @@ void Agent::Get_Cumulative_Rewards(unsigned numberof_bellmanupdate)
 
 	// pair: <numberof_bellmanupdate, rewards_for_that_bellmanupdate>
 	// To plot bellman vs reward graphic.
-	auto pair = make_pair(numberof_bellmanupdate, rewards );
-	rewards_cumulative.push_back(pair);
+	//auto pair = make_pair(numberof_bellmanupdate, rewards );
+	//rewards_cumulative.push_back(pair);
+	// Put the number that shows the bellman update number first
+	logger_simResults<<numberof_bellmanupdate<<",";
+
+	// Then, put the rewards collected from simulation for that bellman update
+	for (unsigned j = 0; j < rewards.size(); ++j) {
+		logger_simResults << rewards[j];
+
+		if( j < rewards.size()-1)
+			logger_simResults<<",";
+	}
+	logger_simResults<<endl;
 
 	//cout<<endl<<endl;
 }
@@ -129,6 +144,8 @@ pair<unsigned,double> Agent::Simulate(void)
 
 void Agent::Get_Report(string filePath, string fileName)
 {
+	/* The logs are created after every simulation. Not only at the end.
+
 	cout<<endl<<"Creating agent report: "<<filePath<<"/"<<fileName<<endl;
 
 	// Create File Directory First
@@ -168,6 +185,7 @@ void Agent::Get_Report(string filePath, string fileName)
 		logger<<endl;
 	}
 	logger.close();
+	*/
 }
 
 float Agent::Get_Score(void)

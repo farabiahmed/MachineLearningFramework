@@ -60,7 +60,7 @@ public:
 
 		for (auto it : contents)
 		{
-			logger << it.first << " : " << it.second << endl;
+			logger << it.first << " = " << it.second << endl;
 		}
 
 		logger.close();

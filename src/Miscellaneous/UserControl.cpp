@@ -66,7 +66,7 @@ void UserControl::Task_User_Interaction()
 		cout<<endl<<"User Input Received: "<< inputStr<<endl;
 
 		// Convert all characters to lower-case
-		std::transform(inputStr.begin(), inputStr.end(), inputStr.begin(), ::tolower);
+		// std::transform(inputStr.begin(), inputStr.end(), inputStr.begin(), ::tolower);
 
 		// Protect shared objects with mutex
 		pthread_mutex_lock(&lock_message);

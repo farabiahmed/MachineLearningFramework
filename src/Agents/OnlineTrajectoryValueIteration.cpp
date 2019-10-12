@@ -14,16 +14,16 @@ TrajectoryBasedValueIteration(env,rep,cfg)
 	// Create File Directory First
 	system(("mkdir -p " + log_file_path).c_str());
 
-	logger.open((log_file_path + "/agentReport2.csv").c_str(),fstream::out);
+	logger_agentStats.open((log_file_path + "/agentReport2.csv").c_str(),fstream::out);
 
 	// Put Header first
-	logger<<"game,moves,egreedy,bellman"<<endl<<flush;
+	logger_agentStats<<"game,moves,egreedy,bellman"<<endl<<flush;
 
 }
 
 OnlineTrajectoryValueIteration::~OnlineTrajectoryValueIteration()
 {
-	logger.close();
+	logger_agentStats.close();
 }
 
 
@@ -127,11 +127,11 @@ bool OnlineTrajectoryValueIteration::Start_Execution(void)
 		cout<<" Belman:" << flush;
 		cout<< numberof_bellmanupdate << flush;
 
-		logger<<num_of_iteration<<",";
-		logger<<number_of_moves<<",";
-		logger<<epsilonProbability<<",";
-		logger<<numberof_bellmanupdate;
-		logger<<endl;
+		logger_agentStats<<num_of_iteration<<",";
+		logger_agentStats<<number_of_moves<<",";
+		logger_agentStats<<epsilonProbability<<",";
+		logger_agentStats<<numberof_bellmanupdate;
+		logger_agentStats<<endl;
 
 		// Calculate mean diff
 		double sum_diff = 0;

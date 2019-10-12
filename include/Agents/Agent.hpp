@@ -50,7 +50,8 @@ protected:
 
 	UserControl& userControl;
 
-	std::fstream logger;
+	std::fstream logger_agentStats;
+	std::fstream logger_simResults;
 
 	void Get_Cumulative_Rewards(unsigned numberof_bellmanupdate);  	///< It does the simulation for predefined times
 																	///< in a loop and fills the "rewards_cumulative".
