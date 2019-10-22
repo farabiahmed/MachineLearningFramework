@@ -344,6 +344,22 @@ SmartVector Rendezvous_Refuel::Get_Initial_State()
 SmartVector Rendezvous_Refuel::Get_Random_State() 
 {
 	return Get_Initial_State();
+
+	/*
+	SmartVector state = Environment::Get_Random_State();
+
+	//Check Fuel Of Initial State is full
+	bool check_validity = true;
+	for (int i = 0; i < number_of_agents; ++i)
+	{
+		if(state[])
+	}
+
+	while(state)
+	{
+		state = Environment::Get_Random_State();
+	}
+	*/
 }
 
 

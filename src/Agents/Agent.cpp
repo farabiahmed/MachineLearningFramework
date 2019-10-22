@@ -28,10 +28,10 @@ userControl(UserControl::GetInstance())
 	// Create File Directory First
 	system(("mkdir -p " + log_file_path).c_str());
 
-	logger_agentStats.open((log_file_path + "/agentReport2.csv").c_str(),fstream::out);
+	logger_agentStats.open((log_file_path + "/agentReport2.csv").c_str(),ios::in | ios::out | ios::app);
 
 
-	logger_simResults.open((log_file_path + "/agentReport_" + cfg.GetValueOfKey<string>("MODEL_ID", "0") + ".csv").c_str(),fstream::out);
+	logger_simResults.open((log_file_path + "/agentReport_" + cfg.GetValueOfKey<string>("MODEL_ID", "0") + ".csv").c_str(),ios::in | ios::out | ios::app);
 }
 
 Agent::~Agent() {

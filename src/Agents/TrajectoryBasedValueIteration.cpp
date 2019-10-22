@@ -64,11 +64,28 @@ TrajectoryBasedValueIteration::TrajectoryBasedValueIteration(const Environment* 
 	// plot the performance of agent.
 	bellman_stride_forsimulation = cfg.GetValueOfKey<unsigned>("BELLMAN_STRIDE_FORSIMULATION",50);
 
+	// Get the last line of report if exist
+	logger_agentStats.seekg(0, std::ios_base::beg);
+	string lastline,temp;
+	while( getline(logger_agentStats, temp)){if(temp.size()>1)lastline = temp;}
+	logger_agentStats.clear(); //cleanup error and eof flags
 
-	states = environment->Get_All_Possible_States();
-
-	// Put Header first
-	logger_agentStats<<"game,moves,egreedy,bellman,diff"<<endl<<flush;
+	if(!lastline.size())
+	{
+		// Put Header first
+		logger_agentStats<<"game,moves,egreedy,bellman,diff"<<endl<<flush;
+		num_of_iteration = 0;
+		numberof_bellmanupdate=0;
+	}
+	else
+	{
+		cout << "Continuing to the game found: " << lastline << endl;
+		//There are some leftovers, sync!
+		vector<string> info = Convert::Parse_String(lastline,',');
+		num_of_iteration = (int) stoi(info[0]) + 1;
+		epsilonProbability = (double) stod(info[2]);
+		numberof_bellmanupdate = (int) stoi(info[3]);
+	}
 }
 
 TrajectoryBasedValueIteration::~TrajectoryBasedValueIteration()
@@ -78,14 +95,13 @@ TrajectoryBasedValueIteration::~TrajectoryBasedValueIteration()
 
 bool TrajectoryBasedValueIteration::Start_Execution()
 {
-	unsigned numberof_bellmanupdate = 0;
 	unsigned numberof_processedtrajectorysteps = 0;
 	bool epsilonProbabilityAutoMode = true;
 
 	// Test initial controller performance.
 	//Get_Cumulative_Rewards(numberof_bellmanupdate);
 
-	for (int num_of_iteration = 0; num_of_iteration < max_number_of_iterations; num_of_iteration++)
+	for (; num_of_iteration < max_number_of_iterations; num_of_iteration++)
 	{
 		// Test controller performance.
 		Get_Cumulative_Rewards(numberof_bellmanupdate);
@@ -98,7 +114,10 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 		}
 		else if (!userCommand.substr(0,19).compare("EPSILON_PROBABILITY"))
 		{
-			 int pos = userCommand.find("=");
+			 // Example:
+			 // EPSILON_PROBABILITY=0.2 	to set a specific value
+			 // EPSILON_PROBABILITY 		to set auto mode again
+			 unsigned pos = userCommand.find("=");
 			 if(pos != string::npos)
 			 {
 				 epsilonProbability = Convert::string_to_T<double>(userCommand.substr(pos + 1));

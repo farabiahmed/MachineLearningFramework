@@ -104,22 +104,24 @@ int main(int argc, char* argv[])
 	//environment->Display_Policy(*value);
 
 	//Get Report
+	/*
 	agent->Get_Report("log/" +
 						cfg.GetValueOfKey<string>("TIME_STAMP","00000000_000000"),
 						"agentReport_" +
 						cfg.GetValueOfKey<string>("MODEL_ID", "0") +
 						".csv");
-
+	*/
 	//Get Report
 	//value->Get_Report("log/"+timeStamp,"representationReport.csv");
 
 
-	/* Return Performance Value */
+	/*
+	//Return Performance Value
 	float f = agent->Get_Score();
 	char array[1024];
 	sprintf(array, "%f", f);
 	write_shared_memory(array, sizeof array);
-
+	*/
 
 	delete agent;
 	delete environment;

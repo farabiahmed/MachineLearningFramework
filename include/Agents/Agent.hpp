@@ -34,6 +34,8 @@ public:
 	float Get_Score(void);
 
 	int max_number_of_iterations;	///< Stores number of max iteration to find best policy.
+	int num_of_iteration; 			///< Current status of iteration
+	unsigned numberof_bellmanupdate; ///< Current status of bellman update counter
 
 	vector<SmartVector> states;  ///< Stores the states of the environment to increase speed
 	 	 	 	 	 	 	 	 ///< of calculation.

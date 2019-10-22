@@ -21,9 +21,15 @@ class DeepCorrection_base(Representation):
                  fusion_model = "MAX_SUM", # MAX_SUM or MAX_MIN
                  correction_model_type="MULTIPLE_OUT",  # MULTIPLE_OUT, SINGLE_OUT
                  modelId = "noid",
-                 logfolder = ""):
+                 logfolder = "",
+                 agent_model = "models/model_0_20181224_091433.h5",
+                 state_dim = 7):
 
-        self.model_agent_file = "models/model_0_20181224_091433.h5" #low quality
+        self.state_dim = 7
+        self.update_target_interval = 50000
+
+
+        self.model_agent_file = agent_model #low quality
         #self.model_agent_file = "models/model_0_20181217_173349.h5" # high quality
         self.Gamma = gamma
         self.batchsize = batch_size
@@ -49,10 +55,10 @@ class DeepCorrection_base(Representation):
 
         if (self.correction_model_type == "MULTIPLE_OUT"):
             self.output_unit = actionspaceperagent**numberofagent
-            self.size_of_input_units = 2 * numberofagent  # (x,y) for each agent
+            self.size_of_input_units = self.state_dim * numberofagent  # (x,y,f,packet,delivery) for each agent
         else:
             self.output_unit = 1
-            self.size_of_input_units = 3 * numberofagent  # (x,y,a) for each agent
+            self.size_of_input_units = (self.state_dim+1) * numberofagent  # (x,y,f,packet,delivery,a) for each agent
 
         self.actions = self.Get_Action_List()
 
@@ -83,13 +89,16 @@ class DeepCorrection_base(Representation):
                         model = load_model(self.model_agent_file)
                         self.model.append(model)
                         self.model[i].summary()
-        print("Loading is completed.")
 
         # Load model
-        # with tf.Session() as sess:
-        #     # Restore variables from disk.
-        #     saver.restore(sess, "/tmp/model.ckpt")
-        #     print("Model restored.")
+        #with tf.Session() as sess:
+             # Restore variables from disk.
+                        #    saver.restore(sess, "log/" + self.logfolder + "/model_correction_" + self.modelId + ".ckpt")
+                        #print("###############################")
+                        #print("Model restored.")
+                        #print("###############################")
+
+        print("Loading is completed.")
         # save the TensorFlow graph:
 
 
@@ -134,9 +143,9 @@ class DeepCorrection_base(Representation):
 
             # Add an op to initialize the variables.
             model_correction_initialize = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
-            model_correction_initialize_g = tf.global_variables_initializer()
-            model_correction_initialize_a = tf.initialize_all_variables()
-            model_correction_initialize_l = tf.local_variables_initializer()
+            #model_correction_initialize_g = tf.global_variables_initializer()
+            #model_correction_initialize_a = tf.initialize_all_variables()
+            #model_correction_initialize_l = tf.local_variables_initializer()
 
 
             # Add ops to save and restore all the variables.
@@ -193,13 +202,15 @@ class DeepCorrection_base(Representation):
         return np.concatenate((state,action))
 
     def my_leaky_relu(self, x):
-        return tf.nn.leaky_relu(x, alpha=0.3)
+        #return tf.nn.leaky_relu(x, alpha=0.3) #requires tf 1.4
+        alpha = 0.3
+        return tf.nn.relu(x) - alpha * tf.nn.relu(-x)
 
     def Get_Greedy_Pair(self,state):
 
         agent_model_outputs = [] #2D list, agentId and Outputs(array) of each Agent.
         for i in range(self.numberofagent):
-            agent_model_outputs.append(self.ForwardPass_AgentModel(i,state[2*i:2*i+2]))
+            agent_model_outputs.append(self.ForwardPass_AgentModel(i,state[self.state_dim*i:self.state_dim*i+self.state_dim]))
 
         if (self.correction_model_type == "MULTIPLE_OUT"):
             input = self.Convert_State_To_Input(state, self.actions[0]);
@@ -244,7 +255,7 @@ class DeepCorrection_base(Representation):
         agent_model_predicts = []
 
         for i in range(self.numberofagent):
-            values = self.ForwardPass_AgentModel(i,state[2*i:2*i+2])
+            values = self.ForwardPass_AgentModel(i,state[self.state_dim*i:self.state_dim*i+self.state_dim])
             agent_model_predicts.append(values[action[i]])
             #if (self.correction_model_type == "MULTIPLE_OUT"):
             #    agent_model_predicts.append(values)
@@ -369,6 +380,9 @@ class DeepCorrection_base(Representation):
             self.trainingepochtotal += self.trainPass
             # print('Training Epoch:', self.trainingepochtotal)
 
+            if not self.trainingepochtotal % self.update_target_interval:
+                self.Save_Model()
+
             # Get Unique Samples from memory as much as batchsize
             minibatch = self.memory.sample(self.batchsize)
 
@@ -402,7 +416,7 @@ class DeepCorrection_base(Representation):
                 #                                                         self.model_correction_input: inputs,
                 #                                                         self.model_correction_label: values
                 #                                                     })
-            print(cost)
+            #print(cost)
 
         return;
 
@@ -425,6 +439,7 @@ class DeepCorrection_base(Representation):
 
         print("###############################")
         print("Model saved in path: %s" % save_path)
+        print("log/" + self.logfolder + "/model_correction_" + self.modelId + ".ckpt")
         print("###############################")
         print("")
 

@@ -3,6 +3,7 @@ import _thread
 import time
 import datetime as dt
 import numpy as np
+import tensorflow
 from Representation_Keras_MultiAgent_TensorInput import Representation_Keras_MultiAgent_TensorInput
 from DeepQNetwork import DeepQNetwork
 from DeepQNetwork_PrioritizedReplay import DeepQNetwork_PrioritizedReplay
@@ -21,6 +22,8 @@ from command_parser import command_parser, config_parser
 #                                       learning_rate=0.1,
 #                                       batch_size=9*4,
 #                                       trainpass=5000)
+
+print('tensorflow: %s' % tensorflow.__version__)
 
 def strToValue(str):
     if len(str.split(";")) > 1 :
@@ -116,6 +119,7 @@ def init_model(config):
                                                                 correction_model_type = config["CORRECTION_MODEL_TYPE"],
                                                                 modelId             = config["MODEL_ID"],
                                                                 logfolder           = config["TIME_STAMP"],
+                                                                agent_model         = config["AGENT_MODEL"],
                                                                 )
     
     return rep
