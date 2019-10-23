@@ -8,6 +8,7 @@
 #include <iostream>
 #include <Miscellaneous/SmartVector.hpp>
 #include <Environments/DeliveryDrone.hpp>
+#include <Environments/MultiDeliveryDrone.hpp>
 #include <Environments/Environment.hpp>
 #include "Miscellaneous/BashFormatter.hpp"
 #include "Miscellaneous/ConfigParser.hpp"
@@ -17,6 +18,7 @@ using namespace std;
 // Test Case Id: Since this program is a unit test to verify the
 // functionality of the related class, there are lots of test cases.
 unsigned test_id = 0;
+int gNumberOfAgents = 1;
 
 // All Possible States and Actions
 vector<SmartVector> States;
@@ -55,39 +57,42 @@ SmartVector generate_random_action(const Environment& env, const SmartVector& st
 bool get_action_from_user(SmartVector &Action)
 {
 	char c;
-	cin>>c;
-	switch(c)
-	{
-	case 'W':
-		cout << "Up" << endl;//key up
-		Action = Actions[0];
-		break;
-	case 'S':
-		cout << "Down" << endl;   // key down
-		Action = Actions[2];
-		break;
-	case 'A':
-		cout << "Left" << endl;  // key left
-		Action = Actions[3];
-		break;
-	case 'D':
-		cout << "Right" << endl;  // key right
-		Action = Actions[1];
-		break;
-	case 'E':
-		cout << "Wait" << endl;  // key wait
-		Action = Actions[4];
-		break;
-	case 'Q':
-		cout << endl << "Quit" << endl;  // key quit
-		return false;
-		break;
-	default:
-		cout << endl << "Invalid Input" << endl;  // not arrow
-		return false;
-		break;
-	}
 
+	for (int agent = 0; agent < gNumberOfAgents; ++agent)
+	{
+		cin>>c;
+		switch(c)
+		{
+		case 'W':
+			cout << "Up" << endl;//key up
+			Action.elements[agent] = 0;
+			break;
+		case 'S':
+			cout << "Down" << endl;   // key down
+			Action.elements[agent] = 2;
+			break;
+		case 'A':
+			cout << "Left" << endl;  // key left
+			Action.elements[agent] = 3;
+			break;
+		case 'D':
+			cout << "Right" << endl;  // key right
+			Action.elements[agent] = 1;
+			break;
+		case 'E':
+			cout << "Wait" << endl;  // key wait
+			Action.elements[agent] = 4;
+			break;
+		case 'Q':
+			cout << endl << "Quit" << endl;  // key quit
+			return false;
+			break;
+		default:
+			cout << endl << "Invalid Input" << endl;  // not arrow
+			return false;
+			break;
+		}
+	}
 	return true;
 }
 
@@ -100,20 +105,22 @@ int main()
 	help_menu();
 
 	// Get parameters from file
-	ConfigParser cfg("config/config_deliverydrone_5x5_1agent.cfg");
+	ConfigParser cfg("config/config_multideliverydrone_5x5_3agent.cfg");
+
+	gNumberOfAgents = cfg.GetValueOfKey<int>("NUMBER_OF_AGENTS",1);
 
 	// Create Environment
-	Environment *env = new DeliveryDrone(cfg);
+	Environment *env = new MultiDeliveryDrone(cfg);
 
 	// Create an instances for NextState and Action
-	SmartVector Action;
+	SmartVector Action(gNumberOfAgents);
 	vector<SmartVector> actions;
 	SmartVector NextState;
 	SmartVector CurrentState;
 	double Reward = 0.0;
 
-	Actions = env->Get_Action_List(CurrentState);
-	States = env->Get_All_Possible_States();
+	//Actions = env->Get_Action_List(CurrentState);
+	//States = env->Get_All_Possible_States();
 
 	CurrentState = env->Get_Random_State();
 	print_test_information("Initial Position Check");

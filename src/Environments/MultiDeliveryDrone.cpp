@@ -224,6 +224,12 @@ void MultiDeliveryDrone::Display_State(const SmartVector& state) const
 {
 	vector<SmartVector> agent_states = SmartVector::Split(state,number_of_agents);
 
+	cout<<"Displaying Multiagent State Status: [";
+	for (unsigned i = 0; i < number_of_agents * StateIdx::TotalNumberOfStates; ++i) {
+		cout<< " " << state.elements[i];
+	}
+	cout<<" ] #"<<state.index<<endl<<endl;
+
 	for (unsigned a = 0; a < number_of_agents; ++a) {
 
 		cout<<"Displaying State for Agent #"<<a<<endl;
