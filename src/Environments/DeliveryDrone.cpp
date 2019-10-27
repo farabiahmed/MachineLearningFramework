@@ -80,10 +80,14 @@ double DeliveryDrone::Get_Reward(const SmartVector& currentState, const SmartVec
 		reward += 0.2;
 	}
 
-	if(Check_Terminal_State(nextState))
+	if(Check_Terminal_State(nextState) && !Check_Terminal_State(currentState))
 	{
 		reward += 1;
+		reward += currentState.elements[StateIdx::Fuel] * cost_action * -1;
 	}
+
+	if(action.elements[0]!=4)
+		reward+=cost_action;
 
 //	if(nextState.elements[StateIdx::Fuel] == 0) reward += -1;
 
@@ -117,7 +121,7 @@ double DeliveryDrone::Get_Reward(const SmartVector& currentState, const SmartVec
 		reward = 0.01 * 1.0 / (1.0 + dist);
 	}
 	*/
-	return reward+cost_action;
+	return reward;
 }
 
 SmartVector DeliveryDrone::BurnFuel(const SmartVector &state)

@@ -127,6 +127,7 @@ int main(int argc, char* argv[])
 	delete environment;
 	delete value;
 
+	cout<< cfg.GetValueOfKey<string>("TIME_STAMP","00000000_000000") <<endl;
 	cout<<"Done."<<endl;
 
 	return 0;

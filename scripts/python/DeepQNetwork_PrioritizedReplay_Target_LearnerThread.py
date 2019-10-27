@@ -14,7 +14,6 @@ from Memory import Memory_UniformRandom
 
 from Representation import Representation
 
-
 class DeepQNetwork_PrioritizedReplay_Target_LearnerThread(Representation):
 
     def __init__(self,gridsize=5,actionspaceperagent=5,numberofagent=2,
@@ -27,6 +26,10 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread(Representation):
                  convolutionLayer= False,
                  modelId = "noid",
                  logfolder = ""):
+
+        print("###############################")
+        print("DeepQNetwork_PrioritizedReplay_Target_LearnerThread")
+        print("###############################")
 
         self.Gamma = gamma
         self.batchsize = batch_size
@@ -41,9 +44,11 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread(Representation):
         elif (statePreprocessType=="Vector"):
             self.size_of_input_units = 7 * numberofagent; # (x,y,a) for each agent
         self.gridsize = gridsize
-
+        
+        self.experiencebuffersize = experiencebuffer
+        
         self.memory = Memory_SumTree(experiencebuffer)
-
+        
         self.fresh_experience_counter = 0
         self.actionspaceforagent = actionspaceperagent
         self.numberofagent = numberofagent
@@ -56,15 +61,22 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread(Representation):
         self.logfolder = logfolder
 
         self.update_target_interval = 10000
-
+        self.experience_counter = 0
+        
         self.model = None
         self.model_target = None
 
-        #if os.path.isfile("log/model_0.h5"):
-        #self.model = load_model("log/model_0.h5")
-        #print("###############################")
-        #print("Existing model loaded.......")
-        #print("###############################")
+        print("log/" + logfolder + "/model_0.h5")
+        if os.path.isfile("log/"+self.logfolder+"/model_0.h5"):
+            print("###############################")
+            print("Existing model is being loaded.......")
+            print("###############################")
+            self.model = load_model("log/" + self.logfolder + "/model_0.h5")
+        else :
+            print("###############################")
+            print("Not Any Existing model found.......")
+            print("###############################")
+
 
         if self.model is None:
 
@@ -90,8 +102,8 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread(Representation):
             self.model.compile(loss='mse', optimizer='sgd', metrics=['accuracy'])
             self.model._make_predict_function()
 
-            if os.path.isfile("log/"+self.logfolder+"/modeltrained.h5"):
-                self.model.load_weights("log/"+self.logfolder+"/modeltrained.h5")
+            if os.path.isfile("log/"+self.logfolder+"/model_weight_0.h5"):
+                self.model.load_weights("log/"+self.logfolder+"/model_weight_0.h5")
                 print("###############################")
                 print("Existing model params are loaded.......")
                 print("###############################")
@@ -104,8 +116,8 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread(Representation):
         self.model_target = clone_model(self.model)
         self.Update_target()
 
-        self.Save_Model()
-        # self.model.save_weights("log/"+self.logfolder+"/modelinit_"+self.modelId+".h5")
+        # self.Save_Model()
+        self.model.save_weights("log/"+self.logfolder+"/modelinit_"+self.modelId+".h5")
 
         # Reset the batch
         self.Reset_Batch()
@@ -211,10 +223,16 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread(Representation):
         # Append new sample to Memory of Experiences
         # Don't worry about its size, since it is a queue
         self.memory.add(error,(state, values))
+        
+        # To be able to stop learner thread if there is no more experience
+        if self.experience_counter < self.experiencebuffersize:
+            self.experience_counter+=1
+        
+        return self.trainingepochtotal
 
     def Learn(self) :
         #if self.fresh_experience_counter == self.batchsize :
-        if self.memory.length() >= self.batchsize :
+        if self.memory.length() >= self.batchsize and self.experience_counter>0:
 
             self.trainingepochtotal += self.trainPass
             # print('Training Epoch:', self.trainingepochtotal)
@@ -235,16 +253,11 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread(Representation):
 
             if not self.trainingepochtotal % self.update_target_interval:
                 self.Update_target()
-            # for i in np.arange(len(minibatch)):
-            #     idx, (X, Y) = minibatch[i]
-            #     self.batchSamplesX = np.vstack((self.batchSamplesX, (X)))
-            #     self.batchSamplesY = np.vstack((self.batchSamplesY, Y))
-            #
-            # with self.graph.as_default():
-            #     self.model.fit(self.batchSamplesX, self.batchSamplesY, epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
-            # self.Reset_Batch()
-
-    # UDP Transmitter
+                
+            # To be able to stop learner thread if there is no more experience
+            self.experience_counter -= 1
+            
+    # Learner Thread Run Function
     def Learner(self):
 
         while self.flag_continue:

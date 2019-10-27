@@ -235,6 +235,8 @@ class DeepQNetwork_PrioritizedReplay(Representation):
             # with self.graph.as_default():
             #     self.model.fit(self.batchSamplesX, self.batchSamplesY, epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
             # self.Reset_Batch()
+        
+        return self.trainingepochtotal
 
     def Reset_Batch(self):
         # Reset the batch
