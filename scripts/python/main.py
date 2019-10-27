@@ -11,7 +11,7 @@ from DeepQNetwork_PrioritizedReplay_Target import DeepQNetwork_PrioritizedReplay
 from DeepQNetwork_PrioritizedReplay_Target_LearnerThread import DeepQNetwork_PrioritizedReplay_Target_LearnerThread
 from DeepCorrection_base import DeepCorrection_base
 from DeepActorCritic_PrioritizedReplay import DeepActorCritic_PrioritizedReplay
-from DeepActorCritic_PrioritizedReplay_tflearn import DeepActorCritic_PrioritizedReplay_tflearn
+#from DeepActorCritic_PrioritizedReplay_tflearn import DeepActorCritic_PrioritizedReplay_tflearn
 from Representation import Representation
 from command_parser import command_parser, config_parser
 
@@ -275,6 +275,9 @@ def userinput():
             flag_continue = False
             _thread.exit()
             break
+        else:
+            print("No User Input.")
+            time.sleep(100/1000)
 
     print("Thread userinput() stopped.")
 

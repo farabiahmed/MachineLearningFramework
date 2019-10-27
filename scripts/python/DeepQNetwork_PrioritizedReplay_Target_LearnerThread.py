@@ -2,6 +2,7 @@ import os
 import os.path
 import random
 import _thread
+from threading import Thread, Lock
 import numpy as np
 import tensorflow as tf
 from keras.models import Sequential
@@ -11,6 +12,7 @@ from keras.models import load_model
 from keras.models import clone_model
 from Memory.Memory_SumTree import Memory_SumTree
 from Memory import Memory_UniformRandom
+import time
 
 from Representation import Representation
 
@@ -38,13 +40,14 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread(Representation):
         self.learningrate = learning_rate
         self.statePreprocessType = statePreprocessType
         self.convolutionLayer = convolutionLayer
-
+        self.mutex = Lock()
+        
         if(statePreprocessType=="Tensor") :
             self.size_of_input_units = gridsize * gridsize * numberofagent
         elif (statePreprocessType=="Vector"):
             self.size_of_input_units = 7 * numberofagent; # (x,y,a) for each agent
         self.gridsize = gridsize
-        
+            
         self.experiencebuffersize = experiencebuffer
         
         self.memory = Memory_SumTree(experiencebuffer)
@@ -124,12 +127,18 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread(Representation):
 
         # Initialize thread parameters
         self.flag_continue = True
-        _thread.start_new_thread(self.Learner, ())
-
+        
+        
+        #_thread.start_new_thread(self.Learner, ())
+        self._thread = Thread(target = self.Learner, args=())
+        self._thread.start()
+        
     def Update_target(self):
         print('Updating Target Network')
         model_weights = self.model.get_weights()
+        self.mutex.acquire(1)
         self.model_target.set_weights(model_weights)
+        self.mutex.release()
 
     def Convert_State_To_Input(self,state):
 
@@ -187,10 +196,12 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread(Representation):
         else:
             input = np.reshape(input,(1,input.shape[0]))
 
+        self.mutex.acquire(1)
         # Prediction of the model
         with self.graph.as_default():
             hypothesis = self.model_target.predict(input)
-
+        self.mutex.release()
+        
         values = np.asarray(hypothesis).reshape(self.output_unit)
 
         return values
@@ -225,17 +236,18 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread(Representation):
         self.memory.add(error,(state, values))
         
         # To be able to stop learner thread if there is no more experience
-        if self.experience_counter < self.experiencebuffersize:
+        if self.experience_counter < 10: #self.experiencebuffersize:
             self.experience_counter+=1
         
         return self.trainingepochtotal
 
     def Learn(self) :
+    
         #if self.fresh_experience_counter == self.batchsize :
         if self.memory.length() >= self.batchsize and self.experience_counter>0:
 
             self.trainingepochtotal += self.trainPass
-            # print('Training Epoch:', self.trainingepochtotal)
+            #print('Training Epoch:', self.trainingepochtotal)
 
             # Get Unique Samples from memory as much as batchsize
             minibatch = self.memory.sample(self.batchsize)
@@ -250,12 +262,15 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread(Representation):
 
             with self.graph.as_default():
                 self.model.fit(np.array(batchSamplesX), np.array(batchSamplesY), epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
-
+            
             if not self.trainingepochtotal % self.update_target_interval:
                 self.Update_target()
                 
             # To be able to stop learner thread if there is no more experience
             self.experience_counter -= 1
+        else:
+            print("Sleeping Learner Thread")
+            time.sleep(1)
             
     # Learner Thread Run Function
     def Learner(self):
