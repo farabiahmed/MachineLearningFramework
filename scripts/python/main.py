@@ -176,6 +176,9 @@ total_command_persec = 0
 total_getval_persec = 0
 total_setval_persec = 0
 total_getgreedy_persec = 0
+total_train_persec = 0
+total_train = 0
+total_train_old = 0
 
 rep = None
 
@@ -184,7 +187,7 @@ rep = None
 def read():
 
     # Initialize parameters
-    global flag_continue, send_command_type, send_ok,rep, total_command_persec, total_getgreedy_persec, total_setval_persec, total_getval_persec, rep
+    global flag_continue, send_command_type, send_ok,rep, total_command_persec, total_getgreedy_persec, total_setval_persec, total_getval_persec, rep, total_train
 
     while flag_continue:
         # Read port when available
@@ -203,7 +206,7 @@ def read():
             command, state, action, value , nextstate, status = command_parser(params[1:])
             
             if command == 'setvalue':
-                rep.Set_Value(state, action, value)
+                total_train = rep.Set_Value(state, action, value)
                 total_setval_persec += 1
                 s.sendto(("OK,setvalue").encode(), (HOSTTX, PORTTX))
     
@@ -272,6 +275,9 @@ def userinput():
             flag_continue = False
             _thread.exit()
             break
+        else:
+            print("No User Input.")
+            time.sleep(100/1000)
 
     print("Thread userinput() stopped.")
 
@@ -286,10 +292,16 @@ _thread.start_new_thread(userinput,())
 
 while flag_continue:
     time.sleep(1)
-    print('Total Command Per Sec:{} SetVal:{} GetVal:{} GetGreedy:{}'.format(total_command_persec,total_setval_persec,total_getval_persec,total_getgreedy_persec))
+    
+    if total_train:
+        total_train_persec = total_train - total_train_old
+        total_train_old = total_train
+    
+    print('Total Command Per Sec:{:>5} SetVal:{:>5} GetVal:{:>5} GetGreedy:{:>5} TotalTrain:{:>5} '.format(total_command_persec,total_setval_persec,total_getval_persec,total_getgreedy_persec, total_train_persec))
     total_command_persec=0
     total_setval_persec=0
     total_getval_persec=0
+    total_train_persec=0
     total_getgreedy_persec=0
 
 
