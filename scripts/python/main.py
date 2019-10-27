@@ -9,6 +9,7 @@ from DeepQNetwork import DeepQNetwork
 from DeepQNetwork_PrioritizedReplay import DeepQNetwork_PrioritizedReplay
 from DeepQNetwork_PrioritizedReplay_Target import DeepQNetwork_PrioritizedReplay_Target
 from DeepQNetwork_PrioritizedReplay_Target_LearnerThread import DeepQNetwork_PrioritizedReplay_Target_LearnerThread
+from DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid import DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid
 from DeepCorrection_base import DeepCorrection_base
 from DeepActorCritic_PrioritizedReplay import DeepActorCritic_PrioritizedReplay
 #from DeepActorCritic_PrioritizedReplay_tflearn import DeepActorCritic_PrioritizedReplay_tflearn
@@ -73,6 +74,21 @@ def init_model(config):
 
     elif config["DEEP_ALGO_TYPE"] ==  "DeepQNetwork_PrioritizedReplay_Target_LearnerThread":
         rep = DeepQNetwork_PrioritizedReplay_Target_LearnerThread   (gridsize            = strToValue(config["NUMBER_OF_ROWS"]),
+                                                                actionspaceperagent = 5,
+                                                                numberofagent       = strToValue(config["NUMBER_OF_AGENTS"]),
+                                                                #hidden_unit=[256, 512, 256],
+                                                                hidden_unit         = strToValue(config["HIDDEN_LAYERS"]),
+                                                                learning_rate       = strToValue(config["ETA_LEARNING_RATE"]),
+                                                                batch_size          = strToValue(config["BATCH_SIZE"]),
+                                                                trainpass           = strToValue(config["TRAINING_PASS_PER_BATCH"]),
+                                                                experiencebuffer    = strToValue(config["EXPERIENCE_REPLAY_BUFFER"]),
+                                                                statePreprocessType = 'Vector',
+                                                                convolutionLayer    = False,
+                                                                modelId             = config["MODEL_ID"],
+                                                                logfolder           = config["TIME_STAMP"],
+                                                                )
+    elif config["DEEP_ALGO_TYPE"] ==  "DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid":
+        rep = DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid   (gridsize            = strToValue(config["NUMBER_OF_ROWS"]),
                                                                 actionspaceperagent = 5,
                                                                 numberofagent       = strToValue(config["NUMBER_OF_AGENTS"]),
                                                                 #hidden_unit=[256, 512, 256],
