@@ -68,71 +68,78 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
         self.update_target_interval = 10000
         self.experience_counter = 0
         
-        self.session_train = tf.session(graph=tf.graph)
-        with self.session_train.graph.as_default():
-            
-            K.set_session(self.session_train)
-            
-            self.model = None
-    
-            print("log/" + logfolder + "/model_0.h5")
-            if os.path.isfile("log/"+self.logfolder+"/model_0.h5"):
-                print("###############################")
-                print("Existing model is being loaded.......")
-                print("###############################")
-                self.model = load_model("log/" + self.logfolder + "/model_0.h5")
-            else :
-                print("###############################")
-                print("Not Any Existing model found.......")
-                print("###############################")
-    
-    
-            if self.model is None:
-    
-                # create model
-                self.model = Sequential()
-    
-                if self.convolutionLayer==True:
-                    self.convolution_input = ( self.numberofagent, self.gridsize, self.gridsize)
-                    self.model.add(Conv2D(16, (2, 2), strides=(1, 1), activation='relu', input_shape=(self.convolution_input),
-                                     data_format='channels_first'))
-                    self.model.add(Conv2D(32, (2, 2), strides=(1, 1), activation='relu'))
-                    #self.model.add(Conv2D(64, (3, 3), activation='relu'))
-                    self.model.add(Flatten())
-                    self.model.add(Dense(self.hidden_unit[0], activation='tanh'))
-                else:
-                    self.model.add(Dense(self.hidden_unit[0], activation='tanh', input_dim = self.size_of_input_units ))
-    
-                for i in range(1, len(hidden_unit)):
-                    self.model.add(Dense(self.hidden_unit[i], activation='tanh'))
-                self.model.add(Dense(self.output_unit, activation='relu'))
-    
-                # Compile model
-                self.model.compile(loss='mse', optimizer='sgd', metrics=['accuracy'])
-                self.model._make_predict_function()
-    
-                if os.path.isfile("log/"+self.logfolder+"/model_weight_0.h5"):
-                    self.model.load_weights("log/"+self.logfolder+"/model_weight_0.h5")
-                    print("###############################")
-                    print("Existing model params are loaded.......")
-                    print("###############################")
-                    
-            # save the TensorFlow graph:
-            # self.graph = tf.get_default_graph()
-    
-            self.model.summary()
-            self.Save_Model()
-            # self.model.save_weights("log/"+self.logfolder+"/modelinit_"+self.modelId+".h5")
+        # Create session and graphs
+        self.graph_train = tf.Graph()
+        self.session_train = tf.Session(graph=self.graph_train)
         
-        self.session_predict = tf.session(graph=tf.graph)
-        with self.session_predict.graph.as_default():
-            K.set_session(self.session_predict)
-            self.model_target = None
-            self.model_target.load_model("log/" + self.logfolder + "/model_" + self.modelId + ".h5")
-            self.model_target.summary()
-            #self.model_target = clone_model(self.model)
-            #self.Update_target()
-            #self.model_target._make_predict_function()
+        self.graph_predict = tf.Graph()
+        self.session_predict = tf.Session(graph=self.graph_predict)
+
+        with self.graph_train.as_default():
+            with self.session_train.as_default():
+            
+                #K.set_session(self.session_train)
+                
+                self.model = None
+        
+                print("log/" + logfolder + "/model_0.h5")
+                if os.path.isfile("log/"+self.logfolder+"/model_0.h5"):
+                    print("###############################")
+                    print("Existing model is being loaded.......")
+                    print("###############################")
+                    self.model = load_model("log/" + self.logfolder + "/model_0.h5")
+                else :
+                    print("###############################")
+                    print("Not Any Existing model found.......")
+                    print("###############################")
+        
+        
+                if self.model is None:
+        
+                    # create model
+                    self.model = Sequential()
+        
+                    if self.convolutionLayer==True:
+                        self.convolution_input = ( self.numberofagent, self.gridsize, self.gridsize)
+                        self.model.add(Conv2D(16, (2, 2), strides=(1, 1), activation='relu', input_shape=(self.convolution_input),
+                                         data_format='channels_first'))
+                        self.model.add(Conv2D(32, (2, 2), strides=(1, 1), activation='relu'))
+                        #self.model.add(Conv2D(64, (3, 3), activation='relu'))
+                        self.model.add(Flatten())
+                        self.model.add(Dense(self.hidden_unit[0], activation='tanh'))
+                    else:
+                        self.model.add(Dense(self.hidden_unit[0], activation='tanh', input_dim = self.size_of_input_units ))
+        
+                    for i in range(1, len(hidden_unit)):
+                        self.model.add(Dense(self.hidden_unit[i], activation='tanh'))
+                    self.model.add(Dense(self.output_unit, activation='relu'))
+        
+                    # Compile model
+                    self.model.compile(loss='mse', optimizer='sgd', metrics=['accuracy'])
+                    self.model._make_predict_function()
+        
+                    if os.path.isfile("log/"+self.logfolder+"/model_weight_0.h5"):
+                        self.model.load_weights("log/"+self.logfolder+"/model_weight_0.h5")
+                        print("###############################")
+                        print("Existing model params are loaded.......")
+                        print("###############################")
+                        
+                # save the TensorFlow graph:
+                # self.graph = tf.get_default_graph()
+        
+                self.model.summary()
+                self.Save_Model()
+                # self.model.save_weights("log/"+self.logfolder+"/modelinit_"+self.modelId+".h5")
+        
+        with self.graph_predict.as_default():
+            with self.session_predict.as_default():
+                #K.set_session(self.session_predict)
+                self.model_target = None
+                self.model_target = load_model("log/" + self.logfolder + "/model_" + self.modelId + ".h5")
+                self.model_target.summary()
+                #self.model_target = clone_model(self.model)
+                #self.Update_target()
+                #self.model_target._make_predict_function()
         
 
 
@@ -157,15 +164,15 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
     def Update_target(self):
         print('Updating Target Network')
         
-        with self.session_train.graph.as_default():
-            K.set_session(self.session_train)
-            model_weights = self.model.get_weights()
+        with self.graph_train.as_default():
+            with self.session_train.as_default():
+                model_weights = self.model.get_weights()
             
-        with self.session_predict.graph.as_default():
-            K.set_session(self.session_predict)
-            self.mutex.acquire(1)
-            self.model_target.set_weights(model_weights)
-            self.mutex.release()
+        with self.graph_predict.as_default():
+            with self.session_predict.as_default():
+                self.mutex.acquire(1)
+                self.model_target.set_weights(model_weights)
+                self.mutex.release()
 
     def Convert_State_To_Input(self,state):
 
@@ -226,11 +233,10 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
         self.mutex.acquire(1)
         # Prediction of the model
         with tf.device('/cpu:0'):
-            with self.session_predict.graph.as_default():
-                
-                K.set_session(self.session_predict)
-                
-                hypothesis = self.model_target.predict(input)
+            with self.graph_predict.as_default():
+                with self.session_predict.as_default():
+                    hypothesis = self.model_target.predict(input)
+                    
         self.mutex.release()
         
         values = np.asarray(hypothesis).reshape(self.output_unit)
@@ -294,11 +300,9 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
                 batchSamplesY.append(Y)
             
             with tf.device('/gpu:0'):
-                with self.session_train.graph.as_default():
-                    
-                    K.set_session(self.session_train)
-                    
-                    self.model.fit(np.array(batchSamplesX), np.array(batchSamplesY), epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
+                with self.graph_train.as_default():
+                    with self.session_train.as_default():                
+                        self.model.fit(np.array(batchSamplesX), np.array(batchSamplesY), epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
         
             if not self.trainingepochtotal % self.update_target_interval:
                 self.Update_target()
@@ -336,10 +340,14 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
         self.Set_Value(state,action,QValue)
 
     def Save_Model(self):
-        K.set_session(self.session_train)
+        #K.set_session(self.session_train)
         #with self.session_train.graph.as_default():
-        with K.get_session().graph.as_default():
-                        
+        #with K.get_session().graph.as_default():
+        print("Model save called...")
+        with self.session_train.as_default():
+            
+            
+            
             if not os.path.exists("log/"+self.logfolder):
                 os.makedirs("log/"+self.logfolder)
 

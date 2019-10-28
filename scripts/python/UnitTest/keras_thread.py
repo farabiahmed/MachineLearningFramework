@@ -25,18 +25,19 @@ session = tf.Session(graph=graph)
 
 #Define the model
 with graph.as_default():
-    with session.as_default() as sess:
+    with session.as_default():
         model = Sequential()
         model.add(Dense(1, activation = 'linear', input_dim = 1))
         sgd = optimizers.SGD(lr=0.01)
         model.compile(optimizer = sgd, loss = 'mean_squared_error', metrics = ['accuracy'])
-
+        #model._make_predict_function()
+        
 _thread = Thread(target=ThreadRun, args=())
 _thread.start()
 
 #Use the model
 with graph.as_default():
-    with session.as_default() as sess:
+    with session.as_default():
         for i in range(5):
             data_before = model.predict(data)
             plt.plot(data, data_before, 'r')
