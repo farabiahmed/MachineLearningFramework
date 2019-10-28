@@ -210,7 +210,7 @@ def read():
 
     while flag_continue:
         # Read port when available
-        data, addr = s.recvfrom(1024)
+        data, addr = s.recvfrom(65530)
 
         # Convert the byte array to string
         rxstr = data.decode('utf-8')
