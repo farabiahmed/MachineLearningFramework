@@ -31,17 +31,14 @@ TrajectoryBasedValueIteration::TrajectoryBasedValueIteration(const Environment* 
 
 	// Explore-Exploit Parameter.
 	// Probability that balances exploration and exploitation
-	epsilonProbabilitySetValue = cfg.GetValueOfKey<double>("EPSILON_PROBABILITY",0.8);
+	epsilonProbabilityEndValue = cfg.GetValueOfKey<double>("EPSILON_PROBABILITY",0.2);
+
+	epsilonProbabilityStartValue = cfg.GetValueOfKey<double>("EPSILON_PROBABILITY_START",0.6);
 
 	// Epsilon Probability Decay Rate
-	epsilonProbabilityDecayRate = cfg.GetValueOfKey<double>("EPSILON_PROBABILITY_DECAYRATE",1.0);
-/*
-	if(epsilonProbabilityDecayRate != 1.0)
-		epsilonProbability = 1.0;
-	else
-		epsilonProbability = epsilonProbabilitySetValue;
-*/
-	epsilonProbability = 1.0;
+	epsilonProbabilityDecayRate = cfg.GetValueOfKey<double>("EPSILON_PROBABILITY_DECAYRATE",1.1);
+
+	epsilonProbability = epsilonProbabilityStartValue;
 
 	// Number of next state samples
 	// It will be used to approximate the expectations on the next state.
@@ -277,12 +274,12 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 		}
 		*/
 
-		if(epsilonProbabilityAutoMode == true && epsilonProbability>epsilonProbabilitySetValue)
+		if(epsilonProbabilityAutoMode == true && epsilonProbability>epsilonProbabilityEndValue)
 		{
 			if(epsilonProbabilityDecayRate<1.0)
 				epsilonProbability *= epsilonProbabilityDecayRate;
 			else
-				epsilonProbability = (1.0 - ((double)num_of_iteration / (double)max_number_of_iterations));
+				epsilonProbability = (epsilonProbabilityStartValue - ((double)num_of_iteration / (double)max_number_of_iterations)*(epsilonProbabilityStartValue- epsilonProbabilityEndValue));
 		}
 	}// End of iterations loop
 	return false;
