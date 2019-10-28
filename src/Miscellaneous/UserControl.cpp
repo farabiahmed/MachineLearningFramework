@@ -41,6 +41,13 @@ string UserControl::GetMessage(void)
 	return ret;
 }
 
+void UserControl::SetMessage(string str)
+{
+	pthread_mutex_lock(&lock_message);
+	message = str;
+	pthread_mutex_unlock(&lock_message);
+}
+
 void UserControl::GetStatus(void)
 {
 	cout<<endl;

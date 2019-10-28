@@ -46,6 +46,7 @@ public:
 	void GetStatus(void);
 
 	string GetMessage(void);
+	void SetMessage(string str);
 
 	void WaitForThreadToExit();
 

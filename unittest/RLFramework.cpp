@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <signal.h>
 #include <Miscellaneous/CommandLineParser.hpp>
 #include <Miscellaneous/ConfigParser.hpp>
 #include <Environments/EnvironmentFactory.hpp>
@@ -20,6 +21,7 @@
 #include <Agents/AgentFactory.hpp>
 #include <Representations/Representation.hpp>
 #include <Representations/RepresentationFactory.hpp>
+#include "Miscellaneous/UserControl.hpp"
 
 using namespace std;
 
@@ -42,12 +44,20 @@ string Get_TimeStamp(void)
 	return string(buffer);
 }
 
+void my_handler(int s){
+   printf("Caught signal \n");
+   UserControl::GetInstance().SetMessage("stop");
+}
+
+
 string configFile;
 
 int main(int argc, char* argv[])
 {
 	// Menu for user
 	help_menu();
+
+	signal (SIGINT,my_handler);
 
 	/* Print commandline parameters */
 	cout<<endl<<"Command Line Variables"<<endl;

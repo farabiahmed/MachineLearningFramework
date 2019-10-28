@@ -15,6 +15,9 @@ from DeepActorCritic_PrioritizedReplay import DeepActorCritic_PrioritizedReplay
 #from DeepActorCritic_PrioritizedReplay_tflearn import DeepActorCritic_PrioritizedReplay_tflearn
 from Representation import Representation
 from command_parser import command_parser, config_parser
+import signal
+import sys
+
 
 #rep = Representation_Tabular([4,12,12])
 #rep = Representation_Tensorflow(4,0.1)
@@ -298,9 +301,17 @@ def userinput():
     print("Thread userinput() stopped.")
 
 
+def signal_handler(sig, frame):
+        print('You pressed Ctrl+C!')
+        rep.Save_Model()
+        flag_continue = False
+        _thread.exit()
+        sys.exit(0)
+
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.bind(("", PORTRX))
 print ('waiting on port:', PORTRX)
+signal.signal(signal.SIGINT, signal_handler)
 
 _thread.start_new_thread(read,())
 _thread.start_new_thread(write,())
