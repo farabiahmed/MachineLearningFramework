@@ -11,6 +11,7 @@ from DeepQNetwork_PrioritizedReplay_Target import DeepQNetwork_PrioritizedReplay
 from DeepQNetwork_PrioritizedReplay_Target_LearnerThread import DeepQNetwork_PrioritizedReplay_Target_LearnerThread
 from DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid import DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid
 from DeepCorrection_base import DeepCorrection_base
+from Representation_Empty import Representation_Empty
 from DeepActorCritic_PrioritizedReplay import DeepActorCritic_PrioritizedReplay
 #from DeepActorCritic_PrioritizedReplay_tflearn import DeepActorCritic_PrioritizedReplay_tflearn
 from Representation import Representation
@@ -140,6 +141,10 @@ def init_model(config):
                                                                 logfolder           = config["TIME_STAMP"],
                                                                 agent_model         = config["AGENT_MODEL"],
                                                                 )
+        
+    elif config["DEEP_ALGO_TYPE"] ==  "Representation_Empty":
+        rep = Representation_Empty()     
+    
     
     return rep
 
