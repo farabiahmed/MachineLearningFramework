@@ -53,7 +53,7 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
         self.experiencebuffersize = experiencebuffer
         
         self.memory = Memory_SumTree(experiencebuffer)
-        
+        self.dict = {}
         self.fresh_experience_counter = 0
         self.actionspaceforagent = actionspaceperagent
         self.numberofagent = numberofagent
@@ -174,6 +174,8 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
                 self.model_target.set_weights(model_weights)
                 self.mutex.release()
 
+        self.dict.clear()
+        
     def Convert_State_To_Input(self,state):
 
         if(self.statePreprocessType=="Tensor") :
@@ -230,18 +232,26 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
         else:
             input = np.reshape(input,(1,input.shape[0]))
 
-        self.mutex.acquire(1)
-        # Prediction of the model
-        with tf.device('/cpu:0'):
-            with self.graph_predict.as_default():
-                with self.session_predict.as_default():
-                    hypothesis = self.model_target.predict(input)
-                    
-        self.mutex.release()
-        
-        values = np.asarray(hypothesis).reshape(self.output_unit)
-
-        return values
+        if input in self.dict:
+            return self.dict[input]
+        else:
+            self.mutex.acquire(1)
+            # Prediction of the model
+            with tf.device('/cpu:0'):
+                with self.graph_predict.as_default():
+                    with self.session_predict.as_default():
+                        hypothesis = self.model_target.predict(input)
+                        
+            self.mutex.release()
+            
+            values = np.asarray(hypothesis).reshape(self.output_unit)
+            
+            self.dict[input] = values
+            
+            if len(self.dict) > self.experiencebuffersize:
+                print("Dictionary: ", len(self.dict))
+            
+            return values
 
 
     def Get_Action_Index(self, action):
