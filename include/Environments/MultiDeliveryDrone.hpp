@@ -54,7 +54,6 @@ private:
 
 	const int DIMENSION_FOR_AGENT;
 
-	string representation_model;
 };
 
 #endif /* ENVIRONMENTS_MULTI_DELIVERY_DRONE_HPP_ */

@@ -12,8 +12,6 @@ MultiDeliveryDrone::MultiDeliveryDrone(const ConfigParser& cfg)
  DIMENSION_FOR_AGENT(DeliveryDrone::TotalNumberOfStates)// x,y,fuel,packet,delivery
 {
 	number_of_agents = cfg.GetValueOfKey<int>("NUMBER_OF_AGENTS");
-
-	representation_model = cfg.GetValueOfKey<string>("REPRESENTATION");
 }
 
 MultiDeliveryDrone::~MultiDeliveryDrone()

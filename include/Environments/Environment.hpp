@@ -73,6 +73,8 @@ public:
 
 	int number_of_actions;	/// Stores the total number of actions.
 
+	string representation_model;
+
 	/// Standardization parameters will be used in neural networks.
 	vector<double> state_mean; 		/// Stores the standardization bias for each state element.
 	vector<double> state_scalar; 	/// Stores the standardization factors for each state element.

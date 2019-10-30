@@ -44,6 +44,12 @@ public:
     				///< Such as Qiteration, TrajectoryBased etc.
 
 	string log_file_path;
+
+
+	void Get_Cumulative_Rewards(unsigned numberof_bellmanupdate);  	///< It does the simulation for predefined times
+																	///< in a loop and fills the "rewards_cumulative".
+
+
 protected:
 
 	Environment* environment;
@@ -54,9 +60,6 @@ protected:
 
 	std::fstream logger_agentStats;
 	std::fstream logger_simResults;
-
-	void Get_Cumulative_Rewards(unsigned numberof_bellmanupdate);  	///< It does the simulation for predefined times
-																	///< in a loop and fills the "rewards_cumulative".
 
 	pair<unsigned,double> Simulate(void); 		///< Simulates the agent from an random initial point through
 								///< calculated last policy.

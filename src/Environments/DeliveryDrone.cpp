@@ -64,6 +64,8 @@ DeliveryDrone::DeliveryDrone(const ConfigParser& cfg) {
 	if(initial_state.dimension>0 && initial_state.index==-1) initial_state.index = Get_State_Index(initial_state);
 
 	initial_state.Print();
+
+	representation_model = cfg.GetValueOfKey<string>("REPRESENTATION");
 }
 
 DeliveryDrone::~DeliveryDrone() {
@@ -550,15 +552,17 @@ SmartVector DeliveryDrone::Get_Random_State()
 	}
 	else
 	{
-		SmartVector state;
+		static SmartVector state;
 
 		state = Environment::Get_Random_State();
 
+		state.elements[StateIdx::Fuel] = fuel_max;
+		/*
 		while(state.elements[StateIdx::Fuel] != fuel_max)
 		{
 			state = Environment::Get_Random_State();
 		}
-
+		*/
 		return state;
 	}
 }
@@ -951,6 +955,8 @@ int DeliveryDrone::Get_State_Index(const SmartVector& state) const
 			return i;
 	}
 	*/
+	if(representation_model != "TabularStateActionPair")
+		return -1;
 
 	std::unordered_map<std::string,int>::iterator val = state_indexes.find(state.Serialize());
 
