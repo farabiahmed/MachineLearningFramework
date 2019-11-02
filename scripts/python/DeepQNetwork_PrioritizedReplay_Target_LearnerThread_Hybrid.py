@@ -174,6 +174,7 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
                 self.model_target.set_weights(model_weights)
                 self.mutex.release()
 
+        self.Save_Model()
         self.dict.clear()
         
     def Convert_State_To_Input(self,state):
@@ -232,8 +233,8 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
         else:
             input = np.reshape(input,(1,input.shape[0]))
 
-        if input in self.dict:
-            return self.dict[input]
+        if input.tobytes() in self.dict:
+            return self.dict[input.tobytes()]
         else:
             self.mutex.acquire(1)
             # Prediction of the model
@@ -246,7 +247,7 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
             
             values = np.asarray(hypothesis).reshape(self.output_unit)
             
-            self.dict[input] = values
+            self.dict[input.tobytes()] = values
             
             if len(self.dict) > self.experiencebuffersize:
                 print("Dictionary: ", len(self.dict))
