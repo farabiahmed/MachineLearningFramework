@@ -127,12 +127,23 @@ double MultiDeliveryDrone::Get_Reward(const SmartVector& currentState, const Sma
 {
 	double reward = 0;
 
+
 	if(Check_Terminal_State(nextState))
 	{
 		reward += 1;
+
+		return reward + cost_action;
 	}
 
-	return reward + cost_action;
+	vector<SmartVector> currentStates = SmartVector::Split(currentState,number_of_agents);
+	vector<SmartVector> actions = SmartVector::Split(action,number_of_agents);
+	vector<SmartVector> nextStates = SmartVector::Split(nextState,number_of_agents);
+
+	for (unsigned i = 0; i < number_of_agents; ++i) {
+		reward += DeliveryDrone::Get_Reward(currentStates[i], actions[i], nextStates[i]);
+	}
+
+	return reward/(double)number_of_agents;
 }
 
 //FIXED: Fix to multiagent case for n>2
@@ -170,7 +181,7 @@ int MultiDeliveryDrone::Get_State_Index(const SmartVector& state) const
 	if(representation_model != "TabularStateActionPair")
 		return -1;
 
-	vector<SmartVector> states = MultiDeliveryDrone::Get_All_Possible_States();
+	static vector<SmartVector> states = MultiDeliveryDrone::Get_All_Possible_States();
 
 	for (unsigned i = 0; i < states.size(); ++i) {
 		if(state == states[i])

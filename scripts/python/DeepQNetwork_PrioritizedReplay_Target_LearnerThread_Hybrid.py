@@ -137,6 +137,11 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
                 self.model_target = None
                 self.model_target = load_model("log/" + self.logfolder + "/model_" + self.modelId + ".h5")
                 self.model_target.summary()
+                
+                # Open the file
+                with open("log/" + self.logfolder + "/model_" + self.modelId + "_networkSummary.txt",'w') as fh:
+                    # Pass the file handle in as a lambda function to make it callable
+                    self.model.summary(print_fn=lambda x: fh.write(x + '\n'))
                 #self.model_target = clone_model(self.model)
                 #self.Update_target()
                 #self.model_target._make_predict_function()
@@ -249,7 +254,7 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
             
             self.dict[input.tobytes()] = values
             
-            if len(self.dict) > self.experiencebuffersize:
+            if len(self.dict) > self.experiencebuffersize and len(self.dict)%100 is 0:
                 print("Dictionary: ", len(self.dict))
             
             return values

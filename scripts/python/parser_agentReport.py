@@ -214,3 +214,15 @@ if os.path.isfile(reportfilename):
     plt.savefig('log/'+inputFolder+"/agentReport_epsilon.svg", format="svg")
     plt.close()
 
+
+    
+    plt.figure(4)
+    avgArr = [np.sum(arr[i:i + skipline, 4]) / skipline if i + skipline < upperlimit else np.sum(arr[i:upperlimit,4]) / (upperlimit - i) for i in
+         np.arange(lowerlimit, upperlimit, skipline)]
+    plt.plot(arr[lowerlimit:upperlimit:skipline,0], avgArr)
+    plt.title('Network Error')
+    plt.xlabel('Game #')
+    plt.ylabel('Error')
+    plt.savefig('log/'+inputFolder+"/agentReport_error.svg", format="svg")
+    plt.savefig('log/'+inputFolder+"/agentReport_error.png", format="png", dpi=250)
+    plt.close()
