@@ -124,8 +124,14 @@ pair<unsigned,double> Agent::Simulate(void)
 	while( !environment->Check_Terminal_State(state) && number_of_movement<max_steps_in_simulation )
 	{
 		// Get next action to apply from updated policy
-		action  = valueFunction->Get_Policy(state);
-
+		if(valueFunction)
+			action  = valueFunction->Get_Policy(state);
+		else
+		{
+			ProbabilityDistribution *p = new DiscreteDistribution(vector<double>(0));
+			static auto actions = environment->Get_Action_List(state);
+			action = actions[(unsigned)(p->Generate_Random_Value()*actions.size())];
+		}
 		// Get next state by iterating previous state and action.
 		nextState = environment->Get_Next_State(state,action);
 

@@ -14,6 +14,7 @@
 #include "Agents/OnlineTrajectoryValueIteration.hpp"
 #include "Agents/QIteration.hpp"
 #include "Agents/TrajectoryBasedValueIteration.hpp"
+#include "Agents/RandomAgent.hpp"
 
 #include "Environments/Environment.hpp"
 #include "Representations/Representation.hpp"
@@ -30,6 +31,7 @@ public:
 			else if(type == "online-trajectory-value-iteration")	return new OnlineTrajectoryValueIteration(env,rep,cfg);
 			else if(type == "q-iteration")							return new QIteration(env,rep,cfg);
 			else if(type == "trajectory-based-value-iteration")		return new TrajectoryBasedValueIteration(env,rep,cfg);
+			else if(type == "random-agent")							return new RandomAgent(env,cfg);
 			else													return NULL;
 	}
 };
