@@ -11,6 +11,7 @@ from DeepQNetwork_PrioritizedReplay_Target import DeepQNetwork_PrioritizedReplay
 from DeepQNetwork_PrioritizedReplay_Target_LearnerThread import DeepQNetwork_PrioritizedReplay_Target_LearnerThread
 from DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid import DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid
 from DeepCorrection_base import DeepCorrection_base
+from DeepCorrection_Hybrid import DeepCorrection_Hybrid
 from Representation_Empty import Representation_Empty
 from DeepActorCritic_PrioritizedReplay import DeepActorCritic_PrioritizedReplay
 #from DeepActorCritic_PrioritizedReplay_tflearn import DeepActorCritic_PrioritizedReplay_tflearn
@@ -141,7 +142,23 @@ def init_model(config):
                                                                 logfolder           = config["TIME_STAMP"],
                                                                 agent_model         = config["AGENT_MODEL"],
                                                                 )
-        
+    elif config["DEEP_ALGO_TYPE"] ==  "DeepCorrectionHybrid":
+        rep = DeepCorrection_base                               (gridsize            = strToValue(config["NUMBER_OF_ROWS"]),
+                                                                actionspaceperagent = 5,
+                                                                numberofagent       = strToValue(config["NUMBER_OF_AGENTS"]),
+                                                                #hidden_unit=[256, 512, 256],
+                                                                hidden_unit         = strToValue(config["HIDDEN_LAYERS"]),
+                                                                learning_rate       = strToValue(config["ETA_LEARNING_RATE"]),
+                                                                batch_size          = strToValue(config["BATCH_SIZE"]),
+                                                                trainpass           = strToValue(config["TRAINING_PASS_PER_BATCH"]),
+                                                                experiencebuffer    = strToValue(config["EXPERIENCE_REPLAY_BUFFER"]),
+                                                                fusion_model        = config["FUSION_MODEL"],
+                                                                correction_model_type = config["CORRECTION_MODEL_TYPE"],
+                                                                modelId             = config["MODEL_ID"],
+                                                                logfolder           = config["TIME_STAMP"],
+                                                                agent_model         = config["AGENT_MODEL"],
+                                                                )
+            
     elif config["DEEP_ALGO_TYPE"] ==  "Representation_Empty":
         rep = Representation_Empty()     
     

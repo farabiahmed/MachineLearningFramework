@@ -363,7 +363,6 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
         with self.session_train.as_default():
             
             
-            
             if not os.path.exists("log/"+self.logfolder):
                 os.makedirs("log/"+self.logfolder)
 
