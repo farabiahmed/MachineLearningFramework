@@ -143,7 +143,7 @@ def init_model(config):
                                                                 agent_model         = config["AGENT_MODEL"],
                                                                 )
     elif config["DEEP_ALGO_TYPE"] ==  "DeepCorrectionHybrid":
-        rep = DeepCorrection_base                               (gridsize            = strToValue(config["NUMBER_OF_ROWS"]),
+        rep = DeepCorrection_Hybrid                               (gridsize            = strToValue(config["NUMBER_OF_ROWS"]),
                                                                 actionspaceperagent = 5,
                                                                 numberofagent       = strToValue(config["NUMBER_OF_AGENTS"]),
                                                                 #hidden_unit=[256, 512, 256],

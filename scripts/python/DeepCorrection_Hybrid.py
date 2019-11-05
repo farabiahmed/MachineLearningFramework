@@ -30,9 +30,12 @@ class DeepCorrection_Hybrid(Representation):
         self.state_dim = 7
         self.update_target_interval = 10000
         self.trainingepochtotal = 0
-        
+        self.flag_continue = True
         self.dict = {}
+        self.dict_agents = {}
         self.model_agent_file = agent_model #low quality
+        self.experiencebuffersize = experiencebuffer
+        
         #self.model_agent_file = "models/model_0_20181217_173349.h5" # high quality
         self.Gamma = gamma
         self.batchsize = batch_size
@@ -333,13 +336,24 @@ class DeepCorrection_Hybrid(Representation):
         # Form Input Values
         # input = np.reshape(input,(1,input.shape[0]))
         input = np.reshape(input, (1, input.shape[0]))
-
-        # Prediction of the model
-        with self.graph_agent[agent_id].as_default(), self.sess_agent[agent_id].as_default():
-            prediction = self.model[agent_id].predict(input)
-
-        values = np.asarray(prediction).reshape(self.action_count_per_agent)
-        return values
+        
+        if input.tobytes() in self.dict_agents:
+            return self.dict_agents[input.tobytes()]
+        else:
+            # Prediction of the model
+            with self.graph_agent[agent_id].as_default(), self.sess_agent[agent_id].as_default():
+                prediction = self.model[agent_id].predict(input)
+    
+            values = np.asarray(prediction).reshape(self.action_count_per_agent)
+            
+            # Dont add more to dictionary if maximum limit reached. x3
+            if len(self.dict_agents) < self.experiencebuffersize * 3:
+                self.dict_agents[input.tobytes()] = values 
+            
+                if len(self.dict_agents) > self.experiencebuffersize and len(self.dict_agents)%100 is 0:
+                    print("Dictionary Agents: ", len(self.dict_agents))
+                
+            return values
 
     def ForwardPass_CorrectionModel(self,input):
         input = np.expand_dims(input,axis=0)
