@@ -33,6 +33,8 @@ class DeepCorrection_Hybrid(Representation):
         self.flag_continue = True
         self.dict = {}
         self.dict_agents = {}
+        self.dict_getvalue = {}
+        self.dict_getgreedy = {}
         self.model_agent_file = agent_model #low quality
         self.experiencebuffersize = experiencebuffer
         
@@ -132,7 +134,14 @@ class DeepCorrection_Hybrid(Representation):
                         self.model_correction_layers.append(tf.layers.dense(self.model_correction_layers[i-1], hidden_unit[1], tf.nn.tanh))  # hidden layer
     
                     # Output Layer
-                    self.model_correction_layers.append(tf.layers.dense(self.model_correction_layers[len(hidden_unit)-1], self.output_unit, activation=self.my_leaky_relu))  # output layer, 1, only Q value
+                    self.model_correction_layers.append(
+                            tf.layers.dense
+                            (
+                                self.model_correction_layers[len(hidden_unit)-1], 
+                                self.output_unit, 
+                                activation=self.my_leaky_relu
+                            )
+                        )  # output layer, 1, only Q value
     
                 with tf.name_scope('Model_Correction_Optimizer'):
                     # Minimize error
@@ -218,6 +227,8 @@ class DeepCorrection_Hybrid(Representation):
 
         self.Save_Model()
         self.dict.clear()
+        self.dict_getgreedy.clear()
+        self.dict_getvalue.clear()
         
     def tf_model_summary(self):
         model_vars = tf.trainable_variables()
@@ -234,7 +245,15 @@ class DeepCorrection_Hybrid(Representation):
         return tf.nn.relu(x) - alpha * tf.nn.relu(-x)
 
     def Get_Greedy_Pair(self,state):
-
+        
+        if state.tobytes() in self.dict_getgreedy:
+            (arg, valmax) = self.dict_getgreedy[state.tobytes()]
+            return arg, valmax
+        
+        if len(self.dict_getgreedy) > self.experiencebuffersize and len(self.dict_getgreedy)%100 is 0:
+            print("Dictionary GetGreedy: ", len(self.dict_getgreedy))
+                
+        
         agent_model_outputs = [] #2D list, agentId and Outputs(array) of each Agent.
         for i in range(self.numberofagent):
             agent_model_outputs.append(self.ForwardPass_AgentModel(i,state[self.state_dim*i:self.state_dim*i+self.state_dim]))
@@ -272,12 +291,22 @@ class DeepCorrection_Hybrid(Representation):
         # Get the maximums
         arg = values.argmax()
         valmax = values.max()
-
+        
+        if len(self.dict_getgreedy) < self.experiencebuffersize:
+            self.dict_getgreedy[state.tobytes()] = (arg, valmax)
+        
         return arg,valmax
 
     def Get_Value(self,state,action):
-
         input = self.Convert_State_To_Input(state, action);
+
+        if input.tobytes() in self.dict_getvalue:
+            ret = self.dict_getvalue[input.tobytes()]
+            return ret
+        
+        if len(self.dict_getvalue) > self.experiencebuffersize and len(self.dict_getvalue)%100 is 0:
+            print("Dictionary Getvalue: ", len(self.dict_getvalue))
+                
 
         agent_model_predicts = []
 
@@ -304,12 +333,15 @@ class DeepCorrection_Hybrid(Representation):
             correction_model_predicts[action_index] += out
             self.fusioned_model_predicts = out
             #self.combined_model_predicts = correction_model_predicts
-            return correction_model_predicts[action_index]
+            ret = correction_model_predicts[action_index]
         else:
             correction_model_predict = correction_model_predicts
-            out = out + correction_model_predict
-
-            return out
+            ret = out + correction_model_predict
+        
+        if len(self.dict_getvalue) < self.experiencebuffersize:
+            self.dict_getvalue[input.tobytes()] = ret
+            
+        return ret
 
     def Fusion_Models(self, agent_outputs):
 
@@ -346,11 +378,11 @@ class DeepCorrection_Hybrid(Representation):
     
             values = np.asarray(prediction).reshape(self.action_count_per_agent)
             
-            # Dont add more to dictionary if maximum limit reached. x3
+            # Dont add more to dictionary if maximum limit reached. experiencebuffersizex3
             if len(self.dict_agents) < self.experiencebuffersize * 3:
                 self.dict_agents[input.tobytes()] = values 
             
-                if len(self.dict_agents) > self.experiencebuffersize and len(self.dict_agents)%100 is 0:
+                if len(self.dict_agents) > self.experiencebuffersize  * 3 and len(self.dict_agents)%100 is 0:
                     print("Dictionary Agents: ", len(self.dict_agents))
                 
             return values
