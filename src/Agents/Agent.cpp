@@ -128,6 +128,7 @@ pair<unsigned,double> Agent::Simulate(void)
 			action  = valueFunction->Get_Policy(state);
 		else
 		{
+			// If valueFunction is not defined then run Random Agent:
 			ProbabilityDistribution *p = new DiscreteDistribution(vector<double>(0));
 			static auto actions = environment->Get_Action_List(state);
 			action = actions[(unsigned)(p->Generate_Random_Value()*actions.size())];

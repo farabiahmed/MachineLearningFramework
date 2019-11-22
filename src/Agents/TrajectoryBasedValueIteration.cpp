@@ -80,8 +80,10 @@ TrajectoryBasedValueIteration::TrajectoryBasedValueIteration(const Environment* 
 		//There are some leftovers, sync!
 		vector<string> info = Convert::Parse_String(lastline,',');
 		num_of_iteration = (int) stoi(info[0]) + 1;
-		epsilonProbability = (double) stod(info[2]);
 		numberof_bellmanupdate = (int) stoi(info[3]);
+
+		//epsilonProbability = (double) stod(info[2]);
+		epsilonProbability = (epsilonProbabilityStartValue - ((double)num_of_iteration / (double)max_number_of_iterations)*(epsilonProbabilityStartValue- epsilonProbabilityEndValue));
 	}
 }
 
@@ -274,7 +276,7 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 		}
 		*/
 
-		if(epsilonProbabilityAutoMode == true && epsilonProbability>epsilonProbabilityEndValue)
+		if(epsilonProbabilityAutoMode == true && epsilonProbability>=epsilonProbabilityEndValue)
 		{
 			if(epsilonProbabilityDecayRate<1.0)
 				epsilonProbability *= epsilonProbabilityDecayRate;

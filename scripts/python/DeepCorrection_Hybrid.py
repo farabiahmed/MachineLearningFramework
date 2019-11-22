@@ -35,6 +35,8 @@ class DeepCorrection_Hybrid(Representation):
         self.dict_agents = {}
         self.dict_getvalue = {}
         self.dict_getgreedy = {}
+        self.dict_actionindex = {}
+        
         self.model_agent_file = agent_model #low quality
         self.experiencebuffersize = experiencebuffer
         
@@ -131,7 +133,7 @@ class DeepCorrection_Hybrid(Representation):
     
                     # Hidden Layers
                     for i in range(1, len(hidden_unit)):
-                        self.model_correction_layers.append(tf.layers.dense(self.model_correction_layers[i-1], hidden_unit[1], tf.nn.tanh))  # hidden layer
+                        self.model_correction_layers.append(tf.layers.dense(self.model_correction_layers[i-1], hidden_unit[i], tf.nn.tanh))  # hidden layer
     
                     # Output Layer
                     self.model_correction_layers.append(
@@ -245,7 +247,6 @@ class DeepCorrection_Hybrid(Representation):
         return tf.nn.relu(x) - alpha * tf.nn.relu(-x)
 
     def Get_Greedy_Pair(self,state):
-        
         if state.tobytes() in self.dict_getgreedy:
             (arg, valmax) = self.dict_getgreedy[state.tobytes()]
             return arg, valmax
@@ -265,24 +266,24 @@ class DeepCorrection_Hybrid(Representation):
         values = []
         for action in self.actions:
 
-            if (self.correction_model_type == "SINGLE_OUT"):
-                input = self.Convert_State_To_Input(state, action);
-                correction_model_predicts = self.ForwardPass_CorrectionModel(input)
+            #if (self.correction_model_type == "SINGLE_OUT"):
+            #    input = self.Convert_State_To_Input(state, action);
+            #    correction_model_predicts = self.ForwardPass_CorrectionModel(input)
 
             agent_model_predicts = [] #1D list, holds Q value of each agent for a given action
             for i in range(self.numberofagent):
                 agent_model_predicts.append(agent_model_outputs[i][action[i]])
 
-            out = self.Fusion_Models(
-                np.array(agent_model_predicts),
-            )
+            #out=0
+            out = self.Fusion_Models(np.array(agent_model_predicts))
 
-            if (self.correction_model_type == "SINGLE_OUT"):
-                correction_model_predict = correction_model_predicts
-                value = out + correction_model_predict
-            else:
-                action_index = self.Get_Action_Index(action)
-                value = out + correction_model_predicts[action_index]
+            #if (self.correction_model_type == "SINGLE_OUT"):
+            #    correction_model_predict = correction_model_predicts
+            #    value = out + correction_model_predict
+            #else:
+            action_index = self.Get_Action_Index(action)
+            #action_index=0
+            value = out + correction_model_predicts[action_index]
 
             values.append(value)
 
@@ -410,6 +411,9 @@ class DeepCorrection_Hybrid(Representation):
                 return prediction[0]
 
     def Get_Action_Index(self, action):
+        
+        return self.dict_actionindex[action.tobytes()]
+        
         sizeOfAction = action.shape[0]
         temp = 0
 
@@ -419,7 +423,9 @@ class DeepCorrection_Hybrid(Representation):
         return temp;
 
     def Get_Action_List(self):
-
+        
+        self.dict_actionindex = {}
+        
         actions = []
         for i in range(self.size_of_action_space):
 
@@ -429,7 +435,8 @@ class DeepCorrection_Hybrid(Representation):
                 action.append ( int((i / numberOfFieldsToPass) % self.action_count_per_agent) )
 
             actions.append(action)
-
+            self.dict_actionindex[np.array(action).tobytes()] = i
+            
         return np.array(actions)
 
     def Set_Value(self,state,action,value):

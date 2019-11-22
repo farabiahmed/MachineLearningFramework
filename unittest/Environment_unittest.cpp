@@ -105,7 +105,7 @@ int main()
 	help_menu();
 
 	// Get parameters from file
-	ConfigParser cfg("config/config_multideliverydrone_5x5_3agent.cfg");
+	ConfigParser cfg("config/config_deliverydrone_10x10_1agent.cfg");
 
 	gNumberOfAgents = cfg.GetValueOfKey<int>("NUMBER_OF_AGENTS",1);
 
