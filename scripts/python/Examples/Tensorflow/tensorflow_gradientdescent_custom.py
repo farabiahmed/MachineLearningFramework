@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 
 # 0. Set Simulation Constants
 # ===============================
-learning_rate = 0.01
+learning_rate = 0.0001
 training_epochs = 5000
-display_step = 1
+display_step = 500
 
 # 1. Prepare Fake Data
 # ===============================
@@ -48,26 +48,32 @@ init = tf.global_variables_initializer()
 
 # 3. Start Training
 # ===============================
-
+            
 # Start training
 with tf.Session() as sess:
     sess.run(init)
 
     # Training cycle
     for epoch in range(training_epochs):
-
+            
+        
         # Fit training using batch data
-        _, _, c = sess.run([new_W, new_b, cost], feed_dict={x: x_data,
+        _w, _b, c = sess.run([new_W, new_b, cost], feed_dict={x: x_data,
                                                             y: y_data})
 
         # Display logs per epoch step
-        if (epoch + 1) % display_step == 0:
+        if (epoch) % display_step == 0:
             print ("Epoch:", '%04d' % (epoch + 1), "cost=", "{:.9f}".format(c))
+            y_predict = sess.run(pred, feed_dict={x: x_data,
+                                          y: y_data})
+            plt.plot(x_data,y_predict,color='Red')
+            plt.pause(0.05)
+            
+            print ("W:",'%03.4f' % (_w), "b:",'%03.4f' % (_b))
 
     print ("Optimization Finished!")
 
-    y_predict = sess.run(pred, feed_dict={x: x_data,
-                                          y: y_data})
+
 
     # Test model
     # correct_prediction = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
@@ -75,5 +81,5 @@ with tf.Session() as sess:
     # accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     # print ("Accuracy:", accuracy.eval({x: mnist.test.images[:3000], y: mnist.test.labels[:3000]}))
 
-plt.plot(x_data,y_predict,color='Red')
+
 plt.show()

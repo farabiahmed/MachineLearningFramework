@@ -180,14 +180,20 @@ class DeepCorrection_Hybrid(Representation):
                 # Intialize the Session
                 self.session_correction.run(model_correction_initialize)
                 
-                if os.path.isfile("log/" + self.logfolder + "/model_correction_" + self.modelId + ".ckpt"):
+                if os.path.isfile("log/" + self.logfolder + "/model_correction_" + self.modelId + ".ckpt.meta"):
                     print("###############################")
                     print("Existing model is being loaded.......")
                     print("###############################")
-                    tf.train.Saver.restore(self.session_correction, "log/" + self.logfolder + "/model_correction_" + self.modelId + ".ckpt")
+                    self.save_path = self.saver.restore(sess=self.session_correction, save_path = "./log/" + self.logfolder + "/model_correction_" + self.modelId + ".ckpt")
                     print("###############################")
                     print("Existing model params are loaded.......")
                     print("###############################")
+                else:
+                    print("")
+                    print("###############################")
+                    print("No pretrained model has been found......")
+                    print("###############################")
+                    print("")
                     
                 print("###############################")
                 print("TEST RESULTS:")
@@ -542,7 +548,7 @@ class DeepCorrection_Hybrid(Representation):
         with self.graph_correction.as_default():
             with self.session_correction.as_default():
                 # Save the variables to disk.
-                save_path = self.saver.save(self.session_correction, "log/" + self.logfolder + "/model_correction_" + self.modelId + ".ckpt")
+                save_path = self.saver.save(self.session_correction, "./log/" + self.logfolder + "/model_correction_" + self.modelId + ".ckpt")
 
         print("###############################")
         print("Model saved in path: %s" % save_path)
@@ -554,6 +560,6 @@ class DeepCorrection_Hybrid(Representation):
         self.Save_Model()
 
         # Close the session
-        self.sess.close()
+        self.session_correction.close()
 
         print('Representation object died.')

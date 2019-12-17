@@ -206,8 +206,8 @@ def init_model(config):
 #                                                         )
 
 HOSTTX   ='127.0.0.1'
-PORTRX = 5000
-PORTTX = 4000
+PORTRX = 5001
+PORTTX = 4001
 
 send_command_type = ''
 send_ok = False
