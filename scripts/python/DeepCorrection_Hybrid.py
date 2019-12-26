@@ -119,7 +119,7 @@ class DeepCorrection_Hybrid(Representation):
         self.session_target = tf.Session(graph=self.graph_correction)
         
         with self.graph_correction.as_default():
-            with self.session_correction.as_default():
+            with self.session_correction.as_default() as sess:
                 with tf.name_scope('Model_Correction'):
                     # Create Correction Model With Tensorflow
                     self.model_correction_input  = tf.placeholder(tf.float32, [None, self.size_of_input_units], name="model_correction_input")   # input state+action
@@ -160,8 +160,9 @@ class DeepCorrection_Hybrid(Representation):
     
                 # Test Variables
                 with tf.name_scope('Test_Variables'):
-                    test_variable = tf.Variable(42, name='foo')
-                    test_assign = test_variable.assign(13)
+                    test_variable = tf.Variable(1, name='foo')
+                    #test_assign = test_variable.assign(13)
+                    test_multiply = test_variable.assign(tf.scalar_mul(2,test_variable))
     
     
                 # Add an op to initialize the variables.
@@ -178,13 +179,18 @@ class DeepCorrection_Hybrid(Representation):
                 self.tf_model_summary()
     
                 # Intialize the Session
-                self.session_correction.run(model_correction_initialize)
+                # self.session_correction.run(model_correction_initialize)
                 
                 if os.path.isfile("log/" + self.logfolder + "/model_correction_" + self.modelId + ".ckpt.meta"):
                     print("###############################")
                     print("Existing model is being loaded.......")
                     print("###############################")
-                    self.save_path = self.saver.restore(sess=self.session_correction, save_path = "./log/" + self.logfolder + "/model_correction_" + self.modelId + ".ckpt")
+                    try:
+                        self.save_path = self.saver.restore(sess=sess, save_path = "./log/" + self.logfolder + "/model_correction_" + self.modelId + ".ckpt")
+                        print(self.save_path)
+                    except ValueError as e:
+                        print("Value error")
+                        print(e)
                     print("###############################")
                     print("Existing model params are loaded.......")
                     print("###############################")
@@ -194,12 +200,14 @@ class DeepCorrection_Hybrid(Representation):
                     print("No pretrained model has been found......")
                     print("###############################")
                     print("")
+                    print(self.session_correction.run(test_variable))
                     
                 print("###############################")
                 print("TEST RESULTS:")
                 print("###############################")
-                print(self.session_correction.run(test_variable))
-                print(self.session_correction.run(test_assign))
+                #print(self.session_correction.run(test_variable))
+                #print(self.session_correction.run(test_assign))
+                print(self.session_correction.run(test_multiply))
                 print("")
 
         self.session_target = self.session_correction
