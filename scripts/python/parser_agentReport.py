@@ -81,7 +81,7 @@ else:
     
 print(modelFiles)
 
-f2 = plt.figure(1)
+f2 = plt.figure(1, figsize=(10, 5))
 ax2 = f2.add_subplot(111)
 
 index = 0
@@ -169,7 +169,7 @@ plt.legend()
 plt.title('Performance Of The Models')
 plt.xlabel('Game Number')
 plt.ylabel('Cumulative Reward')
-plt.savefig('log/'+inputFolder+"/"+"combined"+".svg", format="svg")
+plt.savefig('log/'+inputFolder+"/"+"combined"+".svg", format="svg", figsize=(20, 10),)
 plt.savefig('log/'+inputFolder+"/"+"combined"+".png", format="png", dpi=250)
 plt.close(f2)
 
