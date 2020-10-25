@@ -15,6 +15,7 @@ from keras.models import clone_model
 from Memory.Memory_SumTree import Memory_SumTree
 from Memory import Memory_UniformRandom
 import time
+import datetime
 
 from Representation import Representation
 
@@ -43,15 +44,15 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
         self.statePreprocessType = statePreprocessType
         self.convolutionLayer = convolutionLayer
         self.mutex = Lock()
-        
+
         if(statePreprocessType=="Tensor") :
             self.size_of_input_units = gridsize * gridsize * numberofagent
         elif (statePreprocessType=="Vector"):
             self.size_of_input_units = 7 * numberofagent; # (x,y,a) for each agent
         self.gridsize = gridsize
-            
+
         self.experiencebuffersize = experiencebuffer
-        
+
         self.memory = Memory_SumTree(experiencebuffer)
         self.dict = {}
         self.fresh_experience_counter = 0
@@ -67,21 +68,21 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
 
         self.update_target_interval = 10000
         self.experience_counter = 0
-        
+
         # Create session and graphs
         self.graph_train = tf.Graph()
         self.session_train = tf.Session(graph=self.graph_train)
-        
+
         self.graph_predict = tf.Graph()
         self.session_predict = tf.Session(graph=self.graph_predict)
 
         with self.graph_train.as_default():
             with self.session_train.as_default():
-            
+
                 #K.set_session(self.session_train)
-                
+
                 self.model = None
-        
+
                 print("log/" + logfolder + "/model_0.h5")
                 if os.path.isfile("log/"+self.logfolder+"/model_0.h5"):
                     print("###############################")
@@ -92,13 +93,13 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
                     print("###############################")
                     print("Not Any Existing model found.......")
                     print("###############################")
-        
-        
+
+
                 if self.model is None:
-        
+
                     # create model
                     self.model = Sequential()
-        
+
                     if self.convolutionLayer==True:
                         self.convolution_input = ( self.numberofagent, self.gridsize, self.gridsize)
                         self.model.add(Conv2D(16, (2, 2), strides=(1, 1), activation='relu', input_shape=(self.convolution_input),
@@ -109,35 +110,35 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
                         self.model.add(Dense(self.hidden_unit[0], activation='tanh'))
                     else:
                         self.model.add(Dense(self.hidden_unit[0], activation='tanh', input_dim = self.size_of_input_units ))
-        
+
                     for i in range(1, len(hidden_unit)):
                         self.model.add(Dense(self.hidden_unit[i], activation='tanh'))
                     self.model.add(Dense(self.output_unit, activation='relu'))
-        
+
                     # Compile model
                     self.model.compile(loss='mse', optimizer='sgd', metrics=['accuracy'])
                     self.model._make_predict_function()
-        
+
                     if os.path.isfile("log/"+self.logfolder+"/model_weight_0.h5"):
                         self.model.load_weights("log/"+self.logfolder+"/model_weight_0.h5")
                         print("###############################")
                         print("Existing model params are loaded.......")
                         print("###############################")
-                        
+
                 # save the TensorFlow graph:
                 # self.graph = tf.get_default_graph()
-        
+
                 self.model.summary()
                 self.Save_Model()
                 # self.model.save_weights("log/"+self.logfolder+"/modelinit_"+self.modelId+".h5")
-        
+
         with self.graph_predict.as_default():
             with self.session_predict.as_default():
                 #K.set_session(self.session_predict)
                 self.model_target = None
                 self.model_target = load_model("log/" + self.logfolder + "/model_" + self.modelId + ".h5")
                 self.model_target.summary()
-                
+
                 # Open the file
                 with open("log/" + self.logfolder + "/model_" + self.modelId + "_networkSummary.txt",'w') as fh:
                     # Pass the file handle in as a lambda function to make it callable
@@ -145,7 +146,7 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
                 #self.model_target = clone_model(self.model)
                 #self.Update_target()
                 #self.model_target._make_predict_function()
-        
+
 
 
         # Reset the batch
@@ -153,7 +154,7 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
 
         # Initialize thread parameters
         self.flag_continue = True
-        
+
         print("###############################")
         print("LIST OF DEVICES:")
         print("###############################")
@@ -161,18 +162,18 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
         for d in devices:
             print(d.name)
         print("")
-        
+
         #_thread.start_new_thread(self.Learner, ())
         self._thread = Thread(target = self.Learner, args=())
         self._thread.start()
-        
+
     def Update_target(self):
         print('Updating Target Network')
-        
+
         with self.graph_train.as_default():
             with self.session_train.as_default():
                 model_weights = self.model.get_weights()
-            
+
         with self.graph_predict.as_default():
             with self.session_predict.as_default():
                 self.mutex.acquire(1)
@@ -181,7 +182,7 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
 
         self.Save_Model()
         self.dict.clear()
-        
+
     def Convert_State_To_Input(self,state):
 
         if(self.statePreprocessType=="Tensor") :
@@ -247,16 +248,16 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
                 with self.graph_predict.as_default():
                     with self.session_predict.as_default():
                         hypothesis = self.model_target.predict(input)
-                        
+
             self.mutex.release()
-            
+
             values = np.asarray(hypothesis).reshape(self.output_unit)
-            
+
             self.dict[input.tobytes()] = values
-            
+
             if len(self.dict) > self.experiencebuffersize and len(self.dict)%100 is 0:
                 print("Dictionary: ", len(self.dict))
-            
+
             return values
 
 
@@ -287,17 +288,17 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
         # Append new sample to Memory of Experiences
         # Don't worry about its size, since it is a queue
         self.memory.add(error,(state, values))
-        
+
         # To be able to stop learner thread if there is no more experience
         if self.experience_counter < 10: #self.experiencebuffersize:
             self.experience_counter+=1
-        
+
         #self.Learn()
-        
+
         return self.trainingepochtotal
 
     def Learn(self) :
-    
+
         #if self.fresh_experience_counter == self.batchsize :
         if self.memory.length() >= self.batchsize and self.experience_counter>0:
 
@@ -314,21 +315,21 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
                 idx, (X, Y) = minibatch[i]
                 batchSamplesX.append(X)
                 batchSamplesY.append(Y)
-            
+
             with tf.device('/gpu:0'):
                 with self.graph_train.as_default():
-                    with self.session_train.as_default():                
+                    with self.session_train.as_default():
                         self.model.fit(np.array(batchSamplesX), np.array(batchSamplesY), epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
-        
+
             if not self.trainingepochtotal % self.update_target_interval:
                 self.Update_target()
-                
+
             # To be able to stop learner thread if there is no more experience
             self.experience_counter -= 1
         else:
             #print("Sleeping Learner Thread")
             time.sleep(0.1)
-            
+
     # Learner Thread Run Function
     def Learner(self):
 
@@ -360,16 +361,19 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
         #with self.session_train.graph.as_default():
         #with K.get_session().graph.as_default():
         print("Model save called...")
-        with self.session_train.as_default():
-            
-            
-            if not os.path.exists("log/"+self.logfolder):
-                os.makedirs("log/"+self.logfolder)
 
-            self.model.save("log/" + self.logfolder + "/model_" + self.modelId + ".h5")
-            self.model.save_weights("log/"+self.logfolder+"/model_weight_"+self.modelId+".h5")
+        currentTime = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        with self.session_train.as_default():
+
+
+            if not os.path.exists("log/"+self.logfolder+"/"+currentTime):
+                os.makedirs("log/"+self.logfolder+"/"+currentTime)
+
+            self.model.save("log/" + self.logfolder+"/"+currentTime + "/model_" + self.modelId + ".h5")
+            self.model.save_weights("log/"+self.logfolder+"/"+currentTime+"/model_weight_"+self.modelId+".h5")
             print("###############################")
-            print("Model saved: " + "log/" + self.logfolder)
+            print("Model saved: " + "log/" + self.logfolder+"/"+currentTime)
             print("###############################")
 
     def __del__(self):

@@ -9,6 +9,8 @@ bin/*
 
 # Ignore logs
 log/*
+log_2019/*
+journal/*
 
 # Ignore backup files
 *~

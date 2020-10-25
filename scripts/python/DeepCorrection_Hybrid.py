@@ -11,6 +11,7 @@ from keras.models import load_model
 import _thread
 from threading import Thread, Lock
 import time
+import datetime
 
 class DeepCorrection_Hybrid(Representation):
 
@@ -36,10 +37,10 @@ class DeepCorrection_Hybrid(Representation):
         self.dict_getvalue = {}
         self.dict_getgreedy = {}
         self.dict_actionindex = {}
-        
+
         self.model_agent_file = agent_model #low quality
         self.experiencebuffersize = experiencebuffer
-        
+
         #self.model_agent_file = "models/model_0_20181217_173349.h5" # high quality
         self.Gamma = gamma
         self.batchsize = batch_size
@@ -58,13 +59,13 @@ class DeepCorrection_Hybrid(Representation):
         self.numberofagent = numberofagent
         self.trainingepochtotal = 0
         self.experience_counter = 0
-        
+
         self.train_period = train_period # After how many new experience we will run fitting/training.
         self.counter_experience = 0 # A counter to hold how many tuple experienced
         self.counter_modelReset = model_reset_counter
         self.modelId = modelId
         self.logfolder = logfolder
-        
+
         if (self.correction_model_type == "MULTIPLE_OUT"):
             self.output_unit = actionspaceperagent**numberofagent
             self.size_of_input_units = self.state_dim * numberofagent  # (x,y,f,packet,delivery) for each agent
@@ -117,70 +118,70 @@ class DeepCorrection_Hybrid(Representation):
         self.graph_correction = tf.Graph()
         self.session_correction = tf.Session(graph=self.graph_correction)
         self.session_target = tf.Session(graph=self.graph_correction)
-        
+
         with self.graph_correction.as_default():
             with self.session_correction.as_default() as sess:
                 with tf.name_scope('Model_Correction'):
                     # Create Correction Model With Tensorflow
                     self.model_correction_input  = tf.placeholder(tf.float32, [None, self.size_of_input_units], name="model_correction_input")   # input state+action
                     self.model_correction_label = tf.placeholder(tf.float32, [None, self.output_unit], name="model_correction_label")                          # label y
-    
+
                     # neural network layers
                     self.model_correction_layers = []
-    
+
                     # First Layer
                     self.model_correction_layers.append(tf.layers.dense(self.model_correction_input, hidden_unit[0], tf.nn.tanh))  # input layer
-    
+
                     # Hidden Layers
                     for i in range(1, len(hidden_unit)):
                         self.model_correction_layers.append(tf.layers.dense(self.model_correction_layers[i-1], hidden_unit[i], tf.nn.tanh))  # hidden layer
-    
+
                     # Output Layer
                     self.model_correction_layers.append(
                             tf.layers.dense
                             (
-                                self.model_correction_layers[len(hidden_unit)-1], 
-                                self.output_unit, 
+                                self.model_correction_layers[len(hidden_unit)-1],
+                                self.output_unit,
                                 activation=self.my_leaky_relu
                             )
                         )  # output layer, 1, only Q value
-    
+
                 with tf.name_scope('Model_Correction_Optimizer'):
                     # Minimize error
                     self.model_correction_cost = tf.reduce_mean(tf.squared_difference(self.model_correction_label, self.model_correction_layers[-1]))
-    
+
                     # Optimizer embedded in API
                     model_correction_optimizer = tf.train.GradientDescentOptimizer(self.learningrate)
-    
+
                     # Add minimizer as trainer
                     self.model_correction_train = model_correction_optimizer.minimize(self.model_correction_cost)
-    
+
                 # Create a summary to monitor cost tensor
                 tf.summary.scalar("Model_Correction_Optimizer", self.model_correction_cost)
-    
+
                 # Test Variables
-                with tf.name_scope('Test_Variables'):
-                    test_variable = tf.Variable(1, name='foo')
+                #with tf.name_scope('Test_Variables'):
+                    #test_variable = tf.Variable(1, name='foo')
                     #test_assign = test_variable.assign(13)
-                    test_multiply = test_variable.assign(tf.scalar_mul(2,test_variable))
-    
-    
+                    #test_multiply = test_variable.assign(tf.scalar_mul(2,test_variable))
+
+
                 # Add an op to initialize the variables.
                 model_correction_initialize = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
                 #model_correction_initialize_g = tf.global_variables_initializer()
                 #model_correction_initialize_a = tf.initialize_all_variables()
                 #model_correction_initialize_l = tf.local_variables_initializer()
-    
-    
+
+
                 # Add ops to save and restore all the variables.
                 self.saver = tf.train.Saver()
-    
+
                 # Inform the user about model
                 self.tf_model_summary()
-    
+
                 # Intialize the Session
                 # self.session_correction.run(model_correction_initialize)
-                
+
                 if os.path.isfile("log/" + self.logfolder + "/model_correction_" + self.modelId + ".ckpt.meta"):
                     print("###############################")
                     print("Existing model is being loaded.......")
@@ -200,18 +201,18 @@ class DeepCorrection_Hybrid(Representation):
                     print("No pretrained model has been found......")
                     print("###############################")
                     print("")
-                    print(self.session_correction.run(test_variable))
-                    
+                    #print(self.session_correction.run(test_variable))
+
                 print("###############################")
                 print("TEST RESULTS:")
                 print("###############################")
                 #print(self.session_correction.run(test_variable))
                 #print(self.session_correction.run(test_assign))
-                print(self.session_correction.run(test_multiply))
+                #print(self.session_correction.run(test_multiply))
                 print("")
 
         self.session_target = self.session_correction
-        
+
         print("###############################")
         print("ACTION SPACE:")
         print("###############################")
@@ -230,22 +231,22 @@ class DeepCorrection_Hybrid(Representation):
         print("Initialization is completed.")
         print("###############################")
         print("")
-        
+
         #_thread.start_new_thread(self.Learner, ())
         self._thread = Thread(target = self.Learner, args=())
         self._thread.start()
         #self.Save_Model()
-        
+
     def Update_target(self):
         print('Updating Target Network')
-        
+
         self.session_target = self.session_correction
 
         self.Save_Model()
         self.dict.clear()
         self.dict_getgreedy.clear()
         self.dict_getvalue.clear()
-        
+
     def tf_model_summary(self):
         model_vars = tf.trainable_variables()
         slim.model_analyzer.analyze_vars(model_vars, print_info=True)
@@ -264,11 +265,11 @@ class DeepCorrection_Hybrid(Representation):
         if state.tobytes() in self.dict_getgreedy:
             (arg, valmax) = self.dict_getgreedy[state.tobytes()]
             return arg, valmax
-        
+
         if len(self.dict_getgreedy) > self.experiencebuffersize and len(self.dict_getgreedy)%100 is 0:
             print("Dictionary GetGreedy: ", len(self.dict_getgreedy))
-                
-        
+
+
         agent_model_outputs = [] #2D list, agentId and Outputs(array) of each Agent.
         for i in range(self.numberofagent):
             agent_model_outputs.append(self.ForwardPass_AgentModel(i,state[self.state_dim*i:self.state_dim*i+self.state_dim]))
@@ -306,10 +307,10 @@ class DeepCorrection_Hybrid(Representation):
         # Get the maximums
         arg = values.argmax()
         valmax = values.max()
-        
+
         if len(self.dict_getgreedy) < self.experiencebuffersize:
             self.dict_getgreedy[state.tobytes()] = (arg, valmax)
-        
+
         return arg,valmax
 
     def Get_Value(self,state,action):
@@ -318,10 +319,10 @@ class DeepCorrection_Hybrid(Representation):
         if input.tobytes() in self.dict_getvalue:
             ret = self.dict_getvalue[input.tobytes()]
             return ret
-        
+
         if len(self.dict_getvalue) > self.experiencebuffersize and len(self.dict_getvalue)%100 is 0:
             print("Dictionary Getvalue: ", len(self.dict_getvalue))
-                
+
 
         agent_model_predicts = []
 
@@ -352,10 +353,10 @@ class DeepCorrection_Hybrid(Representation):
         else:
             correction_model_predict = correction_model_predicts
             ret = out + correction_model_predict
-        
+
         if len(self.dict_getvalue) < self.experiencebuffersize:
             self.dict_getvalue[input.tobytes()] = ret
-            
+
         return ret
 
     def Fusion_Models(self, agent_outputs):
@@ -383,28 +384,28 @@ class DeepCorrection_Hybrid(Representation):
         # Form Input Values
         # input = np.reshape(input,(1,input.shape[0]))
         input = np.reshape(input, (1, input.shape[0]))
-        
+
         if input.tobytes() in self.dict_agents:
             return self.dict_agents[input.tobytes()]
         else:
             # Prediction of the model
             with self.graph_agent[agent_id].as_default(), self.sess_agent[agent_id].as_default():
                 prediction = self.model[agent_id].predict(input)
-    
+
             values = np.asarray(prediction).reshape(self.action_count_per_agent)
-            
+
             # Dont add more to dictionary if maximum limit reached. experiencebuffersizex3
             if len(self.dict_agents) < self.experiencebuffersize * 3:
-                self.dict_agents[input.tobytes()] = values 
-            
+                self.dict_agents[input.tobytes()] = values
+
                 if len(self.dict_agents) > self.experiencebuffersize  * 3 and len(self.dict_agents)%100 is 0:
                     print("Dictionary Agents: ", len(self.dict_agents))
-                
+
             return values
 
     def ForwardPass_CorrectionModel(self,input):
         input = np.expand_dims(input,axis=0)
-        
+
         if input.tobytes() in self.dict:
             return self.dict[input.tobytes()]
         else:
@@ -412,22 +413,22 @@ class DeepCorrection_Hybrid(Representation):
                 with self.session_target.as_default():
                     prediction = self.session_target.run(self.model_correction_layers[-1], feed_dict={
                                                                                             self.model_correction_input: input
-                                                                                            })            
+                                                                                            })
             if len(self.dict) > self.experiencebuffersize and len(self.dict)%100 is 0:
                 print("Dictionary: ", len(self.dict))
-                
+
             if (self.correction_model_type == "SINGLE_OUT"):
-                
+
                 self.dict[input.tobytes()] = prediction[0][0]
                 return prediction[0][0]
             else:
-                self.dict[input.tobytes()] = prediction[0] 
+                self.dict[input.tobytes()] = prediction[0]
                 return prediction[0]
 
     def Get_Action_Index(self, action):
-        
+
         return self.dict_actionindex[action.tobytes()]
-        
+
         sizeOfAction = action.shape[0]
         temp = 0
 
@@ -437,9 +438,9 @@ class DeepCorrection_Hybrid(Representation):
         return temp;
 
     def Get_Action_List(self):
-        
+
         self.dict_actionindex = {}
-        
+
         actions = []
         for i in range(self.size_of_action_space):
 
@@ -450,7 +451,7 @@ class DeepCorrection_Hybrid(Representation):
 
             actions.append(action)
             self.dict_actionindex[np.array(action).tobytes()] = i
-            
+
         return np.array(actions)
 
     def Set_Value(self,state,action,value):
@@ -472,15 +473,15 @@ class DeepCorrection_Hybrid(Representation):
         # Append new sample to Memory of Experiences
         # Don't worry about its size, since it is a queue
         self.memory.add(error,(state, action, label))
-        
+
         # To be able to stop learner thread if there is no more experience
         if self.experience_counter < 10: #self.experiencebuffersize:
             self.experience_counter+=1
-        
+
         #self.Learn()
-        
+
         return self.trainingepochtotal
-    
+
     def Learn(self) :
         #if self.fresh_experience_counter == self.batchsize :
         if self.memory.length() >= self.batchsize and self.experience_counter>0:
@@ -511,27 +512,27 @@ class DeepCorrection_Hybrid(Representation):
             inputs = np.array(inputs)
             values = np.array(values)
             values = np.reshape(values, (self.batchsize, self.output_unit))
-            
+
             with tf.device('/gpu:0'):
                 with self.graph_correction.as_default():
-                    with self.session_correction.as_default(): 
+                    with self.session_correction.as_default():
                         for i in range(self.trainPass):
-                            cost, _  = self.session_correction.run([self.model_correction_cost, 
+                            cost, _  = self.session_correction.run([self.model_correction_cost,
                                                                     self.model_correction_train],
                                                                             feed_dict={
                                                                                 self.model_correction_input: inputs,
                                                                                 self.model_correction_label: values
                                                                             })
-            
+
             if not self.trainingepochtotal % self.update_target_interval:
                 self.Update_target()
-                
+
             # To be able to stop learner thread if there is no more experience
             self.experience_counter -= 1
         else:
             #print("Sleeping Learner Thread")
             time.sleep(0.1)
-            
+
     # Learner Thread Run Function
     def Learner(self):
 
@@ -539,7 +540,7 @@ class DeepCorrection_Hybrid(Representation):
             self.Learn()
 
         print("Thread Learner stopped.")
-        
+
     def Add_Experience(self,state,action,nextstate,reward,status):
 
         # WORKING
@@ -550,17 +551,19 @@ class DeepCorrection_Hybrid(Representation):
 
     def Save_Model(self):
 
-        if not os.path.exists("log/"+self.logfolder):
-            os.makedirs("log/"+self.logfolder)
+        currentTime = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        if not os.path.exists("log/"+self.logfolder+"/"+currentTime):
+            os.makedirs("log/"+self.logfolder+"/"+currentTime)
 
         with self.graph_correction.as_default():
             with self.session_correction.as_default():
                 # Save the variables to disk.
-                save_path = self.saver.save(self.session_correction, "./log/" + self.logfolder + "/model_correction_" + self.modelId + ".ckpt")
+                save_path = self.saver.save(self.session_correction, "./log/" + self.logfolder + "/" + currentTime + "/model_correction_" + self.modelId + ".ckpt")
 
         print("###############################")
         print("Model saved in path: %s" % save_path)
-        print("log/" + self.logfolder + "/model_correction_" + self.modelId + ".ckpt")
+        print("log/" + self.logfolder + "/" + currentTime +  "/model_correction_" + self.modelId + ".ckpt")
         print("###############################")
         print("")
 

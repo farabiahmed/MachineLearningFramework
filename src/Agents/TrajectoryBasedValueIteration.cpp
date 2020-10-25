@@ -44,6 +44,13 @@ TrajectoryBasedValueIteration::TrajectoryBasedValueIteration(const Environment* 
 	// It will be used to approximate the expectations on the next state.
 	sample_length_L1 = cfg.GetValueOfKey<int>("SAMPLE_LENGTH_L1",100);
 
+    double probability_of_random_action = cfg.GetValueOfKey<double>("PROBABILITY_OF_RANDOM_ACTION",0.20);
+	if( probability_of_random_action < 0.01 && sample_length_L1>1)
+	{
+		cout<<" L1 length is higher than required. Setting to 1" << flush;
+		sample_length_L1 = 1;
+	}
+
 	// Trajectory Length
 	// It will be used to determine the trajectory that the algorithm will follow for each iteration.
 	length_of_trajectory = cfg.GetValueOfKey<int>("LENGTH_OF_TRAJECTORY",100);
@@ -211,6 +218,8 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 					//if(reward>0.8)
 					//	cout<<endl<<"Reward:"<<reward<<" maxQ:"<<maxQvalue<<" Q_plus:"<<Q_plus<<endl;
 
+					//cout<< numberof_bellmanupdate <<"\r" << flush;
+					numberof_bellmanupdate++;
 				}
 
 				double currentQValue = valueFunction->Get_Value(state,action);
@@ -223,9 +232,6 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 
 				// Update Value
 				valueFunction->Set_Value(state,action,Q_plus);
-
-				//cout<< numberof_bellmanupdate <<"\r" << flush;
-				numberof_bellmanupdate++;
 
 				/*
 				if(numberof_bellmanupdate % bellman_stride_forsimulation == 0)
