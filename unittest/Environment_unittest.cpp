@@ -1,17 +1,21 @@
 /*
- * Blocksworld_unittest.cpp
+ * Environment_unittest.cpp
  *
  *  Created on: Apr 26, 2017
  *      Author: farabiahmed
+ * 
+ *  Example: ./bin/Environment_unittest --CONFIG config/config_deliverydrone1d_10_1agent.cfg 
+ * 
  */
 
 #include <iostream>
 #include <Miscellaneous/SmartVector.hpp>
 #include <Environments/DeliveryDrone.hpp>
-#include <Environments/MultiDeliveryDrone.hpp>
 #include <Environments/Environment.hpp>
-#include "Miscellaneous/BashFormatter.hpp"
-#include "Miscellaneous/ConfigParser.hpp"
+#include <Environments/EnvironmentFactory.hpp>
+#include <Miscellaneous/BashFormatter.hpp>
+#include <Miscellaneous/ConfigParser.hpp>
+#include <Miscellaneous/CommandLineParser.hpp>
 
 using namespace std;
 
@@ -26,7 +30,7 @@ vector<SmartVector> Actions;
 
 void help_menu(void)
 {
-	cout << "Gridworld Refuel Test...							"<<endl;
+	cout << "Environment Unit Testing...							"<<endl;
 }
 
 void print_test_information (string s)
@@ -96,7 +100,7 @@ bool get_action_from_user(SmartVector &Action)
 	return true;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
 	// For Random Number Generator
 	srand(time(0));
@@ -104,14 +108,27 @@ int main()
 	// Menu for user
 	help_menu();
 
+	/* Print commandline parameters */
+	cout<<endl<<"Command Line Variables"<<endl;
+	CommandLineParser clp = CommandLineParser(argc,argv);
+	clp.Print_Arguments();
+
+	/* Print configuration parameters */
 	// Get parameters from file
-	ConfigParser cfg("config/config_deliverydrone_10x10_1agent.cfg");
+	// ConfigParser cfg("config/config_deliverydrone_10x10_1agent.cfg");
+	ConfigParser cfg(clp.GetOption<string>("CONFIG"));
+	cout<<endl<<"Default Config Variables"<<endl;
+	cfg.Print_Arguments();
+
 
 	gNumberOfAgents = cfg.GetValueOfKey<int>("NUMBER_OF_AGENTS",1);
 
 	// Create Environment
-	Environment *env = new MultiDeliveryDrone(cfg);
-
+	cout << "Target Environment: " << cfg.GetValueOfKey<string>("ENVIRONMENT") << endl;
+	Environment *env = EnvironmentFactory::Create(cfg.GetValueOfKey<string>("ENVIRONMENT"), cfg); //new MultiDeliveryDrone(cfg);
+	if(env==NULL)
+		cout << "Environment cannot be found..." << endl;
+		
 	// Create an instances for NextState and Action
 	SmartVector Action(gNumberOfAgents);
 	vector<SmartVector> actions;

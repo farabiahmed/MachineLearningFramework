@@ -80,6 +80,17 @@ public:
 	vector<double> state_scalar; 	/// Stores the standardization factors for each state element.
 	vector<double> action_mean;
 	vector<double> action_scalar;
+protected:
+	enum ActionValue
+	{
+	    North,
+	    East,
+		South,
+		West,
+		Wait,
+
+		TotalNumberOfActions,
+	};
 
 
 };
