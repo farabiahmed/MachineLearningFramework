@@ -407,6 +407,22 @@ SmartVector Gridworld_Refuel::Get_Initial_State()
 	return vec;
 }
 
+SmartVector Gridworld_Refuel::Get_Random_State()
+{
+	static SmartVector state;
+
+	state = Environment::Get_Random_State();
+
+	state.elements[2] = fuel_max;
+	/*
+	while(state.elements[StateIdx::Fuel] != fuel_max)
+	{
+		state = Environment::Get_Random_State();
+	}
+	*/
+	return state;
+}
+
 bool Gridworld_Refuel::ComparePosition(const SmartVector& state1, const SmartVector& state2) const
 {
 	if( (state1.elements[0]==state2.elements[0]) && (state1.elements[1]==state2.elements[1]) )

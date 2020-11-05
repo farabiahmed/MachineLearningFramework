@@ -4,7 +4,9 @@
  *  Created on: Apr 26, 2017
  *      Author: farabiahmed
  * 
- *  Example: ./bin/Environment_unittest --CONFIG config/config_deliverydrone1d_10_1agent.cfg 
+ *  Example: 
+ *  ./bin/Environment_unittest --CONFIG config/config_deliverydrone1d_10_1agent.cfg 
+ *  ./bin/Environment_unittest --CONFIG config/config_deliverydrone_5x5_1agent.cfg --ENVIRONMENT gridworld_refuel
  * 
  */
 
@@ -120,6 +122,14 @@ int main(int argc, char* argv[])
 	cout<<endl<<"Default Config Variables"<<endl;
 	cfg.Print_Arguments();
 
+	/* Update configuration via command line arguments */
+	unordered_map<string, string> contents = clp.GetContents();
+	for(auto it : contents)
+	{
+		cfg.UpdateContent(it.first,it.second);
+	}
+	cout<<endl<<"Updated Config Variables"<<endl;
+	cfg.Print_Arguments();
 
 	gNumberOfAgents = cfg.GetValueOfKey<int>("NUMBER_OF_AGENTS",1);
 

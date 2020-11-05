@@ -53,8 +53,11 @@ public:
 	bool Check_Refuel_State(const SmartVector& state) const;
 
 	bool Check_Above_Packet(const SmartVector& state) const;
+
 	bool Check_Packet_Picked(const SmartVector& state) const;
+
 	bool Check_Above_DeliveryPoint(const SmartVector& state) const;
+
 	bool Check_Packet_Delivered(const SmartVector& state) const;
 
 	SmartVector Get_Next_State(const SmartVector& state, const SmartVector& action);
@@ -105,6 +108,10 @@ protected:
 	int fuel_initial;
 
 	int fuel_max;
+
+	bool fuel_enabled;
+
+	bool delivery_enabled;
 
 	mutable std::unordered_map<string, int> state_indexes;
 };

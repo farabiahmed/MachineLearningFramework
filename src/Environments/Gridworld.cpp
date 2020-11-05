@@ -401,12 +401,94 @@ bool Gridworld::Check_Blocked_State(const SmartVector& state) const
 	return false;
 }
 
-void Gridworld::Display_State(const SmartVector& state)  const
+bool Gridworld::ComparePosition(const SmartVector& state1, const SmartVector& state2) const
 {
-	cout<<"State "<<state.index<<": ";
-	for (int i = 0; i < state.size(); ++i) {
-		cout<<state.elements[i]<<" ";
+	if( (state1.elements[0]==state2.elements[0]) && (state1.elements[1]==state2.elements[1]) )
+	{
+		return true;
 	}
+
+	return false;
+}
+
+void Gridworld::Display_State(const SmartVector& agent)  const
+{
+
+	cout<<"Displaying Current Status:"<<endl;
+	cout<<"State "<<agent.index<<": ";
+	for (int i = 0; i < agent.size(); ++i) {
+		cout<<agent.elements[i]<<" ";
+	}
+	cout<<endl;
+
+	for (int r = 0; r < number_of_rows; r++)
+	{
+		for (int c = 0; c < number_of_columns; c++)
+		{
+			SmartVector state(2);
+			state.elements[0] = r;
+			state.elements[1] = c;
+
+			for (unsigned i = 0; i < blocked_states.size(); ++i)
+			{
+				if(ComparePosition(state, blocked_states[i]))
+				{
+					cout<<"\u2612";
+					goto position_placed;
+				}
+			}
+
+			for (unsigned i = 0; i < terminal_states.size(); ++i)
+			{
+				if(ComparePosition(state, terminal_states[i]))
+				{
+					if(rewards_of_terminal_states[i]>0)
+					{
+						if(ComparePosition(agent, state))
+						{
+							cout<<"\033[32m\u2611\033[0m"; // Green Square Tick
+							goto position_placed;
+						}
+						else
+						{
+							cout<<"\u2714"; // Tick
+							goto position_placed;
+						}
+					}
+					else if(rewards_of_terminal_states[i]<0)
+					{
+						if(ComparePosition(agent, state))
+						{
+							cout<<"\033[31m\u2620\033[0m"; // Red Skull with bones
+							goto position_placed;
+						}
+						else
+						{
+							cout<<"\u2620"; // Skull with bones
+							goto position_placed;
+						}
+					}
+				}
+			}
+
+			if(ComparePosition(agent, state))
+			{
+				cout<<"\033[32m\u25A0\033[0m"; // Green Hexagon Filled
+				goto position_placed;
+			}
+			else
+			{
+				cout<<"\u25A1"; // Hexagon Empty
+				goto position_placed;
+			}
+
+position_placed:
+			cout << " ";
+		}
+		cout << " " << endl;
+	}
+
+
 	cout<<endl;
 }
 

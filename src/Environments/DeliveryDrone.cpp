@@ -33,9 +33,16 @@ DeliveryDrone::DeliveryDrone(const ConfigParser& cfg) {
 
 	number_of_rows = cfg.GetValueOfKey<int>("NUMBER_OF_ROWS");
 
-	fuel_max = cfg.GetValueOfKey<int>("FUEL_MAX", 3);
-
 	fuel_initial = cfg.GetValueOfKey<int>("FUEL_INITIAL", fuel_max);
+
+	fuel_enabled = cfg.GetValueOfKey<bool>("FUEL_ENABLED", true); // for cirriculum learning
+
+	if(fuel_enabled)
+		fuel_max = cfg.GetValueOfKey<int>("FUEL_MAX", (number_of_columns+number_of_rows)/2);
+	else
+		fuel_max = 0;
+	
+	delivery_enabled = cfg.GetValueOfKey<bool>("DELIVERY_ENABLED", true); // for cirriculum learning
 
 	// Standardization scale first element of state (row).
 	state_scalar.push_back( 1.0/(double)(number_of_rows-1)*2.0 );
@@ -85,10 +92,12 @@ double DeliveryDrone::Get_Reward(const SmartVector& currentState, const SmartVec
 	if(Check_Terminal_State(nextState) && !Check_Terminal_State(currentState))
 	{
 		reward += 1;
-		reward += currentState.elements[StateIdx::Fuel] * cost_action * -1;
+
+		if(fuel_enabled)
+			reward += currentState.elements[StateIdx::Fuel] * cost_action * -1;
 	}
 
-	if(action.elements[0]!=4)
+	if(action.elements[0]!=ActionValue::Wait)
 		reward+=cost_action;
 
 //	if(nextState.elements[StateIdx::Fuel] == 0) reward += -1;
@@ -128,6 +137,8 @@ double DeliveryDrone::Get_Reward(const SmartVector& currentState, const SmartVec
 
 SmartVector DeliveryDrone::BurnFuel(const SmartVector &state)
 {
+	if(!fuel_enabled) return state;
+
 	SmartVector temp = state;
 
 	temp.elements[StateIdx::Fuel]--;
@@ -289,7 +300,8 @@ bool DeliveryDrone::Get_Feasibility_Of_Action(const SmartVector& state, const Sm
 	int r_blocked;
 	int c_blocked;
 
-	if(f==0) return false; //if no fuel, you cannot move.
+	if(fuel_enabled)
+		if(f==0) return false; //if no fuel, you cannot move.
 
 	// Action North
 	if(action.elements[0] == 0)

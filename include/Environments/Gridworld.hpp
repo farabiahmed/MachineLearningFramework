@@ -41,6 +41,8 @@ public:
 
 	bool Check_Blocked_State(const SmartVector& state) const;
 
+	bool ComparePosition(const SmartVector& state1, const SmartVector& state2) const;
+
 	SmartVector Get_Next_State(const SmartVector& state, const SmartVector& action);
 
 	int Get_State_Index(const SmartVector& state) const;

@@ -41,6 +41,8 @@ public:
 
 	SmartVector Get_Initial_State();
 
+	SmartVector Get_Random_State();
+
 	bool Check_Terminal_State(const SmartVector& state) const;
 
 	bool Check_Blocked_State(const SmartVector& state) const;
