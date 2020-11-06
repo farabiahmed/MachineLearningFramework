@@ -84,6 +84,12 @@ double DeliveryDrone::Get_Reward(const SmartVector& currentState, const SmartVec
 {
 	double reward = 0.0;
 
+	/*
+	if(Check_Refuel_State(nextState) && !Check_Refuel_State(currentState))
+	{
+		reward += 0.2;
+	}
+	*/
 	if(Check_Packet_Picked(nextState) && !Check_Packet_Picked(currentState))
 	{
 		reward += 0.2;
@@ -378,13 +384,24 @@ vector<SmartVector> DeliveryDrone::Get_All_Possible_States() const
 	{
 		int index=0;
 
+		int delivery_startPos = -1;
+		int delivery_endPosRow = number_of_rows;
+		int delivery_endPosColumn = number_of_columns;
+		
+		if(!delivery_enabled)
+		{
+			delivery_startPos = 0;
+			delivery_endPosRow = 1;
+			delivery_endPosColumn = 1;
+		}
+
 		for (int r = 0; r < number_of_rows; r++) {
 			for (int c = 0; c < number_of_columns; c++) {
 				for (int f = fuel_max; f >= 0; f--) {
 					for (int r_packet = -1; r_packet < number_of_rows; r_packet++) { //-1 means packet picked
 						for (int c_packet = -1; c_packet < number_of_columns; c_packet++) {
-							for (int r_deliverypoint = -1; r_deliverypoint < number_of_rows; r_deliverypoint++) { // -1 means packet delivered
-								for (int c_deliverypoint = -1; c_deliverypoint < number_of_columns; c_deliverypoint++) {
+							for (int r_deliverypoint = delivery_startPos; r_deliverypoint < delivery_endPosRow; r_deliverypoint++) { // -1 means packet delivered
+								for (int c_deliverypoint = delivery_startPos; c_deliverypoint < delivery_endPosColumn; c_deliverypoint++) {
 
 									SmartVector state(StateIdx::TotalNumberOfStates);
 
@@ -600,12 +617,19 @@ bool DeliveryDrone::Check_Terminal_State(const SmartVector& state) const
 		}
 	}
 	*/
-	if(state.elements[StateIdx::Row_DeliveryPoint] == -1 &&
-		state.elements[StateIdx::Col_DeliveryPoint] == -1 &&
-		state.elements[StateIdx::Row_Packet] == -1 &&
+	if(state.elements[StateIdx::Row_Packet] == -1 &&
 		state.elements[StateIdx::Col_Packet] == -1)
 		{
-			return true;
+			if(delivery_enabled)
+			{
+				if	(state.elements[StateIdx::Row_DeliveryPoint] == -1 &&
+					state.elements[StateIdx::Col_DeliveryPoint] == -1)
+					return true;
+			}
+			else
+			{
+				return true;
+			}
 		}
 	return false;
 }
