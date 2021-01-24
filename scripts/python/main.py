@@ -44,8 +44,8 @@ def strToValue(str):
             return float(str)
 
 def init_model(config):
-                
-    if config["DEEP_ALGO_TYPE"] ==  "DeepQNetwork_PrioritizedReplay":               
+
+    if config["DEEP_ALGO_TYPE"] ==  "DeepQNetwork_PrioritizedReplay":
         rep = DeepQNetwork_PrioritizedReplay                   (gridsize            = strToValue(config["NUMBER_OF_ROWS"]),
                                                                 actionspaceperagent = 5,
                                                                 numberofagent       = strToValue(config["NUMBER_OF_AGENTS"]),
@@ -108,14 +108,14 @@ def init_model(config):
                                                                 logfolder           = config["TIME_STAMP"],
                                                                 )
 
-#   elif config["DEEP_ALGO_TYPE"] ==  "DeepActorCritic_PrioritizedReplay":   
+#   elif config["DEEP_ALGO_TYPE"] ==  "DeepActorCritic_PrioritizedReplay":
 #       rep = DeepActorCritic_PrioritizedReplay_tflearn        (gridsize            = strToValue(config["NUMBER_OF_ROWS"]),
 #                                                               actionspaceperagent = 5,
 #                                                               numberofagent       = strToValue(config["NUMBER_OF_AGENTS"]),
 #                                                               actor_hidden_unit   = strToValue(config["HIDDEN_LAYERS"]),
 #                                                               critic_hidden_unit  = strToValue(config["CRITIC_HIDDEN_LAYERS"]),
 #                                                               actor_learning_rate  = 0.05,
-#                                                               critic_learning_rate = strToValue(config["ETA_LEARNING_RATE"]),                                                        
+#                                                               critic_learning_rate = strToValue(config["ETA_LEARNING_RATE"]),
 #                                                               batch_size          = strToValue(config["BATCH_SIZE"]),
 #                                                               trainpass           = strToValue(config["TRAINING_PASS_PER_BATCH"]),
 #                                                               experiencebuffer    = strToValue(config["EXPERIENCE_REPLAY_BUFFER"]),
@@ -158,11 +158,11 @@ def init_model(config):
                                                                 logfolder           = config["TIME_STAMP"],
                                                                 agent_model         = config["AGENT_MODEL"],
                                                                 )
-            
+
     elif config["DEEP_ALGO_TYPE"] ==  "Representation_Empty":
-        rep = Representation_Empty()     
-    
-    
+        rep = Representation_Empty()
+
+
     return rep
 
 # rep = Representation_Keras_MultiAgent_TensorInput      (gridsize=3,
@@ -237,26 +237,26 @@ def read():
         # Convert the byte array to string
         rxstr = data.decode('utf-8')
         #print(rxstr)
-        
-        # Check whether it is config or command            
+
+        # Check whether it is config or command
         params = rxstr.split(",")
-        
-                
+
+
         if params[0] == "command" :
             # Parse Received Command
             command, state, action, value , nextstate, status = command_parser(params[1:])
-            
+
             if command == 'setvalue':
                 total_train = rep.Set_Value(state, action, value)
                 total_setval_persec += 1
                 s.sendto(("OK,setvalue").encode(), (HOSTTX, PORTTX))
-    
+
             elif command == 'getvalue':
                 val = rep.Get_Value(state, action)
                 total_getval_persec+=1
                 s.sendto(("OK,getvalue,"+ str(val) ).encode(), (HOSTTX, PORTTX))
-    
-    
+
+
             elif command == 'getgreedypair':
                 #n1 = dt.datetime.now()
                 arg, val = rep.Get_Greedy_Pair(state)
@@ -265,23 +265,24 @@ def read():
                 s.sendto((tmp).encode(), (HOSTTX, PORTTX))
                 #n2 = dt.datetime.now()
                 #print(((n2-n1).microseconds)/1e3)
-    
+
             elif command == 'experience':
                 rep.Add_Experience(state, action, nextstate, value, status)
                 total_setval_persec += 1
                 s.sendto(("OK,experience").encode(), (HOSTTX, PORTTX))
-    
+
             total_command_persec+=1
-    
+
         elif params[0] == "config" :
             config = config_parser(rxstr[7:].split("|"))
             print("Received Configuration:")
             print(config)
-            
+
             #if rep != None:
             #    rep.Save_Model()
-                
-            rep = init_model(config)
+            if "NOT_INIT" not in config:
+                rep = init_model(config)
+
             s.sendto(("OK,config").encode(), (HOSTTX, PORTTX))
 
     print("Thread read() stopped.")
@@ -341,19 +342,14 @@ _thread.start_new_thread(userinput,())
 
 while flag_continue:
     time.sleep(1)
-    
+
     if total_train:
         total_train_persec = total_train - total_train_old
         total_train_old = total_train
-    
+
     print('Total Command Per Sec:{:>5} SetVal:{:>5} GetVal:{:>5} GetGreedy:{:>5} TotalTrain:{:>5} '.format(total_command_persec,total_setval_persec,total_getval_persec,total_getgreedy_persec, total_train_persec))
     total_command_persec=0
     total_setval_persec=0
     total_getval_persec=0
     total_train_persec=0
     total_getgreedy_persec=0
-
-
-
-
-
