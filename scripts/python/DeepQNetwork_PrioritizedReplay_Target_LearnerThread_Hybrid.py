@@ -129,18 +129,18 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
                 # self.graph = tf.get_default_graph()
 
                 self.model.summary()
-                self.Save_Model()
+                saved_path = self.Save_Model()
                 # self.model.save_weights("log/"+self.logfolder+"/modelinit_"+self.modelId+".h5")
 
         with self.graph_predict.as_default():
             with self.session_predict.as_default():
                 #K.set_session(self.session_predict)
                 self.model_target = None
-                self.model_target = load_model("log/" + self.logfolder + "/model_" + self.modelId + ".h5")
+                self.model_target = load_model(saved_path + "/model_" + self.modelId + ".h5")
                 self.model_target.summary()
 
                 # Open the file
-                with open("log/" + self.logfolder + "/model_" + self.modelId + "_networkSummary.txt",'w') as fh:
+                with open(saved_path + "/model_" + self.modelId + "_networkSummary.txt",'w') as fh:
                     # Pass the file handle in as a lambda function to make it callable
                     self.model.summary(print_fn=lambda x: fh.write(x + '\n'))
                 #self.model_target = clone_model(self.model)
@@ -375,6 +375,8 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
             print("###############################")
             print("Model saved: " + "log/" + self.logfolder+"/"+currentTime)
             print("###############################")
+            
+        return "log/" + self.logfolder +"/"+currentTime
 
     def __del__(self):
         self.Save_Model()
