@@ -33,6 +33,8 @@ skiplineGiven = None
 myfigsize = (7, 3)
 xscale_log = False;
 uncertainty = False;
+offsetGiven = None
+RESOLUTION = 100
 
 print(sys.argv)
 
@@ -184,8 +186,8 @@ for filename in modelFiles:
     records = upperlimit - lowerlimit
 
     if skiplineGiven is None:
-        if records>100 :
-            skipline = (records // 100)
+        if records>RESOLUTION :
+            skipline = (records // RESOLUTION)
         else :
             skipline = 1
     else:
@@ -270,7 +272,7 @@ if xscale_log :
     #plt.xscale('log')
     #plt.xlim(xmin=1)  # this line
 
-plt.ylim(ymax=1)  # this line
+plt.ylim(ymax=1.3)  # this line
 #plt.xlim(xmin=10000)  # this line
 plt.figure(1,figsize=myfigsize)
 plt.legend()
