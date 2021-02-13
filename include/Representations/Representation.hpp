@@ -42,6 +42,8 @@ public:
 
 	virtual void Get_Report(string filePath, string fileName);
 
+	virtual SmartVector Initial_State(const SmartVector& state, double fitnessValue, bool& initialStateDone) const {return state;}
+
 	string Name;	///< It stores the name of representation to increase readability and awareness.
     				///< Such as StateActionValue, GaussianRBF etc.
 

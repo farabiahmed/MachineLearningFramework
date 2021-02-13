@@ -29,9 +29,9 @@ public:
 
 	vector<pair<SmartVector,double>> Get_Transition_Probability(const SmartVector& currentState, const SmartVector& action);
 
-	vector<SmartVector> Get_All_Possible_States() const;
+	vector<SmartVector>& Get_All_Possible_States() const;
 
-	vector<SmartVector> Get_Action_List(const SmartVector&) const;
+	vector<SmartVector>& Get_Action_List(const SmartVector&) const;
 
 	bool Get_Feasibility_Of_Action(const SmartVector& state, const SmartVector& action) const;
 

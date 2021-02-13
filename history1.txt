@@ -1,0 +1,1000 @@
+ 1000  ./bin/getlistoffilesinadirectory 
+ 1001  make unittest/getlistoffilesinadirectory
+ 1002  ./bin/getlistoffilesinadirectory 
+ 1003  make unittest/getlistoffilesinadirectory
+ 1004  ./bin/getlistoffilesinadirectory 
+ 1005  make unittest/getlistoffilesinadirectory
+ 1006  ./bin/getlistoffilesinadirectory 
+ 1007  make unittest/getlistoffilesinadirectory
+ 1008  ./bin/getlistoffilesinadirectory 
+ 1009  make unittest/getlistoffilesinadirectory
+ 1010  ./bin/getlistoffilesinadirectory 
+ 1011  make unittest/getlistoffilesinadirectory
+ 1012  ./bin/getlistoffilesinadirectory 
+ 1013  make unittest/getlistoffilesinadirectory
+ 1014  ./bin/getlistoffilesinadirectory 
+ 1015  make unittest/getlistoffilesinadirectory
+ 1016  ./bin/getlistoffilesinadirectory 
+ 1017  make unittest/getlistoffilesinadirectory
+ 1018  ./bin/getlistoffilesinadirectory 
+ 1019  make main 
+ 1020  ./bin/main 
+ 1021  ./bin/main -CONFIG config/gridsearch_rendezvous.cfg -TIMESTAMP 20180520_123411
+ 1022  ./bin/main -CONFIG config/gridsearch_rendezvous.cfg
+ 1023  ./bin/main 
+ 1024  make main 
+ 1025  ./bin/main -CONFIG config/gridsearch_rendezvous.cfg -TIME_STAMP 20180527_133325
+ 1026  make main 
+ 1027  ./bin/main -CONFIG config/gridsearch_rendezvous.cfg -TIME_STAMP 20180527_133325
+ 1028  make main 
+ 1029  ./bin/main -CONFIG config/gridsearch_rendezvous.cfg -TIME_STAMP 20180527_133325
+ 1030  make main 
+ 1031  ./bin/main -CONFIG config/gridsearch_rendezvous.cfg -TIME_STAMP 20180527_133325
+ 1032  git status
+ 1033  git reset 
+ 1034  git status
+ 1035  git pull
+ 1036  git reset 
+ 1037  git status
+ 1038  git push
+ 1039  git status
+ 1040  cd Desktop/PhdThesis/workspace/MachineLearningFramework/
+ 1041  ./bin/main -CONFIG config/gridsearch_rendezvous.cfg 
+ 1042  cd /home/farabiahmed/Desktop/PhdThesis/workspace/MachineLearningFramework
+ 1043  python3 scripts/python/main.py 
+ 1044  python3 scripts/python/UnitTest_Representation.py 
+ 1045  python3 scripts/python/main.py 
+ 1046  python3 scripts/python/UnitTest_Representation.py 
+ 1047  python3 scripts/python/main.py 
+ 1048  python3 scripts/python/UnitTest_Env.py 
+ 1049  python3 scripts/python/main.py 
+ 1050  make unittest/Environment_unittest
+ 1051  ./bin/Environment_unittest 
+ 1052  make clean
+ 1053  make unittest/RLFramework
+ 1054  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1055  python3 scripts/python/parser_agentReport.py 
+ 1056  make unittest/RLFramework
+ 1057  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1058  python3 scripts/python/parser_agentReport.py 
+ 1059  make unittest/RLFramework
+ 1060  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1061  make unittest/RLFramework
+ 1062  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1063  make unittest/RLFramework
+ 1064  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1065  make unittest/RLFramework
+ 1066  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1067  python3 scripts/python/parser_agentReport.py 
+ 1068  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1069  python3 scripts/python/parser_agentReport.py 
+ 1070  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1071  python3 scripts/python/parser_agentReport.py 
+ 1072  ./bin/Environment_unittest 
+ 1073  make unittest//Environment_unittest 
+ 1074  make unittest/Environment_unittest 
+ 1075  ./bin/Environment_unittest 
+ 1076  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1077  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1078  python3 scripts/python/parser_agentReport.py 
+ 1079  make unittest/RLFramework
+ 1080  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1081  python3 scripts/python/parser_agentReport.py 
+ 1082  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1083  python3 scripts/python/parser_agentReport.py 
+ 1084  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1085  python3 scripts/python/parser_agentReport.py 
+ 1086  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1087  make unittest/RLFramework
+ 1088  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1089  python3 scripts/python/parser_agentReport.py 
+ 1090  make unittest/RLFramework
+ 1091  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1092  python3 scripts/python/parser_agentReport.py 
+ 1093  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1094  make unittest/RLFramework
+ 1095  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1096  sudo pip install ds4drv
+ 1097  sudo apt-get install bluez*
+ 1098  ds4drv --hidraw
+ 1099  sudo ds4drv --hidraw
+ 1100  ds4drv --led ff0000
+ 1101  sudo ds4drv --led 00ff00
+ 1102  sudo ds4drv --led 0000ff
+ 1103  sudo ds4drv --help
+ 1104  sudo ds4drv --dump-reports --led ff0000
+ 1105  sudo ds4drv  --led ff0000 &
+ 1106  sudo ds4drv --dump-reports --led ff0000
+ 1107  jstest /dev/input/js0
+ 1108  sudo apt-get install joystick
+ 1109  jstest /dev/input/js0
+ 1110  sudo jstest /dev/input/js0
+ 1111  jstest /dev/input/js0
+ 1112  jstest /dev/input/js1
+ 1113  jstest /dev/input/js0
+ 1114  jstest /dev/input/js2
+ 1115  jstest /dev/input/js1
+ 1116  jstest /dev/input/js2
+ 1117  jstest /dev/input/js0
+ 1118  jstest /dev/input/js1
+ 1119  sudo jstest /dev/input/js0
+ 1120  jstest /dev/input/js1dd
+ 1121  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1122  python3 scripts/python/parser_agentReport.py 
+ 1123  make unittest/RLFramework
+ 1124  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1125  python3 scripts/python/parser_agentReport.py 
+ 1126  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1127  python3 scripts/python/parser_agentReport.py 
+ 1128  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1129  python3 scripts/python/parser_agentReport.py 
+ 1130  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1131  python3 scripts/python/parser_agentReport.py 
+ 1132  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1133  python3 scripts/python/parser_agentReport.py ~
+ 1134  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1135  python3 scripts/python/parser_agentReport.py ~
+ 1136  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1137  python3 scripts/python/parser_agentReport.py
+ 1138  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1139  python3 scripts/python/parser_agentReport.py
+ 1140  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1141  python3 scripts/python/parser_agentReport.py
+ 1142  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1143  python3 scripts/python/parser_agentReport.py
+ 1144  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1145  python3 scripts/python/parser_agentReport.py
+ 1146  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1147  python3 scripts/python/parser_agentReport.py
+ 1148  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1149  python3 scripts/python/parser_agentReport.py
+ 1150  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1151  python3 scripts/python/parser_agentReport.py
+ 1152  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1153  make unittest/RLFramework
+ 1154  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1155  make unittest/RLFramework
+ 1156  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1157  python3 scripts/python/parser_agentReport.py
+ 1158  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1159  python3 scripts/python/parser_agentReport.py
+ 1160  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1161  python3 scripts/python/parser_agentReport.py
+ 1162  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1163  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1164  python3 scripts/python/parser_agentReport.py
+ 1165  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1166  python3 scripts/python/parser_agentReport.py
+ 1167  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg 
+ 1168  python3 scripts/python/parser_agentReport.py
+ 1169  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1170  python3 scripts/python/parser_agentReport.py
+ 1171  uname -r
+ 1172  uname -a
+ 1173  sudo apt-get install ros-indigo-desktop-full
+ 1174  sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+ 1175  sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+ 1176  curl -sSL 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0xC1CF6E31E6BADE8868B172B4F42ED6FBAB17C654' | sudo apt-key add -
+ 1177  sudo apt-get update && sudo apt-get install dpkg
+ 1178  sudo apt-get install libgl1-mesa-dev-lts-trusty
+ 1179  sudo apt-get install ros-indigo-desktop-full
+ 1180  roscore
+ 1181  apt-cache search ros-indigo
+ 1182  sudo rosdep init
+ 1183  rosdep update
+ 1184  echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
+ 1185  source ~/.bashrc
+ 1186  sudo apt-get install python-rosinstall
+ 1187  sudo apt-get install ros-indigo-rviz
+ 1188  roscore
+ 1189  roscore &
+ 1190  rosrun rviz rviz
+ 1191  ./bin/RLFramework --CONFIG config/config_multideliverydrone_3x3_2agent.cfg --DEEP_ALGO_TYPE DeepQNetwork_PrioritizedReplay_Target
+ 1192  python3 scripts/python/parser_agentReport.py
+ 1193  ./bin/RLFramework --CONFIG config/config_multideliverydrone_3x3_2agent.cfg --DEEP_ALGO_TYPE DeepQNetwork_PrioritizedReplay_Target
+ 1194  ./bin/RLFramework --CONFIG config/config_multideliverydrone_3x3_2agent.cfg --DEEP_ALGO_TYPE DeepQNetwork_PrioritizedReplay_Target --TIME_STAMP 20191013_090640
+ 1195  python3 scripts/python/main.py -i  20191013_090640
+ 1196  python3 scripts/python/parser_agentReport.py -i  20191013_090640
+ 1197  python3 scripts/python/parser_agentReport.py
+ 1198  python3 scripts/python/parser_agentReport.py -b
+ 1199  python3 scripts/python/main.py 
+ 1200  python3 scripts/python/parser_agentReport.py
+ 1201  python3 scripts/python/parser_agentReport.py -i 20191004_204135
+ 1202  python3 scripts/python/parser_agentReport.py
+ 1203  python3 scripts/python/parser_agentReport.py -b
+ 1204  ./bin/RLFramework --CONFIG config/config_multideliverydrone_3x3_2agent.cfg --DEEP_ALGO_TYPE DeepQNetwork_PrioritizedReplay_Target --TIME_STAMP 20191013_090640
+ 1205  python3 scripts/python/parser_agentReport.py -i  20191013_090640
+ 1206  ./bin/RLFramework --CONFIG config/config_multideliverydrone_3x3_2agent.cfg --DEEP_ALGO_TYPE DeepQNetwork_PrioritizedReplay_Target
+ 1207  python3 scripts/python/parser_agentReport.py
+ 1208  python3 scripts/python/parser_agentReport.py -b
+ 1209  python3 scripts/python/parser_agentReport.py
+ 1210  ./bin/RLFramework --CONFIG config/config_multideliverydrone_3x3_2agent.cfg
+ 1211  python3 scripts/python/parser_agentReport.py
+ 1212  make unittest/RLFramework
+ 1213  ./bin/RLFramework --CONFIG config/config_multideliverydrone_3x3_2agent.cfg
+ 1214  python3 scripts/python/parser_agentReport.py
+ 1215  ./bin/RLFramework --CONFIG config/config_multideliverydrone_3x3_2agent.cfg
+ 1216  ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_3agent.cfg 
+ 1217  python3 scripts/python/main.py 
+ 1218  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg --TIME_STAMP 20191004_204136
+ 1219  make unittest/RLFramework
+ 1220  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg --TIME_STAMP 20191004_204136
+ 1221  python3 scripts/python/parser_agentReport.py -i  20191004_204136
+ 1222  ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_3agent.cfg 
+ 1223  python3 scripts/python/parser_agentReport.py -i  20191004_204136
+ 1224  python3 scripts/python/parser_agentReport.py -i 20191004_204136
+ 1225  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg --TIME_STAMP 20191004_204136
+ 1226  python3 scripts/python/parser_agentReport.py -i 20191004_204136
+ 1227  sudo apt-get install meld
+ 1228  python3 scripts/python/UnitTest/numpytest.py 
+ 1229  python3 scripts/python/parser_agentReport.py -i 20191004_204136 -s 50000
+ 1230  python3 scripts/python/parser_agentReport.py -i 20191004_204136 -u 50000
+ 1231  python3 scripts/python/parser_agentReport.py -i 20191004_204136 -l 50000
+ 1232  python3 scripts/python/parser_agentReport.py -i 20191004_204136 -l 500000
+ 1233  python3 scripts/python/parser_agentReport.py -i 20191004_204136 -l 1000000
+ 1234  python3 scripts/python/parser_agentReport.py -i 20191004_204136 
+ 1235  htop
+ 1236  python3 scripts/python/main.py 
+ 1237  python3 scripts/python/parser_agentReport.py -i 20191004_204136
+ 1238  python3 scripts/python/main.py 
+ 1239  fg
+ 1240  pkill python3 
+ 1241  python3 scripts/python/main.py 
+ 1242  sudo lsof -t -i:5000
+ 1243  python3 scripts/python/main.py 
+ 1244  sudo lsof -t -i:5000
+ 1245  kill 11088
+ 1246  sudo lsof -t -i:5000
+ 1247  sudo fuser -k 5000/tcp
+ 1248  sudo lsof -t -i:5000
+ 1249  sudo fuser -k 5000/udp
+ 1250  sudo lsof -t -i:5000
+ 1251  python3 scripts/python/main.py 
+ 1252  ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg --TIME_STAMP 20191004_204136
+ 1253  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg
+ 1254  make unittest/RLFramework
+ 1255  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg
+ 1256  python3 scripts/python/parser_agentReport.py 
+ 1257  python3 scripts/python/main.py 
+ 1258  kill %1
+ 1259  python3 scripts/python/main.py 
+ 1260  şşşşş..çççğçlççl..çlllllllllllüp*püüüOFü
+ 1261  cd Desktop/PhdThesis/workspace/MachineLearningFramework/
+ 1262  python3 scripts/python/UnitTest/PrioritizedBoundedDictionary_Unittest.py 
+ 1263  cd scripts/python/UnitTest/
+ 1264  python3 scripts/python/UnitTest/PrioritizedBoundedDictionary_Unittest.py 
+ 1265  python3 PrioritizedBoundedDictionary_Unittest.py 
+ 1266  cd ..
+ 1267  git status
+ 1268  git fetch
+ 1269  git log
+ 1270  git log --all
+ 1271  git bash
+ 1272  git pull --rebase
+ 1273  git status
+ 1274  git pull --rebase --autostash
+ 1275  git status
+ 1276  git pull --rebase --autostash
+ 1277  git stash
+ 1278  git pull --rebase --autostash
+ 1279  git pull --rebase
+ 1280  git status
+ 1281  git log --all
+ 1282  make unittest/RLFramework
+ 1283  ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty
+ 1284  ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --DEEP_ALGO_TYPE Representation_Empty
+ 1285  kill %1
+ 1286  ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --DEEP_ALGO_TYPE Representation_Empty
+ 1287  kill %1
+ 1288  ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --DEEP_ALGO_TYPE Representation_Empty
+ 1289  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg --DEEP_ALGO_TYPE Representation_Empty
+ 1290  ./bin/RLFramework --CONFIG config/config_deliverydrone_3x3_1agent.cfg --REPRESENTATION RepresentationEmpty
+ 1291  make unittest/EnvironmentSpeed_Unittest
+ 1292  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_deliverydrone_3x3_1agent.cfg
+ 1293  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_3x3_2agent.cfg --REPRESENTATION RepresentationEmpty
+ 1294  make unittest/EnvironmentSpeed_Unittest
+ 1295  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_3x3_2agent.cfg --REPRESENTATION RepresentationEmpty
+ 1296  make unittest/EnvironmentSpeed_Unittest
+ 1297  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_3x3_2agent.cfg --REPRESENTATION RepresentationEmpty
+ 1298  make unittest/EnvironmentSpeed_Unittest
+ 1299  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_3x3_2agent.cfg --REPRESENTATION RepresentationEmpty
+ 1300  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_3x3_2agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1301  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1302  make unittest/EnvironmentSpeed_Unittest
+ 1303  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1304  make unittest/EnvironmentSpeed_Unittest
+ 1305  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1306  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_3x3_2agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 10
+ 1307  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1308  make unittest/EnvironmentSpeed_Unittest
+ 1309  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1310  make unittest/EnvironmentSpeed_Unittest
+ 1311  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1312  make clean
+ 1313  make unittest/EnvironmentSpeed_Unittest
+ 1314  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1315  make unittest/EnvironmentSpeed_Unittest
+ 1316  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1317  make unittest/EnvironmentSpeed_Unittest
+ 1318  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1319  make unittest/EnvironmentSpeed_Unittest
+ 1320  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1321  make unittest/EnvironmentSpeed_Unittest
+ 1322  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1323  make unittest/EnvironmentSpeed_Unittest
+ 1324  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1325  make unittest/EnvironmentSpeed_Unittest
+ 1326  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1327  make unittest/EnvironmentSpeed_Unittest
+ 1328  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1329  make unittest/EnvironmentSpeed_Unittest
+ 1330  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1331  make unittest/EnvironmentSpeed_Unittest
+ 1332  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1333  make unittest/EnvironmentSpeed_Unittest
+ 1334  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1335  make unittest/EnvironmentSpeed_Unittest
+ 1336  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1337  make unittest/EnvironmentSpeed_Unittest
+ 1338  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1339  make unittest/EnvironmentSpeed_Unittest
+ 1340  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --REPRESENTATION RepresentationEmpty --MAX_NUMBER_OF_ITERATION 100
+ 1341  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_gridworld_55_easy.cfg 
+ 1342  time ./bin/EnvironmentSpeed_Unittest --CONFIG config/config_rendezvous_3x3_1agent.cfg 
+ 1343  make unittest/RLFramework
+ 1344  time ./bin/RLFramework --CONFIG config/config_rendezvous_3x3_1agent.cfg 
+ 1345  kill %1"
+ 1346  kill %1
+ 1347  time ./bin/RLFramework --CONFIG config/config_rendezvous_3x3_1agent.cfg 
+ 1348  kill %1
+ 1349  time ./bin/RLFramework --CONFIG config/config_rendezvous_3x3_1agent.cfg 
+ 1350  time ./bin/RLFramework --CONFIG config/config_rendezvous_3x3_1agent.cfg  --REPRESENTATION TabularStateAction
+ 1351  time ./bin/RLFramework --CONFIG config/config_rendezvous_3x3_1agent.cfg  --REPRESENTATION TabularStateActionPair
+ 1352  time ./bin/RLFramework --CONFIG config/config_rendezvous_3x3_1agent.cfg  --REPRESENTATION TabularStateAction
+ 1353  time ./bin/RLFramework --CONFIG config/config_gridworld_55_easy.cfg  --REPRESENTATION TabularStateAction
+ 1354  time ./bin/RLFramework --CONFIG config/config_gridworld_55_easy.cfg  --REPRESENTATION TabularStateActionPair
+ 1355  time ./bin/RLFramework --CONFIG config/config_gridworld_55_easy.cfg 
+ 1356  time ./bin/RLFramework --CONFIG config/config_rendezvous_5x5_1agent.cfg 
+ 1357  time ./bin/RLFramework --CONFIG config/config_rendezvous_5x5_1agent.cfg --REPRESENTATİON TabularStateActionPair
+ 1358  time ./bin/RLFramework --CONFIG config/config_rendezvous_3x3_1agent.cfg --REPRESENTATİON TabularStateActionPaiR
+ 1359  time ./bin/RLFramework --CONFIG config/config_rendezvous_3x3_1agent.cfg
+ 1360  time ./bin/RLFramework --CONFIG config/config_rendezvous_5x5_2agent.cfg 
+ 1361  kill %1
+ 1362  time ./bin/RLFramework --CONFIG config/config_rendezvous_5x5_2agent.cfg 
+ 1363  python3 scripts/python/parser_agentReport.py 
+ 1364  python3 scripts/python/parser_agentReport.py -i 20191102_153544
+ 1365  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_3agent.cfg 
+ 1366  make unittest/RLFramework
+ 1367  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_3agent.cfg 
+ 1368  python3 scripts/python/parser_agentReport.py
+ 1369  make unittest/Environment_unittest
+ 1370  ./bin/Environment_unittest 
+ 1371  make clean
+ 1372  make unittest/RLFramework
+ 1373  make unittest/Environment_unittest
+ 1374  ./bin/Environment_unittest 
+ 1375  w
+ 1376  ./bin/Environment_unittest 
+ 1377  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_3x3_2agent.cfg 
+ 1378  python3 scripts/python/parser_agentReport.py
+ 1379  time ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1380  python3 scripts/python/parser_agentReport.py
+ 1381  time ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg -i 20191102_235154
+ 1382  time ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg --TIME_STAMP 20191102_235154
+ 1383  python3 scripts/python/parser_agentReport.py
+ 1384  time ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg
+ 1385  kill %1
+ 1386  time ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_1agent.cfg
+ 1387  python3
+ 1388  pip3 freeze
+ 1389  python3 scripts/python/parser_agentReport.py
+ 1390  htop
+ 1391  make unittest/RLFramework
+ 1392  ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --AGENT random-agent
+ 1393  make clean
+ 1394  make unittest/RLFramework
+ 1395  ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --AGENT random-agent
+ 1396  kill %1
+ 1397  make unittest/RLFramework
+ 1398  ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --AGENT random-agent
+ 1399  kill %1
+ 1400  make unittest/RLFramework
+ 1401  ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --AGENT random-agent
+ 1402  make unittest/RLFramework
+ 1403  ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_3agent.cfg --AGENT random-agent
+ 1404  ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_2agent.cfg
+ 1405  python3 scripts/python/parser_agentReport.py
+ 1406  python3 scripts/python/parser_agentReport.py -u 10000
+ 1407  python3 scripts/python/parser_agentReport.py -u 70000
+ 1408  python3 scripts/python/parser_agentReport.py -u 40000
+ 1409  python3 scripts/python/parser_agentReport.py -u 50000
+ 1410  python3 scripts/python/parser_agentReport.py
+ 1411  python3 scripts/python/UnitTest/numpytest.py 
+ 1412  python3 scripts/python/parser_agentReport.py
+ 1413  time python3 scripts/python/main.py 
+ 1414  time python3 scripts/python/UnitTest/numpytest.py 
+ 1415  time python3 scripts/python/main.py 
+ 1416  cd Desktop/PhdThesis/workspace/MachineLearningFramework/
+ 1417  time ./bin/RLFramework --CONFIG config/config_deliverydrone_5x5_2agent.cfg
+ 1418  kill %1
+ 1419  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_2agent.cfg 
+ 1420  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_3agent.cfg 
+ 1421  jobs
+ 1422  kill %1
+ 1423  jobs
+ 1424  kill %1
+ 1425  jobs
+ 1426  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_4agent.cfg 
+ 1427  kill %1
+ 1428  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_2agent.cfg 
+ 1429  kill %1
+ 1430  jobs
+ 1431  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_2agent.cfg 
+ 1432  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_4agent.cfg 
+ 1433  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_5agent.cfg 
+ 1434  kill %1
+ 1435  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_5agent.cfg 
+ 1436  kill %1
+ 1437  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_5agent.cfg 
+ 1438  kill %1
+ 1439  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_5agent.cfg 
+ 1440  kill %1
+ 1441  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_5agent.cfg 
+ 1442  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_2agent.cfg 
+ 1443  make unittest/RLFramework
+ 1444  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_5agent.cfg 
+ 1445  make unittest/RLFramework
+ 1446  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_5agent.cfg 
+ 1447  make unittest/RLFramework
+ 1448  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_5agent.cfg 
+ 1449  make unittest/RLFramework
+ 1450  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_5agent.cfg 
+ 1451  make unittest/RLFramework
+ 1452  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_5agent.cfg 
+ 1453  make unittest/RLFramework
+ 1454  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_5agent.cfg 
+ 1455  make unittest/RLFramework
+ 1456  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_5x5_5agent.cfg 
+ 1457  time ./bin/RLFramework --CONFIG config/config_deliverydrone_10x10_1agent.cfg 
+ 1458  kill %1
+ 1459  time ./bin/RLFramework --CONFIG config/config_deliverydrone_10x10_1agent.cfg 
+ 1460  fg
+ 1461  jobs
+ 1462  kill %1
+ 1463  jobs
+ 1464  killall RLFramework 
+ 1465  jobs
+ 1466  ps ax
+ 1467  ps ax | grep RLFram
+ 1468  killall RLFramework 
+ 1469  jobs
+ 1470  kill %2
+ 1471  kill %3
+ 1472  kill %
+ 1473  kill %4
+ 1474  jobs
+ 1475  kill %5
+ 1476  kill %6
+ 1477  jobs
+ 1478  kill %6
+ 1479  jobs
+ 1480  time ./bin/RLFramework --CONFIG config/config_deliverydrone_10x10_1agent.cfg 
+ 1481  jobs
+ 1482  kill %1
+ 1483  time ./bin/RLFramework --CONFIG config/config_deliverydrone_10x10_1agent.cfg 
+ 1484  python3 scripts/python/parser_agentReport.py 
+ 1485  python3 scripts/python/parser_agentReport.py -i 20191110_170422
+ 1486  python3 scripts/python/main.py 
+ 1487  kill %1
+ 1488  jobs
+ 1489  time ./bin/RLFramework --CONFIG config/config_deliverydrone_10x10_1agent.cfg --TIME_STAMP 20191110_022747
+ 1490  make unittest/Environment_unittest
+ 1491  ./bin/Environment_unittest config/config_deliverydrone_10x10_1agent.cfg 
+ 1492  make unittest/Environment_unittest
+ 1493  ./bin/Environment_unittest config/config_deliverydrone_10x10_1agent.cfg 
+ 1494  time ./bin/RLFramework --CONFIG config/config_deliverydrone_10x10_1agent.cfg --TIME_STAMP 20191110_022747
+ 1495  kill %1
+ 1496  jobs
+ 1497  time ./bin/RLFramework --CONFIG config/config_deliverydrone_10x10_1agent.cfg
+ 1498  time ./bin/RLFramework --CONFIG config/config_deliverydrone_10x10_1agent.cfg --TIME_STAMP 20191110_170422
+ 1499  make unittest/Environment_unittest
+ 1500  make unittest/RLFramework
+ 1501  python3 scripts/python/parser_agentReport.py 
+ 1502  python3 scripts/python/parser_agentReport.py -l 1000000
+ 1503  ssh ituarc@160.75.15.189
+ 1504  ssh 160.75.15.189
+ 1505  python3 scripts/python/parser_agentReport.py -l 1000000
+ 1506  ssh ituarc@160.75.15.189
+ 1507  ssh ituarc@160.75.15.189
+ 1508  ssh ituarc@160.75.15.118
+ 1509  ssh ituarc@160.75.15.189
+ 1510  python3 scripts/python/parser_agentReport.py -i 20191110_170423
+ 1511  python3 scripts/python/parser_agentReport.py -i 20191110_170423 -l 2000000
+ 1512  bin/Environment_unittest
+ 1513  python3 scripts/python/parser_agentReport.py
+ 1514  python3 scripts/python/parser_agentReport.py -u 1000000
+ 1515  python3 scripts/python/parser_agentReport.py -u 2000000
+ 1516  python3 scripts/python/parser_agentReport.py -u 500000
+ 1517  python3 scripts/python/parser_agentReport.py -u 10000
+ 1518  python3 scripts/python/parser_agentReport.py -l 10000
+ 1519  python3 scripts/python/parser_agentReport.py -l 10000 -u 1400000
+ 1520  python3 scripts/python/parser_agentReport.py -l 10000 -u 1200000
+ 1521  python3 scripts/python/parser_agentReport.py -l 100000 -u 1200000
+ 1522  python3 scripts/python/parser_agentReport.py -l 20000 -u 1200000
+ 1523  python3 scripts/python/parser_agentReport.py
+ 1524  tail -f log/20191114_215559/agentReport2.csv 
+ 1525  python3 scripts/python/parser_agentReport.py
+ 1526  python3 scripts/python/parser_agentReport.py -u 43667201
+ 1527  sed `$d` log/20191114_215600/agentReport2.csv 
+ 1528  sed '$d' log/20191114_215600/agentReport2.csv 
+ 1529  sed -i '$d' log/20191114_215600/agentReport2.csv 
+ 1530  python3 scripts/python/parser_agentReport.py
+ 1531  sed -i '$d' log/20191114_215600/agentReport2.csv 
+ 1532  sed -i '$d' log/20191114_215600/agentReport_0.csv 
+ 1533  python3 scripts/python/parser_agentReport.py
+ 1534  kill python3
+ 1535  python3 scripts/python/main.py 
+ 1536  cd log/20191114_215602/
+ 1537  python3 h5filerepair.py 
+ 1538  python3 loader.py 
+ 1539  python3 h5filerepair.py 
+ 1540  hdfview model_0.h5 
+ 1541  cd..
+ 1542  cd ..
+ 1543  ssh ituarc@160.75.15.189
+ 1544  python3 scripts/python/parser_agentReport.py -l 1000000
+ 1545  python3 scripts/python/parser_agentReport.py
+ 1546  python3 scripts/python/parser_agentReport.py -l 1000000 -i 20191114_215606
+ 1547  python3 scripts/python/parser_agentReport.py
+ 1548  df
+ 1549  tail log/20191114_215606/agentReport2.csv 
+ 1550  tail log/20191114_215606/agentReport_0.csv 
+ 1551  python3 scripts/python/main.py 
+ 1552  python3 scripts/python/main.py 
+ 1553  python3 scripts/python/parser_agentReport.py 
+ 1554  python3 scripts/python/parser_agentReport.py 
+ 1555  python3 scripts/python/main.py 
+ 1556  sudo python3 scripts/python/main.py 
+ 1557  sudo python3 log/20191114_215602/h5filerepair.py 
+ 1558  sudo python3 scripts/python/main.py 
+ 1559  python3 scripts/python/parser_agentReport.py 
+ 1560  python3 scripts/python/parser_agentReport.py -l 1000000
+ 1561  python3 scripts/python/parser_agentReport.py -l 1000000 -u 7000000
+ 1562  python3 scripts/python/parser_agentReport.py 
+ 1563  sudo python3 scripts/python/main.py 
+ 1564  time ./bin/RLFramework --CONFIG config/config_deliverydrone_10x10_1agent.cfg --TIME_STAMP 20191110_170423
+ 1565  kill %1
+ 1566  jobs
+ 1567  time ./bin/RLFramework --CONFIG config/config_deliverydrone_10x10_1agent.cfg --TIME_STAMP 20191110_170423
+ 1568  time ./bin/RLFramework --CONFIG config/config_deliverydrone_10x10_1agent.cfg
+ 1569  time ./bin/RLFramework --CONFIG config/config_deliverydrone_10x10_1agent.cfg --TIME_STAMP 20191114_215604
+ 1570  time ./bin/RLFramework --CONFIG config/config_deliverydrone_10x10_1agent.cfg --TIME_STAMP 20191114_215600
+ 1571  make unittest/RLFramework
+ 1572  sudo apt-get install filezilla
+ 1573  filezilla
+ 1574  python3 scripts/python/parser_agentReport.py
+ 1575  python3 scripts/python/parser_agentReport.py -u 10000000
+ 1576  tail log/20191114_215604/agentReport2.csv 
+ 1577  tail log/20191114_215604/agentReport_0.csv 
+ 1578  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_3agent.cfg 
+ 1579  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg 
+ 1580  kill %1
+ 1581  python3 scripts/python/parser_agentReport.py -i 20191129_062804 -u 1000000
+ 1582  python3 scripts/python/parser_agentReport.py -i 20191129_062804
+ 1583  python3 scripts/python/parser_agentReport.py -i 20191129_062804 -l 100
+ 1584  python3 scripts/python/parser_agentReport.py -i 20191129_062804 -l 10000
+ 1585  python3 scripts/python/parser_agentReport.py -i 20191129_062804 -l 10000 -u 1000000
+ 1586  python3 scripts/python/parser_agentReport.py -i 20191129_062804 -l 10000 -u 100000
+ 1587  python3 scripts/python/parser_agentReport.py -i 20191129_062804
+ 1588  python3 scripts/python/parser_agentReport.py -i 20191129_062804 -u 100000
+ 1589  python3 scripts/python/parser_agentReport.py -i 20191129_062804 -u 40000
+ 1590  python3 scripts/python/parser_agentReport.py -i 20191129_062804 -u 80000
+ 1591  python3 scripts/python/parser_agentReport.py -i 20191129_062804 -u 100000
+ 1592  cd ..
+ 1593  python3 scripts/python/Examples/Tensorflow/tensorflow_gradientdescent_save_load.py
+ 1594  python3 scripts/python/parser_agentReport.py 
+ 1595  python3 scripts/python/Examples/Tensorflow/tensorflow_gradientdescent.py 
+ 1596  python3 scripts/python/Examples/Tensorflow/tensorflow_gradientdescent_custom.py 
+ 1597  python3 scripts/python/Examples/Tensorflow/tensorflow_gradientdescent_save_load.py 
+ 1598  cd scripts/python/Examples/Tensorflow/
+ 1599  python3 tensorflow_gradientdescent_save_load.py 
+ 1600  python3 scripts/python/main.py 
+ 1601  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg 
+ 1602  kill %1
+ 1603  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg 
+ 1604  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg  --TIME_STAMP 20191207_163708
+ 1605  kill %1
+ 1606  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg  --TIME_STAMP 20191207_163708
+ 1607  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg  --TIME_STAMP 20191207_163709
+ 1608  kill %1
+ 1609  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg  --TIME_STAMP 20191207_163709
+ 1610  kill %1
+ 1611  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg  --TIME_STAMP 20191207_163709
+ 1612  kill %1
+ 1613  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg  --TIME_STAMP 20191207_163709
+ 1614  kill %1
+ 1615  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg  --TIME_STAMP 20191207_163709
+ 1616  kill %1
+ 1617  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg  --TIME_STAMP 20191207_163709
+ 1618  kill %1
+ 1619  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg  --TIME_STAMP 20191207_163709
+ 1620  df
+ 1621  python3 scripts/python/parser_agentReport.py
+ 1622  python3 scripts/python/parser_agentReport.py -l 5000000
+ 1623  python3 scripts/python/parser_agentReport.py -l 50000000
+ 1624  python3 scripts/python/parser_agentReport.py -l 500
+ 1625  python3 scripts/python/parser_agentReport.py -l 50000
+ 1626  python3 scripts/python/parser_agentReport.py -l 50000 -u 245000
+ 1627  python3 scripts/python/Examples/Tensorflow/tensorflow_gradientdescent_save_load.py 
+ 1628  python3 scripts/python/parser_agentReport.py -l 50000 
+ 1629  python3 scripts/python/parser_agentReport.py -l 250000
+ 1630  python3 scripts/python/parser_agentReport.py -l 200000
+ 1631  python3 scripts/python/parser_agentReport.py -l 100000
+ 1632  python3 scripts/python/parser_agentReport.py -l 50000
+ 1633  python3 scripts/python/parser_agentReport.py -l 50000 -u 338900
+ 1634  python3 scripts/python/parser_agentReport.py -l 50000 -u 337000
+ 1635  python3 scripts/python/parser_agentReport.py -l 50000
+ 1636  kill %1
+ 1637  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg  --TIME_STAMP 20191207_163709
+ 1638  kill %1
+ 1639  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg  --TIME_STAMP 20191207_163709
+ 1640  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg  --TIME_STAMP 20191207_163710
+ 1641  kill %1
+ 1642  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg  --TIME_STAMP 20191207_163710
+ 1643  kill %1
+ 1644  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg  --TIME_STAMP 20191207_163710
+ 1645  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg  --TIME_STAMP 20191207_163711
+ 1646  python3 scripts/python/main.py 
+ 1647  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg  --TIME_STAMP 20191207_163711
+ 1648  tail log/20191207_163712/agentReport2.csv 
+ 1649  tail log/20191207_163712/agentReport_0.csv 
+ 1650  time ./bin/RLFramework --CONFIG config/config_multideliverydrone_10x10_5agent.cfg  --TIME_STAMP 20191207_163712
+ 1651  sudo find . -name "*agent_report*"
+ 1652  sudo find /home/ -name "*agent_report*"
+ 1653  sudo find /home/ -name "*agentReport*"
+ 1654  sudo find /home/ -name "*agentReport*" > searchresult.txt
+ 1655  sudo find /media/farabiahmed/Farabi\ 320/ -name "*agentReport*" > searchresult.txt
+ 1656  sudo find /media/farabiahmed/UUI/ -name "*agentReport*" > searchresult.txt
+ 1657  reboot
+ 1658  sudo reboot
+ 1659  sudo find /home/ -name "*.odp"
+ 1660  sudo find /home/ -name "*.ppt*"
+ 1661  du -sh /var/cache/apt/archives
+ 1662  sudo apt-get clean
+ 1663  sudo apt-get autoremove --purge
+ 1664  python3 scripts/python/parser_agentReport.py 
+ 1665  python3 scripts/python/parser_agentReport.py  -b
+ 1666  ./bin/RLFramework --CONFIG config/config_journal_gridworld_55_1agent_0.cfg 
+ 1667  python3 scripts/python/parser_agentReport.py  -b
+ 1668  ./bin/RLFramework --CONFIG config/config_journal_gridworld_55_1agent_0.cfg 
+ 1669  python3 scripts/python/parser_agentReport.py  -b
+ 1670  make unittest/RLFramework
+ 1671  ./bin/RLFramework --CONFIG config/config_journal_gridworld_55_1agent_0.cfg 
+ 1672  make unittest/RLFramework
+ 1673  python3 scripts/python/parser_agentReport.py  -b
+ 1674  ./bin/RLFramework --CONFIG config/config_journal_gridworld_55_1agent_0.cfg 
+ 1675  python3 scripts/python/parser_agentReport.py  -b
+ 1676  ./bin/RLFramework --CONFIG config/config_journal_gridworld_55_1agent_0.cfg 
+ 1677  python3 scripts/python/parser_agentReport.py  -b
+ 1678  python3 scripts/python/parser_agentReport.py  -i 20200607_211900 -b 
+ 1679  python3 scripts/python/parser_agentReport.py  -i 20200607_211900
+ 1680  python3 scripts/python/parser_agentReport.py  -i 20200607_211900 -b
+ 1681  ./bin/RLFramework --CONFIG config/config_journal_gridworld_55_1agent_0.cfg 
+ 1682  python3 scripts/python/parser_agentReport.py -b
+ 1683  ./bin/RLFramework --CONFIG config/config_journal_gridworld_55_1agent_0.cfg 
+ 1684  python3 scripts/python/parser_agentReport.py -b
+ 1685  make unittest/RLFramework
+ 1686  ./bin/RLFramework --CONFIG config/config_journal_gridworld_55_1agent_0.cfg 
+ 1687  python3 scripts/python/parser_agentReport.py -b
+ 1688  ./bin/RLFramework --CONFIG config/config_journal_gridworld_55_1agent_0.cfg 
+ 1689  python3 scripts/python/parser_agentReport.py -b
+ 1690  python3 scripts/python/parser_agentReport.py -b -u 500
+ 1691  python3 scripts/python/parser_agentReport.py -b -u 100
+ 1692  python3 scripts/python/parser_agentReport.py  -i 20200607_211900 -b
+ 1693  ./bin/RLFramework --CONFIG config/config_journal_gridworld_55_1agent_0.cfg 
+ 1694  python3 scripts/python/parser_agentReport.py -b -u 100
+ 1695  python3 scripts/python/parser_agentReport.py  -i 20200607_211900 -b
+ 1696  ./bin/RLFramework --CONFIG config/config_journal_gridworld_55_1agent_0.cfg 
+ 1697  python3 scripts/python/parser_agentReport.py  -i 20200607_211900 -b
+ 1698  python3 scripts/python/parser_agentReport.py -b -u
+ 1699  python3 scripts/python/parser_agentReport.py -b
+ 1700  ./bin/RLFramework --CONFIG config/config_journal_gridworld_55_1agent_0.cfg 
+ 1701  python3 scripts/python/parser_agentReport.py -b
+ 1702  make unittest/RLFramework
+ 1703  ./bin/RLFramework --CONFIG config/config_journal_gridworld_55_1agent_0.cfg 
+ 1704  python3 scripts/python/parser_agentReport.py -b
+ 1705  python3 scripts/python/parser_agentReport.py -b - u100
+ 1706  python3 scripts/python/parser_agentReport.py -b -u 100
+ 1707  ./bin/RLFramework --CONFIG config/config_journal_gridworld_55_1agent_0.cfg 
+ 1708  python3 scripts/python/parser_agentReport.py -b
+ 1709  python3 scripts/python/parser_agentReport.py -b -u 100
+ 1710  make unittest/RLFramework
+ 1711  ./bin/RLFramework --CONFIG config/config_journal_gridworld_55_1agent_0.cfg 
+ 1712  python3 scripts/python/parser_agentReport.py -b -u 100
+ 1713  python3 scripts/python/parser_agentReport.py  -i 20200607_211900 -b -u 100
+ 1714  python3 scripts/python/parser_agentReport.py -b -u 100
+ 1715  python3 scripts/python/parser_agentReport.py  -i 20200607_230306 -b
+ 1716  python3 scripts/python/Examples/plot_xscale_test.py 
+ 1717  python3 scripts/python/parser_agentReport.py  -i 20200607_230306 -b
+ 1718  python3 scripts/python/Examples/plot_xscale_test.py 
+ 1719  python3 scripts/python/parser_agentReport.py  -i 20200607_230306 -b
+ 1720  python3 scripts/python/Examples/plot_xscale_test.py 
+ 1721  python3 scripts/python/parser_agentReport.py  -i 20200607_230306 -b -xlog
+ 1722  python3 scripts/python/parser_agentReport.py  -i 20200607_230306 -b --xlog
+ 1723  python3 scripts/python/parser_agentReport.py  -i 20200607_230306 -b -xlog
+ 1724  python3 scripts/python/parser_agentReport.py  -i 20200607_230306 -b -x
+ 1725  python3 scripts/python/parser_agentReport.py  -i 20200607_211900 -b -x
+ 1726  python3 scripts/python/parser_agentReport.py  -i 20200607_211900 -b -u 100
+ 1727  python3 scripts/python/parser_agentReport.py  -i 20200607_211900 -b -u 70
+ 1728  python3 scripts/python/parser_agentReport.py -b
+ 1729  xinput list
+ 1730  xinput list-props 12
+ 1731  xinput set-prop 12 'Evdev Scrolling Distance' 1 3 5
+ 1732  xinput set-prop 12 'Evdev Scrolling Distance' 1 13 5
+ 1733  xinput set-prop 12 'Evdev Scrolling Distance' 1 130 5
+ 1734  xinput set-prop 12 'Evdev Scrolling Distance' 1 1 1
+ 1735  xinput list-props 12
+ 1736  xinput set-prop 12 'Evdev Scrolling Distance' 1 13 5
+ 1737  xinput list-props 12
+ 1738  xinput set-prop 12 'Evdev Scrolling Distance' 10 10 10
+ 1739  xinput list-props 12
+ 1740  xinput set-prop 12 'Evdev Scrolling Distance' 8 1 1 
+ 1741  python3 scripts/python/parser_agentReport.py
+ 1742  sudo apt-get install imwheel
+ 1743  gedit ~/.imwheelrc
+ 1744  imwheel --kill --buttons "4 5"
+ 1745  python3 scripts/python/parser_agentReport.py
+ 1746  python3 scripts/python/parser_agentReport.py -s 1,2,3,45,6,89
+ 1747  python3 scripts/python/parser_agentReport.py -s 99
+ 1748  python3 scripts/python/parser_agentReport.py -l 0,0,50000
+ 1749  python3 scripts/python/parser_agentReport.py -l 0,0,50000 -m 1,1,1.66
+ 1750  python3 scripts/python/parser_agentReport.py -l 0,0,50000 -u 21000000,66335,380000 -m 1.81,1.20,1.6
+ 1751  python3 scripts/python/parser_agentReport.py -l 0,0,50000 -u 21000000,66335,380000 -m 1.5,1.5,1.6
+ 1752  python3 scripts/python/parser_agentReport.py -l 0,0,50000 -u 21000000,46335,380000 -m 1.2,1.6,1.6
+ 1753  python3 scripts/python/parser_agentReport.py -l 0,0,50000 -u 21000000,46335,380000 -m 1.3,1.6,1.6
+ 1754  python3 scripts/python/parser_agentReport.py -l 0,0,50000 -u 21000000,46335,380000 -m 1.3,1.6,1.5
+ 1755  python3 scripts/python/parser_agentReport.py -l 0,0,50000 -u 21000000,46335,380000 -m 1.3,1.6,1.4
+ 1756  python3 scripts/python/parser_agentReport.py -l 0,50000 -u 46335,380000 -m 1.6,1.4
+ 1757  python3 scripts/python/parser_agentReport.py -l 0,50000 -u 46335,380000 -m 1.6,1.4 -x
+ 1758  python3 scripts/python/parser_agentReport.py -l 0,50000 -u 46335,380000 -m 1.6,1.4
+ 1759  python3 scripts/python/parser_agentReport.py -l 0,50000 -u 46335,380000 -m 1.6,1.4 --titles "3 Agent","5 Agent"
+ 1760  python3 scripts/python/parser_agentReport.py -l 0,50000 -u 46335,380000 -m 1.6,1.4 --title "3 Agent","5 Agent"
+ 1761  python3 scripts/python/parser_agentReport.py -l 0,50000 -u 46335,380000 -m 1.6,1.4 -t "3 Agent","5 Agent"
+ 1762  python3 scripts/python/parser_agentReport.py -l 0,40000 -u 46335,380000 -m 1.6,1.4 -t "3 Agent","5 Agent"
+ 1763  python3 scripts/python/parser_agentReport.py -l 1000,50000 -u 46335,380000 -m 1.6,1.4 -t "3 Agent","5 Agent"
+ 1764  python3 scripts/python/parser_agentReport.py -l 1500,50000 -u 46335,380000 -m 1.6,1.4 -t "3 Agent","5 Agent"
+ 1765  python3 scripts/python/parser_agentReport.py -l 1500,50000 -u 46335,380000 -m 1.6,1.4 -t "3 Agents","5 Agents"
+ 1766  python3 scripts/python/Examples/parser.py 
+ 1767  pip3 install parse
+ 1768  sudo pip3 install parse
+ 1769  python3 scripts/python/Examples/parser.py 
+ 1770  python3 scripts/python/parser_agentReport.py -l 1500,50000 -u 46335,380000 -m 1.6,1.4 -t "3 Agents","5 Agents"
+ 1771  python3 scripts/python/parser_agentReport.py -l 0,0,50000 -u 21000000,46335,380000 -m 1.3,1.6,1.4 -t "1 Agent","3 Agents","5 Agents"
+ 1772  python3 scripts/python/parser_agentReport.py -l 1500,50000 -u 46335,380000 -m 1.6,1.4 -t "3 Agents","5 Agents"
+ 1773  python3 scripts/python/parser_agentReport.py -i 20200613_173408 -l 0,0,50000 -u 21000000,46335,380000 -m 1.3,1.6,1.4 -t "1 Agent","3 Agents","5 Agents"
+ 1774  python3 scripts/python/parser_agentReport.py -l 1500,50000 -u 46335,380000 -m 1.6,1.4 -t "3 Agents","5 Agents"
+ 1775  python3 scripts/python/parser_agentReport.py -l 1500,50000 -u 46335,380000 -m 1.6,1.4 -t "3 Agents","5 Agents" -x
+ 1776  python3 scripts/python/parser_agentReport.py -l 1500,50000 -u 26335,380000 -m 1.6,1.4 -t "3 Agents","5 Agents" -x
+ 1777  python3 scripts/python/parser_agentReport.py -l 1500,50000,0 -u 26335,380000,0 -m 1.6,1.4,1 -t "3 Agents","5 Agents","DQN" -x
+ 1778  python3 scripts/python/parser_agentReport.py -l 1500,50000,0 -u 26335,380000,0 -m 1.6,1.4,-0.5 -t "3 Agents","5 Agents","DQN" -x
+ 1779  python3 scripts/python/parser_agentReport.py -l 1500,50000,0 -u 26335,380000,0 -m 1.6,1.4,-0.5 -t "3 Agents Deep Correction","5 Agents Deep Correction","5 Agents DQN" -x
+ 1780  python3 scripts/python/parser_agentReport.py -l 1500,50000,0 -u 26335,380000,0 -m 1.6,1.4,-0.5 -t "3 Agents Deep Correction","5 Agents Deep Correction","3 Agents DQN" -x
+ 1781  python3 scripts/python/parser_agentReport.py
+ 1782  python3 scripts/python/parser_agentReport.py -s 2,2
+ 1783  python3 scripts/python/parser_agentReport.py
+ 1784  python3 scripts/python/parser_agentReport.py -c
+ 1785  python3 scripts/python/parser_agentReport.py --certainty
+ 1786  python3 scripts/python/parser_agentReport.py -c
+ 1787  python3 scripts/python/parser_agentReport.py -c -s 2,2
+ 1788  python3 scripts/python/parser_agentReport.py -c -s 5,5
+ 1789  python3 scripts/python/parser_agentReport.py -c -s 15,15
+ 1790  python3 scripts/python/parser_agentReport.py -c -s 15,15 -b
+ 1791  python3 scripts/python/parser_agentReport.py -c -s 15,15 -t "DQN with %56 params", "DQN with %15 params" -b 
+ 1792  python3 scripts/python/parser_agentReport.py -c -s 15,15 -t "DQN with %56 params","DQN with %15 params" -b 
+ 1793  python3 scripts/python/parser_agentReport.py -c -s 25,25 -t "DQN with %56 params","DQN with %15 params" -b 
+ 1794  python3 scripts/python/Examples/meanMin.py 
+ 1795  python3 scripts/python/parser_agentReport.py -c -s 25,25 -t "DQN with %56 params","DQN with %15 params" -b 
+ 1796  python3 scripts/python/parser_agentReport.py -s 25,25 -t "DQN with %56 params","DQN with %15 params" -b 
+ 1797  python3 scripts/python/parser_agentReport.py -l 1500,50000,0 -u 26335,380000,0 -m 1.6,1.4,-0.5 -t "3 Agents Deep Correction","5 Agents Deep Correction","3 Agents DQN" -x -i 20200613_173411
+ 1798  python3 scripts/python/parser_agentReport.py -l 1500,50000,0 -u 26335,380000,0 -m 1.6,1.4,-0.5 -t "3 Agents Deep Correction","5 Agents Deep Correction","3 Agents DQN" -x -i 20200613_173411 -b
+ 1799  python3 scripts/python/parser_agentReport.py -t "3 Agents Deep Correction","5 Agents Deep Correction","3 Agents DQN" -x -i 20200613_173411 -b
+ 1800  python3 scripts/python/parser_agentReport.py -i 20191028_172035
+ 1801  find . -iname params_0.txt
+ 1802  grep -r NUMBER_OF_AGENTS = 1 *
+ 1803  grep -r "NUMBER_OF_AGENTS = 1" *
+ 1804  grep -r "NUMBER_OF_AGENTS = 4" *
+ 1805  grep -r "NUMBER_OF_AGENTS = 4" /media/farabiahmed/Farabi\ 320/Backups/PHD2020/PhdThesis_Results/
+ 1806  grep -r "NUMBER_OF_AGENTS = 4" /media/farabiahmed/Farabi\ 320/Backups/PHD2020/PhdThesis_Results/log_4/
+ 1807  grep -r "NUMBER_OF_AGENTS = 2" /media/farabiahmed/Farabi\ 320/Backups/PHD2020/PhdThesis_Results/log_4/
+ 1808  grep -r "NUMBER_OF_AGENTS = 2" /media/farabiahmed/Farabi\ 320/Backups/PHD2020/PhdThesis_Results/log_4
+ 1809  grep -r "NUMBER_OF_AGENTS = 2" /media/farabiahmed/Farabi\ 320/Backups/PHD2020/PhdThesis_Results/
+ 1810  grep -r "NUMBER_OF_ROWS = 5" /media/farabiahmed/Farabi\ 320/Backups/PHD2020/PhdThesis_Results/log_4
+ 1811  find /media/farabiahmed/Farabi\ 320/Backups/PHD2020/PhdThesis_Results/log_4/ -iname agentReport*.png
+ 1812  find 20191192_235154
+ 1813  find . 20191192_235154
+ 1814  find . -name 20191192_235154 -type d
+ 1815  find . -name 20191028* -type d
+ 1816  find /media/farabiahmed/Farabi\ 320/Backups/PHD2020/PhdThesis_Results/ -name 20191192* -type d
+ 1817  find / -name 20191192* -type d
+ 1818  sudo find / -name 20191192* -type d
+ 1819  sudo find / -name 20191102* -type d
+ 1820  python3 scripts/python/main.py 
+ 1821  ps
+ 1822  kill -9 5469
+ 1823  python3 scripts/python/main.py 
+ 1824  ps
+ 1825  python3 scripts/python/main.py 
+ 1826  python3 scripts/python/parser_agentReport.py 
+ 1827  python3 scripts/python/parser_agentReport.py -c -b
+ 1828  python3 scripts/python/parser_agentReport.py
+ 1829  python3 scripts/python/parser_agentReport.py -c
+ 1830  python3 scripts/python/parser_agentReport.py -c -b
+ 1831  python3 scripts/python/parser_agentReport.py -i 20200621_190457 -c -b
+ 1832  python3 scripts/python/parser_agentReport.py -i 20200621_190457
+ 1833  python3 scripts/python/parser_agentReport.py -i 20200621_190457 -u 0,0,0,0,700
+ 1834  python3 scripts/python/parser_agentReport.py -i 20200621_190457 -u 700,0,0,0,0
+ 1835  python3 scripts/python/parser_agentReport.py -c -b
+ 1836  python3 scripts/python/parser_agentReport.py -u 5000,5000,5000
+ 1837  python3 scripts/python/parser_agentReport.py -u 3000,4000,5000
+ 1838  python3 scripts/python/parser_agentReport.py -u 300,400,500
+ 1839  python3 scripts/python/parser_agentReport.py -u 400,450,500
+ 1840  python3 scripts/python/parser_agentReport.py -u 400,450,500 -t "a:0","a:0.5","a:1.0"
+ 1841  python3 scripts/python/parser_agentReport.py -u 400,450,500 -t "alpha:0","alpha:0.5","alpha:1.0"
+ 1842  python3 scripts/python/parser_agentReport.py -u 400,400,500 -t "alpha:0","alpha:0.5","alpha:1.0"
+ 1843  python3 scripts/python/parser_agentReport.py -u 400,420,500 -t "alpha:0","alpha:0.5","alpha:1.0"
+ 1844  python3 scripts/python/parser_agentReport.py -u 380,420,500 -t "alpha:0","alpha:0.5","alpha:1.0"
+ 1845  python3 scripts/python/parser_agentReport.py -u 350,420,500 -t "alpha:0","alpha:0.5","alpha:1.0"
+ 1846  python3 scripts/python/parser_agentReport.py -b -c
+ 1847  python3 scripts/python/parser_agentReport.py -b
+ 1848  python3 scripts/python/Examples/meanMin.py 
+ 1849  python3 scripts/python/parser_agentReport.py -b
+ 1850  python3 scripts/python/parser_agentReport.py
+ 1851  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN", "2 Agents with DeepCorrection", "3 Agents with DeepCorrection", "4 Agents with Deep Correction"
+ 1852  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction"
+ 1853  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,0,0,-1
+ 1854  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-0.5,-0.5,-0.5
+ 1855  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-0.5,-0.5,-0.5 -x
+ 1856  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-0.5,-0.5,-0.5
+ 1857  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-0.5,-0.5,-0.5 -u 0,0,0,10000
+ 1858  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-0.5,-0.5,-0.5 -u 0,0,0,100000
+ 1859  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-0.5,-0.5,-0.5 -u 0,0,0,50000
+ 1860  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-0.5,-0.5,-0.5 -u 0,0,50000,50000
+ 1861  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-0.5,-0.5,-0.5 -u 0,0,20000,50000
+ 1862  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-0.5,-0.5,-1 -m 1,1,1,2 -u 0,0,20000,50000 
+ 1863  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-0.5,-0.5,-1 -m 1,3,3,3 -u 0,0,20000,50000 
+ 1864  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-1 -m 1,3,3,3 -u 0,0,20000,50000 
+ 1865  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-2 -m 1,3,3,3 -u 0,0,20000,50000 
+ 1866  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-1.5 -m 1,3,3,3 -u 0,0,20000,50000 
+ 1867  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-1 -m 1,3,3,3 -u 0,0,20000,50000 
+ 1868  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-2 -m 1,3,3,5 -u 0,0,20000,50000 
+ 1869  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-1.5 -m 1,3,3,5 -u 0,0,20000,50000 
+ 1870  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-1 -m 1,3,3,7 -u 0,0,20000,50000 
+ 1871  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-2 -m 1,3,3,7 -u 0,0,20000,50000 
+ 1872  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-1.3 -m 1,3,3,7 -u 0,0,20000,50000 
+ 1873  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-1.2 -m 1,3,3,7 -u 0,0,20000,50000 
+ 1874  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-1.3 -m 1,3,3,7 -u 0,0,20000,50000 -x
+ 1875  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-1.2 -m 1,3,3,7 -u 0,0,20000,50000 
+ 1876  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-1.2 -m 1,3,3,7 -u 100000,0,20000,50000 
+ 1877  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-1.2 -m 1,3,3,7 -u 70000,0,20000,50000 
+ 1878  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-1.2 -m 1,3,3,7 -u 70000,0,20000,50000 -x
+ 1879  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-1.2 -m 1,3,3,7 -u 70000,0,20000,50000
+ 1880  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-1.2 -m 1,3,3,7 -u 70000,0,20000,50000 -x
+ 1881  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-1.2 -m 1,3,3,7 -u 70000,0,20000,50000 -x -s 50,50,50,50
+ 1882  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-1.2 -m 1,3,3,7 -u 70000,0,20000,50000 -x -s 50,50,50,250
+ 1883  python3 scripts/python/parser_agentReport.py -t "1 Agent with DQN","2 Agents with DeepCorrection","3 Agents with DeepCorrection","4 Agents with Deep Correction" -o 0,-1,-1,-1.2 -m 1,3,3,7 -u 70000,0,20000,50000 -x
+ 1884  python3 scripts/python/parser_agentReport.py -i 20181228_230617
+ 1885  python3 scripts/python/parser_agentReport.py -i 20181228_230617 -u 20000
+ 1886  python3 scripts/python/parser_agentReport.py -i 20181228_230617
+ 1887  grep -r "NUMBER_OF_ROWS = 5" /media/farabiahmed/Farabi\ 320/Backups/PHD2020/PhdThesis_Results
+ 1888  find /home/ -name 20181224_094007 -type d
+ 1889  python3 scripts/python/parser_agentReport.py
+ 1890  python3 scripts/python/parser_agentReport.py -c
+ 1891  python3 scripts/python/parser_agentReport.py -c -b
+ 1892  ./bin/RLFramework config/config_journal_gridworld_55_1agent_0.cfg 
+ 1893  ./bin/RLFramework -CONFIG config/config_journal_gridworld_55_1agent_0.cfg 
+ 1894  ./bin/RLFramework -CONFIG config/config_journal_gridworld_55_1agent_dqnPrioTest.cfg 
+ 1895  fg
+ 1896  fg list
+ 1897  ps
+ 1898  kill -9 5208
+ 1899  kill -9 5227
+ 1900  fg
+ 1901  ./bin/RLFramework -CONFIG config/config_journal_gridworld_55_1agent_dqnPrioTest.cfg 
+ 1902  ps
+ 1903  kill -9 5335
+ 1904  kill -9 5377
+ 1905  kill -9 5480
+ 1906  ps
+ 1907  ./bin/RLFramework -CONFIG config/config_journal_gridworld_55_1agent_dqnPrioTest.cfg 
+ 1908  ps
+ 1909  ./bin/RLFramework -CONFIG config/config_journal_gridworld_55_1agent_dqnPrioTest.cfg 
+ 1910  ./bin/RLFramework -CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1911  s
+ 1912  ps
+ 1913  ./bin/RLFramework -CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1914  ./bin/RLFramework -CONFIG config/config_multideliverydrone_5x5_2agent.cfg 
+ 1915  df -h
+ 1916  du -a /dir/ | sort -n -r | head -n 20
+ 1917  du -a / | sort -n -r | head -n 20
+ 1918  find / -size +100M -ls
+ 1919  sudo find / -size +100M -ls
+ 1920  df -h
+ 1921  sudo nmap -sn 192.168.1.0/24
+ 1922  git push
+ 1923  ./bin/Environment_unittest --CONFIG config/config_deliverydrone1d_10_1agent.cfg 
+ 1924  ./bin/Environment_unittest --CONFIG config/config_deliverydrone_5x5_1agent.cfg --ENVIRONMENT gridworld_refuel
+ 1925  make unittest/Environment_unittest
+ 1926  ./bin/Environment_unittest --CONFIG config/config_deliverydrone_5x5_1agent.cfg --ENVIRONMENT gridworld_refuel
+ 1927  make unittest/Environment_unittest
+ 1928  ./bin/Environment_unittest --CONFIG config/config_deliverydrone_5x5_1agent.cfg --ENVIRONMENT gridworld_refuel
+ 1929  ./bin/Environment_unittest --CONFIG config/config_deliverydrone_5x5_1agent.cfg --ENVIRONMENT gridworld
+ 1930  S
+ 1931  make unittest/Environment_unittest
+ 1932  ./bin/Environment_unittest --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1933  ./bin/Environment_unittest --CONFIG config/config_deliverydrone_5x5_1agent.cfg --ENVIRONMENT gridworld_refuel
+ 1934  ./bin/Environment_unittest --CONFIG config/config_deliverydrone_5x5_1agent.cfg 
+ 1935  make unittest/Environment_unittest
+ 1936  ./bin/Environment_unittest --CONFIG config/config_deliverydrone_5x5_1agent.cfg --ENVIRONMENT gridworld_refuel
+ 1937  make unittest/RLFramework
+ 1938  ./bin/Environment_unittest --CONFIG config/config_deliverydrone_5x5_1agent.cfg --ENVIRONMENT gridworld_refuel
+ 1939  
+ 1940  make unittest/Environment_unittest
+ 1941  ./bin/Environment_unittest --CONFIG config/config_deliverydrone_5x5_1agent.cfg --FUEL_ENABLED false
+ 1942  ./bin/Environment_unittest --CONFIG config/config_deliverydrone_5x5_1agent.cfg --FUEL_ENABLED 0
+ 1943  code
+ 1944  git status
+ 1945  git log
+ 1946  git push
+ 1947  git log --all
+ 1948  sudo apt-get update git
+ 1949  sudo apt-get install  git
+ 1950  sudo apt-get update
+ 1951  sudo apt-get install  git
+ 1952  git --version
+ 1953  sudo apt-get install  git
+ 1954  git --version
+ 1955  git push
+ 1956  git status
+ 1957  git push master origin
+ 1958  git push origin master
+ 1959  gitk --all
+ 1960  git push origin simulations_for_journal
+ 1961  git branch
+ 1962  git master
+ 1963  git checkout master
+ 1964  git stash
+ 1965  git checkout master
+ 1966  sudo apt-get install  git
+ 1967  git --version
+ 1968  git branchs
+ 1969  git branch
+ 1970  git checkout simulations_for_journal
+ 1971  git log --all
+ 1972  git branch
+ 1973  git checkout master
+ 1974  git log
+ 1975  git log --all
+ 1976  gitk --all
+ 1977  git status
+ 1978  git log
+ 1979  git push
+ 1980  git status
+ 1981  git log --all
+ 1982  gitk
+ 1983  gitk --all
+ 1984  git fetch
+ 1985  gitk --all
+ 1986  gitlog
+ 1987  git log
+ 1988  git log --all
+ 1989  git checkout
+ 1990  git checkout master
+ 1991  git checkout origin master
+ 1992  git pull
+ 1993  git log
+ 1994  make unittest/Environment_unittest
+ 1995  code .
+ 1996  git commit
+ 1997  sudo git push
+ 1998  history
+ 1999  history > history1.txt

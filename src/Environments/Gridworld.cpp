@@ -273,7 +273,7 @@ bool Gridworld::Get_Feasibility_Of_Action(const SmartVector& state, const SmartV
 	return true;
 }
 
-vector<SmartVector> Gridworld::Get_All_Possible_States() const
+vector<SmartVector>& Gridworld::Get_All_Possible_States() const
 {
 	vector<SmartVector> states;
 
@@ -294,7 +294,7 @@ vector<SmartVector> Gridworld::Get_All_Possible_States() const
 	return states;
 }
 
-vector<SmartVector> Gridworld::Get_Action_List(const SmartVector& state) const
+vector<SmartVector>& Gridworld::Get_Action_List(const SmartVector& state) const
 {
 	vector<SmartVector> actions;
 

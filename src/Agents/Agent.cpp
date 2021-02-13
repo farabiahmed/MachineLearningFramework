@@ -100,7 +100,32 @@ void Agent::Get_Cumulative_Rewards(unsigned numberof_bellmanupdate)
 	//cout<<endl<<endl;
 }
 
-pair<unsigned,double> Agent::Simulate(void)
+pair<unsigned,double> Agent::Simulate()
+{
+	// Current State of agent
+	SmartVector state;
+	bool initialStateDone = false;
+	double fitnessValue = 0.0;
+
+	state = environment->Get_Random_State();
+	
+	while(!initialStateDone)	
+	{
+		fitnessValue = FitnessValue(state).second;
+		state = valueFunction->Initial_State(state, fitnessValue, initialStateDone);		
+	}
+
+	// provide log to console.
+	cout<<" Init: [";
+	for (int i = 0; i < state.dimension; ++i) {
+		cout<<setw(2)<<(int)state.elements[i]<<" ";
+	}
+	cout<<"] ";
+
+	return FitnessValue(state);
+}
+
+pair<unsigned,double> Agent::FitnessValue(SmartVector& state)
 {
 	// Hold the reward that we will return.
 	double reward=0;
@@ -108,15 +133,7 @@ pair<unsigned,double> Agent::Simulate(void)
 	// Count the number of total movement.
 	unsigned number_of_movement = 0;
 
-	// Current State of agent
-	SmartVector state = environment->Get_Random_State();
-
-	cout<<" Init: [";
-	for (int i = 0; i < state.dimension; ++i) {
-		cout<<setw(2)<<(int)state.elements[i]<<" ";
-	}
-	cout<<"] ";
-
+	// Intermediate vars of agent
 	SmartVector nextState;
 	SmartVector action;
 
@@ -137,8 +154,18 @@ pair<unsigned,double> Agent::Simulate(void)
 		nextState = environment->Get_Next_State(state,action);
 
 		// Sum the reward
-		reward += environment->Get_Reward(state,action,nextState);
-
+		double r = environment->Get_Reward(state,action,nextState);
+		//cout<<" Reward: " << r;
+		reward += r;
+		/*
+		if(r>0.5)
+		{
+			state.Print();
+			action.Print();
+			nextState.Print();
+			r = environment->Get_Reward(state,action,nextState);
+		}
+		*/
 		// Move the agent to next state.
 		state = nextState;
 

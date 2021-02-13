@@ -29,7 +29,7 @@ Rendezvous_Refuel::~Rendezvous_Refuel()
 
 // FIXED: Fix for multi state agents: x,y,fuel,
 // TODO: get the states from base class and get their combination.
-vector<SmartVector> Rendezvous_Refuel::Get_All_Possible_States() const
+vector<SmartVector>& Rendezvous_Refuel::Get_All_Possible_States() const
 {
 	static vector<SmartVector> states;		//Cache states since it is expensive to calculate
 
@@ -161,7 +161,7 @@ bool Rendezvous_Refuel::Check_Blocked_State(const SmartVector& state) const
 }
 
 //Fixed: needs to be updated for parametric multiagent case.
-vector<SmartVector> Rendezvous_Refuel::Get_Action_List(const SmartVector& state) const
+vector<SmartVector>& Rendezvous_Refuel::Get_Action_List(const SmartVector& state) const
 {
 	/*
 	vector<SmartVector> actionsSingleAgent = Gridworld::Get_Action_List(state);

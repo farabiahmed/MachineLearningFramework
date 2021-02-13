@@ -43,7 +43,7 @@
 #
 #
 
-CC 	:= g++ # This is the main compiler
+CC 	:= g++-7 # This is the main compiler
 
 
 CFLAGS 	:= -g -O0 -std=c++11 -Wall

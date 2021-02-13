@@ -137,7 +137,7 @@ vector<pair<SmartVector,double>> Blocksworld::Get_Transition_Probability(const S
 	return state_probability;
 }
 
-vector<SmartVector> Blocksworld::Get_All_Possible_States() const
+vector<SmartVector>& Blocksworld::Get_All_Possible_States() const
 {
 	// This algorithm works like "base aritmetic"
 	// -Initial state for n=3 is [0 0 0]
@@ -203,7 +203,7 @@ vector<SmartVector> Blocksworld::Get_All_Possible_States() const
 	return states;
 }
 
-vector<SmartVector> Blocksworld::Get_Action_List(const SmartVector& state) const
+vector<SmartVector>& Blocksworld::Get_Action_List(const SmartVector& state) const
 {
 	// Vector of action is 2 by 1 vector.
 	// For a given state, there are three different cases;

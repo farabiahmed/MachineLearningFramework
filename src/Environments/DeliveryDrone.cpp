@@ -376,7 +376,7 @@ bool DeliveryDrone::Get_Feasibility_Of_Action(const SmartVector& state, const Sm
 	return true;
 }
 
-vector<SmartVector> DeliveryDrone::Get_All_Possible_States() const
+vector<SmartVector>& DeliveryDrone::Get_All_Possible_States() const
 {
 	static vector<SmartVector> states;
 
@@ -489,7 +489,7 @@ vector<SmartVector> DeliveryDrone::Get_All_Possible_States() const
 	return states;
 }
 
-vector<SmartVector> DeliveryDrone::Get_Action_List(const SmartVector& state) const
+vector<SmartVector>& DeliveryDrone::Get_Action_List(const SmartVector& state) const
 {
 	static vector<SmartVector> actions;
 

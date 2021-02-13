@@ -65,7 +65,7 @@ bool MultiDeliveryDrone::Check_Blocked_State(const SmartVector& state) const
 }
 
 //Fixed: needs to be updated for parametric multiagent case.
-vector<SmartVector> MultiDeliveryDrone::Get_Action_List(const SmartVector& state) const
+vector<SmartVector>& MultiDeliveryDrone::Get_Action_List(const SmartVector& state) const
 {
 	static vector<SmartVector> actions;
 
@@ -127,13 +127,14 @@ double MultiDeliveryDrone::Get_Reward(const SmartVector& currentState, const Sma
 {
 	double reward = 0;
 
-
+	/*
 	if(Check_Terminal_State(nextState))
 	{
 		reward += 1;
 
 		return reward + cost_action;
 	}
+	*/
 
 	vector<SmartVector> currentStates = SmartVector::Split(currentState,number_of_agents);
 	vector<SmartVector> actions = SmartVector::Split(action,number_of_agents);

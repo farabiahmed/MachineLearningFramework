@@ -16,3 +16,6 @@ class Representation(metaclass=ABCMeta):
     @abstractmethod
     def Add_Experience(self,state,action,nextstate,reward,status):
         raise NotImplementedError()
+
+    def Initial_State(self,state, value):
+        return state, True

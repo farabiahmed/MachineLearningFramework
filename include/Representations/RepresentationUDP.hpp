@@ -42,6 +42,8 @@ public:
 
 	void Print_Value();
 
+	SmartVector Initial_State(const SmartVector& state, double fitnessValue, bool& isInitialStateDone) const;
+
 	string Name;	///< It stores the name of representation to increase readability and awareness.
     				///< Such as StateActionValue, GaussianRBF etc.
 

@@ -302,7 +302,7 @@ bool Gridworld_Refuel::Get_Feasibility_Of_Action(const SmartVector& state, const
 	return true;
 }
 
-vector<SmartVector> Gridworld_Refuel::Get_All_Possible_States() const
+vector<SmartVector>& Gridworld_Refuel::Get_All_Possible_States() const
 {
 	vector<SmartVector> states;
 
@@ -326,7 +326,7 @@ vector<SmartVector> Gridworld_Refuel::Get_All_Possible_States() const
 	return states;
 }
 
-vector<SmartVector> Gridworld_Refuel::Get_Action_List(const SmartVector& state) const
+vector<SmartVector>& Gridworld_Refuel::Get_Action_List(const SmartVector& state) const
 {
 	vector<SmartVector> actions;
 

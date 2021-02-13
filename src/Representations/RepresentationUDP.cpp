@@ -10,6 +10,8 @@
 #include <string>
 #include <iostream>
 #include <exception>
+#include <regex>
+#include <cstdlib>
 
 using namespace std;
 
@@ -144,7 +146,9 @@ SmartVector RepresentationUDP::Get_Policy(const SmartVector& state) const
 	pair<int,double> policyInfo = Get_Greedy_Pair(state);
 
 	// Return It
-	return environment->Get_Action_List(state)[policyInfo.first];
+	vector<SmartVector>& actions = environment->Get_Action_List(state);
+	SmartVector action = actions[policyInfo.first];
+	return action;
 }
 
 double RepresentationUDP::Get_Value(const SmartVector& state, const SmartVector& action) const
@@ -222,6 +226,56 @@ void RepresentationUDP::Set_Value(const SmartVector& state, const SmartVector& a
 	//cout<<"UDP Receiver: "<<len<<" Data:"<<rxBuffer<<endl;
 }
 
+SmartVector RepresentationUDP::Initial_State(const SmartVector& state, double fitnessValue, bool& isDone) const
+{
+	isDone = false;
+
+	string data;
+	data+="command,initialstate,";
+	data+="state,";
+	data+=Vector_ToString(state);
+	data+=",";
+	data+="value,";
+	data+=to_string(fitnessValue);
+
+	udpsocket.WriteSocket((unsigned char*)data.c_str(),data.size());
+
+	// Return packet:
+	// ex: OK,getgreedypair,<arg>,<val>
+	// ex: OK,getgreedypair,2,0.87
+
+	unsigned char rxBuffer[65535]= {0};
+	int len = udpsocket.ReadSocket(rxBuffer,65535);
+	//cout<<"UDP Receiver: "<<len<<" Data:"<<rxBuffer<<endl;
+
+	// Convert char array to string
+	string str = string((char*)rxBuffer);
+
+	// Parse string to vector-list
+	vector<string> words = Convert::string_to_T<vector<string>>(str);
+
+	string &strState = words[2];
+	strState = regex_replace(strState, regex(" "), string{ "," });
+	strState = regex_replace(strState, regex("(\\[|])"), string{ "" });
+
+	assert(words[0] == "OK" && words[1] == "initialstate");
+	try
+	{
+		// Parse string to vector-list
+		SmartVector newstate = Convert::string_to_T<SmartVector>(words[2]);
+		//cout<<endl<<"RepresentationUDP newState"<<endl;
+		//newstate.Print();
+		
+		isDone = Convert::string_to_T<bool>(words[3]);
+		//cout<<endl<<isDone<<endl;
+		return newstate;
+	}
+	catch(int e)
+	{
+		return state;
+	}
+}
+
 void RepresentationUDP::Add_Experience(const SmartVector& state, const SmartVector& action, const SmartVector& nextState, const double& reward, const int status)
 {
 	double maxQvalue = this->Get_Greedy_Pair(nextState).second;
@@ -230,6 +284,7 @@ void RepresentationUDP::Add_Experience(const SmartVector& state, const SmartVect
 
 	this->Set_Value(state,action,qvalue);
 }
+
 void RepresentationUDP::Print_Value()
 {
 	cout<<endl<<"Displaying State-Action Pair Q Value:"<<endl;

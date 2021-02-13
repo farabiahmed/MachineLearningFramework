@@ -12,7 +12,7 @@
 #include <string>     	// std::string, std::stod
 #include <sstream>		// Conversion between string and primitives
 #include <typeinfo>
-#include <algorithm>	// std::count
+#include <algorithm>	// std::count std::algorithm
 #include <vector>
 #include "Miscellaneous/SmartVector.hpp"
 
@@ -114,5 +114,9 @@ template <> vector<vector<int>> Convert::string_to_T < vector<vector<int>> > (st
 // HIDDEN_UNITS	=	2;4;8;4,4
 template <> vector<vector<unsigned>> Convert::string_to_T < vector<vector<unsigned>> > (string const &val);
 
+// Parsing string boolean.
+// Ex:
+// myvector		= true or false, or FALse or tRue
+template <> bool Convert::string_to_T <bool> (string const &val);
 
 #endif /* MISCELLANEOUS_CONVERT_HPP_ */

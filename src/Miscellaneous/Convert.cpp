@@ -163,4 +163,12 @@ vector<string> Convert::Parse_String(const string& val, const char& delimiter)
 	return str_arr;
 }
 
-
+template <>
+bool Convert::string_to_T <bool> (const string &_str) {
+	string str = _str;
+    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+    std::istringstream is(str);
+    bool b;
+    is >> std::boolalpha >> b;
+    return b;
+}

@@ -30,7 +30,8 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
                  statePreprocessType = "Tensor",
                  convolutionLayer= False,
                  modelId = "noid",
-                 logfolder = ""):
+                 logfolder = "",
+                 agent_model = ""):
 
         print("###############################")
         print("DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid")
@@ -83,12 +84,18 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
 
                 self.model = None
 
-                print("log/" + logfolder + "/model_0.h5")
-                if os.path.isfile("log/"+self.logfolder+"/model_0.h5"):
+                if os.path.isfile(agent_model):
+                    print("###############################")
+                    print("Existing model is being loaded through given agent_model.......")
+                    print("###############################")
+                    self.model = load_model(agent_model)
+
+                elif os.path.isfile("log/"+self.logfolder+"/model_0.h5"):                    
                     print("###############################")
                     print("Existing model is being loaded.......")
                     print("###############################")
                     self.model = load_model("log/" + self.logfolder + "/model_0.h5")
+
                 else :
                     print("###############################")
                     print("Not Any Existing model found.......")

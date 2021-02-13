@@ -62,7 +62,9 @@ protected:
 	std::fstream logger_simResults;
 
 	pair<unsigned,double> Simulate(void); 		///< Simulates the agent from an random initial point through
-								///< calculated last policy.
+												///< calculated last policy.
+
+	pair<unsigned,double> FitnessValue(SmartVector &state);
 
 	vector< pair<int,vector<double>> > rewards_cumulative;	///< Stores the rewards that collected during
 															///< each iteration. Then printed out to csv file

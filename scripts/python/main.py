@@ -15,6 +15,7 @@ from DeepCorrection_Hybrid import DeepCorrection_Hybrid
 from Representation_Empty import Representation_Empty
 from DeepActorCritic_PrioritizedReplay import DeepActorCritic_PrioritizedReplay
 #from DeepActorCritic_PrioritizedReplay_tflearn import DeepActorCritic_PrioritizedReplay_tflearn
+from GeneticDistributer import GeneticDistributer
 from Representation import Representation
 from command_parser import command_parser, config_parser
 import signal
@@ -158,6 +159,15 @@ def init_model(config):
                                                                 logfolder           = config["TIME_STAMP"],
                                                                 agent_model         = config["AGENT_MODEL"],
                                                                 )
+    elif config["DEEP_ALGO_TYPE"] ==  "GeneticDistributer":
+        rep = GeneticDistributer                               (gridsize            = strToValue(config["NUMBER_OF_ROWS"]),
+                                                                actionspaceperagent = 5,
+                                                                numberofagent       = strToValue(config["NUMBER_OF_AGENTS"]),                                                                
+                                                                modelId             = config["MODEL_ID"],
+                                                                logfolder           = config["TIME_STAMP"],
+                                                                agent_model         = config["AGENT_MODEL"],
+                                                                algo_mode           = config["ALGO_MODE"],
+                                                                )
 
     elif config["DEEP_ALGO_TYPE"] ==  "Representation_Empty":
         rep = Representation_Empty()
@@ -246,7 +256,20 @@ def read():
             # Parse Received Command
             command, state, action, value , nextstate, status = command_parser(params[1:])
 
-            if command == 'setvalue':
+            if command == 'initialstate':
+                #print("params: ", params)
+                newState, isDone = rep.Initial_State(state, value)
+                
+                newStateStr ="["
+                for x in newState:
+                    newStateStr+=str(x)+" "
+                newStateStr = newStateStr[:-1]    
+                newStateStr +="]"
+                tmp = "OK,initialstate,"+ newStateStr + "," + str(isDone)
+                #print(tmp)
+                s.sendto(tmp.encode(), (HOSTTX, PORTTX))
+
+            elif command == 'setvalue':
                 total_train = rep.Set_Value(state, action, value)
                 total_setval_persec += 1
                 s.sendto(("OK,setvalue").encode(), (HOSTTX, PORTTX))

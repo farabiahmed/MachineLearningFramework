@@ -21,7 +21,7 @@ Rendezvous::~Rendezvous()
 }
 
 
-vector<SmartVector> Rendezvous::Get_All_Possible_States() const
+vector<SmartVector>& Rendezvous::Get_All_Possible_States() const
 {
 	static vector<SmartVector> states;		//Cache states since it is expensive to calculate
 
@@ -149,7 +149,7 @@ bool Rendezvous::Check_Blocked_State(const SmartVector& state) const
 }
 
 //TODO needs to be updated for parametric multiagent case.
-vector<SmartVector> Rendezvous::Get_Action_List(const SmartVector& state) const
+vector<SmartVector>& Rendezvous::Get_Action_List(const SmartVector& state) const
 {
 	/*
 	vector<SmartVector> actionsSingleAgent = Gridworld::Get_Action_List(state);

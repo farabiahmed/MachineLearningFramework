@@ -34,7 +34,7 @@ public:
 
 //	vector<SmartVector> Get_All_Possible_States() const;
 
-	vector<SmartVector> Get_Action_List(const SmartVector&) const;
+	vector<SmartVector>& Get_Action_List(const SmartVector&) const;
 
 	int Get_State_Index(const SmartVector& state) const;
 

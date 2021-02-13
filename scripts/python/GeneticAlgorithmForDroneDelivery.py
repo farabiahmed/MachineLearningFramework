@@ -1,6 +1,8 @@
 import numpy as np
+import time
 from matplotlib.pyplot import *
-from random import choices, randint, randrange, random
+from random import randint, randrange, random
+from Examples.GeneticAlgo.custom_random import choices
 from typing import List, Callable, Tuple
 from collections import namedtuple
 from functools import partial
@@ -31,6 +33,9 @@ PopulateFunc = Callable[[], Population] # takes nothing but spits out new soluti
 SelectionFunc = Callable[[Population, FitnessFunc], Tuple[Genome, Genome]] # takes population and fitnessfunc to select two solutions to be the parents of our next solution
 CrossoverFunc = Callable[[Genome, Genome],Tuple[Genome, Genome]]
 MutationFunc = Callable[[Genome], Genome]
+
+
+population = []
 
 # Genetic representation of a solution
 def generate_genome(length: int) -> Genome:
@@ -131,18 +136,26 @@ def run_evaluation(
 
     return population, i
 
-start = time.time()
-population, generations = run_evaluation(
-    populate_func=partial(
-        generate_population, size=10, genome_length=len(more_things)
-    ),
-    fitness_func=partial(
-        fitness, things=more_things, weight_limit=3000
-    ),
-    fitness_limit=1310, #740
-    generation_limit=100
-)
-end = time.time()
+def init():
+    global population
+    
+    start = time.time()
+    population, generations = run_evaluation(
+        populate_func=partial(
+            generate_population, size=10, genome_length=len(more_things)
+        ),
+        fitness_func=partial(
+            fitness, things=more_things, weight_limit=3000
+        ),
+        fitness_limit=1310, #740
+        generation_limit=100
+    )
+    end = time.time()
+
+    print("number of generations: " + str(generations))
+    print("time: " + str(end - start))
+    print("best solution: " + str(genome_to_things(population[0], more_things)))
+    print("population[0]: " + str(population[0]))
 
 def genome_to_things(genome: Genome, things: [Thing]) -> [Thing]:
     result = []
@@ -154,9 +167,6 @@ def genome_to_things(genome: Genome, things: [Thing]) -> [Thing]:
 
     return result, weight
 
-print(f"number of generations: {generations}")
-print(f"time: {end - start}")
-print(f"best solution: {genome_to_things(population[0], more_things)}")
+def test():
+    return str(genome_to_things(population[0], more_things))
 
-#print(generate_genome(5))
-#print(generate_population(3, 5))
