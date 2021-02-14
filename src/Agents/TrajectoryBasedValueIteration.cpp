@@ -208,9 +208,16 @@ bool TrajectoryBasedValueIteration::Start_Execution()
 					// Get Reward for tuple (state,action,state')
 					double reward = environment->Get_Reward(state,action,nextState);
 
-					// Get max Q value for next state.
-					//double maxQvalue 	= Get_Greedy_Value(nextState,environment->Get_Action_List(state));
-					double maxQvalue 	= valueFunction->Get_Greedy_Pair(nextState).second;
+					if(reward>0.4)
+						cout<<"";
+
+					double maxQvalue = 0.0;
+					if(!environment->Check_Terminal_State(nextState))
+					{
+						// Get max Q value for next state.
+						//double maxQvalue 	= Get_Greedy_Value(nextState,environment->Get_Action_List(state));
+						maxQvalue 	= valueFunction->Get_Greedy_Pair(nextState).second;
+					}
 
 					// Update Q_plus
 					Q_plus += (1.0/(double)sample_length_L1) * ( reward + gamma * maxQvalue ) ;

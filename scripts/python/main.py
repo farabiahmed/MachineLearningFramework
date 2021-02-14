@@ -107,6 +107,7 @@ def init_model(config):
                                                                 convolutionLayer    = False,
                                                                 modelId             = config["MODEL_ID"],
                                                                 logfolder           = config["TIME_STAMP"],
+                                                                agent_model         = config["AGENT_MODEL"],
                                                                 )
 
 #   elif config["DEEP_ALGO_TYPE"] ==  "DeepActorCritic_PrioritizedReplay":
@@ -163,6 +164,11 @@ def init_model(config):
         rep = GeneticDistributer                               (gridsize            = strToValue(config["NUMBER_OF_ROWS"]),
                                                                 actionspaceperagent = 5,
                                                                 numberofagent       = strToValue(config["NUMBER_OF_AGENTS"]),                                                                
+                                                                hidden_unit         = strToValue(config["HIDDEN_LAYERS"]),
+                                                                learning_rate       = strToValue(config["ETA_LEARNING_RATE"]),
+                                                                batch_size          = strToValue(config["BATCH_SIZE"]),
+                                                                trainpass           = strToValue(config["TRAINING_PASS_PER_BATCH"]),
+                                                                experiencebuffer    = strToValue(config["EXPERIENCE_REPLAY_BUFFER"]),
                                                                 modelId             = config["MODEL_ID"],
                                                                 logfolder           = config["TIME_STAMP"],
                                                                 agent_model         = config["AGENT_MODEL"],

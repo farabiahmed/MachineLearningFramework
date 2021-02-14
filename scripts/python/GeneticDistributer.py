@@ -15,6 +15,11 @@ class GeneticDistributer(Representation):
                  gridsize=5,
                  actionspaceperagent=5,
                  numberofagent=2,
+                 hidden_unit=[12,12], #for learning
+                 learning_rate=0.1, #for learning
+                 batch_size=32, #for learning
+                 trainpass=25, #for learning
+                 experiencebuffer=128, #for learning
                  modelId = "noid",
                  logfolder = "",
                  agent_model = "models/model_0_20181224_091433.h5",
@@ -33,6 +38,11 @@ class GeneticDistributer(Representation):
                 gridsize            = gridsize,
                 actionspaceperagent = actionspaceperagent,
                 numberofagent       = 1,
+                hidden_unit         = hidden_unit,
+                learning_rate       = learning_rate,
+                batch_size          = batch_size,
+                trainpass           = trainpass,
+                experiencebuffer    = experiencebuffer,
                 statePreprocessType = 'Vector',
                 modelId             = modelId,
                 logfolder           = logfolder+"/singlemodel",

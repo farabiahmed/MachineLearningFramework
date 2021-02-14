@@ -11,6 +11,7 @@ bool TrajectoryBasedValueIterationMultiAgent::Start_Execution()
 {
 	unsigned numberof_processedtrajectorysteps = 0;
 	bool epsilonProbabilityAutoMode = true;
+	int countofAgents = 10;
 
 	// Test initial controller performance.
 	//Get_Cumulative_Rewards(numberof_bellmanupdate);
@@ -106,7 +107,7 @@ bool TrajectoryBasedValueIterationMultiAgent::Start_Execution()
 			else
 			{
 				double Q_plus = 0.0;
-				vector<double> Q_pluses;
+				vector<double> Q_pluses = vector<double>(countofAgents);
 
 				// Load prospective nextstates with experiments.
 				for (unsigned int i = 0; i < sample_length_L1; ++i) {
@@ -118,14 +119,35 @@ bool TrajectoryBasedValueIterationMultiAgent::Start_Execution()
 					double reward = environment->Get_Reward(state,action,nextState);
 					vector<double> rewards = environment->Get_Rewards();
 
+					if(reward>0.4)
+						cout<<"";
+					countofAgents = rewards.size();
+					/*
+					cout<<" Rewards: [";
+					for (unsigned int i = 0; i < rewards.size(); ++i) {
+						cout<<rewards[i]<<" ";
+					}
+					cout<<"] ";
+					*/
+
 					// Get max Q value for next state.
 					//double maxQvalue 	= Get_Greedy_Value(nextState,environment->Get_Action_List(state));
 					//double maxQvalue 	= valueFunction->Get_Greedy_Pair(nextState).second;
-					vector<double> maxQvalues 	= valueFunction->Get_Greedy_Pairs(nextState).second;
+					vector<double> maxQvalues = valueFunction->Get_Greedy_Pairs(nextState).second;
+
+					// Check whether one of the agent reached its own terminal state.
+					vector<SmartVector> nextStates = SmartVector::Split(nextState,countofAgents);
+					for(size_t j=0; j<nextStates.size(); j++)
+					{
+						if(environment->Check_Terminal_State(nextStates[j]))
+						{
+							// set max Q value 0 since next state is already terminal state.
+							maxQvalues[j] = 0;
+						}
+					}
 
 					// Update Q_plus
 					//Q_plus += (1.0/(double)sample_length_L1) * ( reward + gamma * maxQvalue ) ;
-					Q_pluses = vector<double>(maxQvalues.size());
 					for(size_t j=0; j<maxQvalues.size(); j++)
 					{
 						Q_pluses[j] += (1.0/(double)sample_length_L1) * ( rewards[j] + gamma * maxQvalues[j] ) ;
@@ -150,6 +172,13 @@ bool TrajectoryBasedValueIterationMultiAgent::Start_Execution()
 				//valueFunction->Set_Value(state,action,Q_plus);
 				valueFunction->Set_Values(state,action,Q_pluses);
 
+				/*
+				cout<<" Q_pluses: [";
+				for (unsigned int i = 0; i < Q_pluses.size(); ++i) {
+					cout<<Q_pluses[i]<<" ";
+				}
+				cout<<"] ";
+				*/
 				/*
 				if(numberof_bellmanupdate % bellman_stride_forsimulation == 0)
 				{
