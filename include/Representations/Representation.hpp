@@ -30,11 +30,15 @@ public:
 
 	virtual pair<int,double> Get_Greedy_Pair(const SmartVector& state) const = 0;
 
+	virtual pair<vector<int>,vector<double>> Get_Greedy_Pairs(const SmartVector& state) const {return make_pair(vector<int>(),vector<double>());}
+
 	virtual SmartVector Get_Policy(const SmartVector& state) const = 0;
 
 	virtual double Get_Value(const SmartVector& state, const SmartVector& action) const = 0;
 
 	virtual void Set_Value(const SmartVector& state, const SmartVector& action, double value) = 0;
+
+	virtual void Set_Values(const SmartVector& state, const SmartVector& action, vector<double> values){}
 
 	virtual void Print_Value() = 0;
 

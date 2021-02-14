@@ -254,7 +254,7 @@ def read():
 
         if params[0] == "command" :
             # Parse Received Command
-            command, state, action, value , nextstate, status = command_parser(params[1:])
+            command, state, action, value, values, nextstate, status = command_parser(params[1:])
 
             if command == 'initialstate':
                 #print("params: ", params)
@@ -274,6 +274,11 @@ def read():
                 total_setval_persec += 1
                 s.sendto(("OK,setvalue").encode(), (HOSTTX, PORTTX))
 
+            elif command == 'setvalues':
+                total_train = rep.Set_Values(state, action, values)
+                total_setval_persec += 1
+                s.sendto(("OK,setvalues").encode(), (HOSTTX, PORTTX))
+
             elif command == 'getvalue':
                 val = rep.Get_Value(state, action)
                 total_getval_persec+=1
@@ -288,6 +293,21 @@ def read():
                 s.sendto((tmp).encode(), (HOSTTX, PORTTX))
                 #n2 = dt.datetime.now()
                 #print(((n2-n1).microseconds)/1e3)
+
+            elif command == 'getgreedypairs':
+                #n1 = dt.datetime.now()
+                pairs = rep.Get_Greedy_Pairs(state)
+                total_getgreedy_persec += 1
+
+                tmp = "OK,getgreedypairs,"
+
+                for pair in pairs:
+                        arg, val = pair
+                        tmp += str(arg) + "," + str(val) + "," 
+                
+                tmp = tmp[:-1]  #remove last comma
+
+                s.sendto((tmp).encode(), (HOSTTX, PORTTX))
 
             elif command == 'experience':
                 rep.Add_Experience(state, action, nextstate, value, status)

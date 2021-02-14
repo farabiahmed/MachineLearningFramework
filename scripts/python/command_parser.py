@@ -18,6 +18,7 @@ def command_parser(words):
     nextstate = []
     reward = 0
     value = 0
+    values = []
     status = 0
     commandtype = ''
 
@@ -26,6 +27,10 @@ def command_parser(words):
     for word in words:
 
         if word == 'setvalue':
+            commandtype = word
+            continue
+        
+        if word == 'setvalues':
             commandtype = word
             continue
 
@@ -52,6 +57,10 @@ def command_parser(words):
         elif word == 'value':
             commandtype = word
             continue
+        
+        elif word == 'values':
+            commandtype = word
+            continue
 
         elif commandtype == 'state':
             state.append(int(word))
@@ -65,9 +74,12 @@ def command_parser(words):
         elif commandtype == 'value' or commandtype == 'reward':
             value = float(word)
 
+        elif commandtype == 'values':
+            values = word.split(" ")
+
         elif commandtype == 'status':
             status = int(word)
 
     # Return in this order:
     # command, state, action, value
-    return words[0],np.array(state),np.array(action),value, np.array(nextstate),status
+    return words[0],np.array(state),np.array(action),value, values, np.array(nextstate),status

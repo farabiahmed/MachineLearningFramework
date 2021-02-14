@@ -72,11 +72,42 @@ class GeneticDistributer(Representation):
         #arg,valmax
         return action_index, combinedValue
 
+    def Get_Greedy_Pairs(self,state):
+        action = np.zeros(self.numberofagent)
+        agent_model_outputs = []
+        start_whole = datetime.datetime.now()
+        for i in range(self.numberofagent):
+            stateMini = state[self.state_dim*i:self.state_dim*i+self.state_dim]
+            arg, argValue = self.representation.Get_Greedy_Pair(stateMini)
+            agent_model_outputs.append((arg, argValue))
+            
+        # print("agent_model_outputs: ", agent_model_outputs)
+        finish_whole = datetime.datetime.now()
+        #print(finish_whole-start_whole)
+
+        #arg,valmax
+        return agent_model_outputs       
+
     def Get_Value(self,state,action):
-        raise NotImplementedError()
+        agent_model_outputs = []
+        for i in range(self.numberofagent):
+            stateMini = state[self.state_dim*i:self.state_dim*i+self.state_dim]
+            value = self.representation.Get_Value(stateMini, action[i])
+            agent_model_outputs.append(value)           
+            sumValue += value
+        combinedValue = sumValue / self.numberofagent
+        return combinedValue
 
     def Set_Value(self,state,action,value):
-        raise NotImplementedError()
+        return
+
+    def Set_Values(self,state,action,value):
+
+        for i in range(self.numberofagent):
+            stateMini = state[self.state_dim*i:self.state_dim*i+self.state_dim]
+            self.representation.Set_Value(stateMini, np.array([action[i]]), float(value[i]))
+
+        return
 
     def Add_Experience(self,state,action,nextstate,reward,status):
         raise NotImplementedError()

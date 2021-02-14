@@ -30,7 +30,7 @@ public:
 	virtual ~TrajectoryBasedValueIteration();
 
 	// Solver
-	bool Start_Execution();
+	virtual bool Start_Execution();
 
 	// Policy Selector
 	SmartVector Epsilon_Greedy_Policy(const SmartVector& state) const;

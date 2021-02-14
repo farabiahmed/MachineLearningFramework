@@ -42,6 +42,8 @@ public:
 
 	virtual double Get_Reward(const SmartVector& currentState, const SmartVector& action, const SmartVector& nextState) = 0;
 
+	virtual vector<double> Get_Rewards(){return vector<double>();}
+
 	virtual vector<pair<SmartVector,double>> Get_Transition_Probability(const SmartVector& currentState, const SmartVector& action) = 0;
 
 	virtual vector<SmartVector>& Get_All_Possible_States() const = 0;

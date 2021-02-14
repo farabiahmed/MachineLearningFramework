@@ -272,10 +272,11 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
         sizeOfAction = action.shape[0]
         temp = 0
 
-        for i in np.arange(sizeOfAction):
+        #for i in np.arange(sizeOfAction):
+        for i in range(sizeOfAction):
             temp = temp + action[i] * (self.actionspaceforagent**(sizeOfAction-i-1))
 
-        return temp;
+        return int(temp)
 
 
     def Set_Value(self,state,action,value):

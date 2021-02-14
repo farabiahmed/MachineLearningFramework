@@ -139,6 +139,63 @@ pair<int,double> RepresentationUDP::Get_Greedy_Pair(const SmartVector& state) co
 	return make_pair(maxArg,maxVal);
 }
 
+pair<vector<int>,vector<double>> RepresentationUDP::Get_Greedy_Pairs(const SmartVector& state) const
+{
+	vector<double> maxVal;
+	vector<int> maxArg;
+
+	// Sending packet:
+	// ex: getgreedypair,state,state.el[0],state.el[1],...,state.el[n]
+	// ex: getgreedypair,state,2,3
+
+	string data;
+	data+="command,getgreedypairs,";
+	data+="state,";
+	data+=Vector_ToString(state);
+
+	udpsocket.WriteSocket((unsigned char*)data.c_str(),data.size());
+
+	// Return packet:
+	// ex: OK,getgreedypair,<arg>,<val>
+	// ex: OK,getgreedypair,2,0.87
+
+	unsigned char rxBuffer[65535]= {0};
+	int len = udpsocket.ReadSocket(rxBuffer,65535);
+	//cout<<"UDP Receiver: "<<len<<" Data:"<<rxBuffer<<endl;
+
+	// Convert char array to string
+	string str = string((char*)rxBuffer);
+
+	// Parse string to vector-list
+	vector<string> words = Convert::string_to_T< vector<string> >(str);
+
+	assert(words[0] == "OK" && words[1] == "getgreedypairs");
+
+	unsigned int count = (words.size() - 2)/2;
+
+	try
+	{
+		for(unsigned int i=0; i<count; i++)
+		{
+			int arg = stoi(words[2+2*i]);
+			double val = stod(words[3+2*i]);
+
+			maxArg.push_back(arg);
+			maxVal.push_back(val);
+		}
+
+	}
+	catch (int e)
+	{
+		cout << "An exception occurred. Exception Code: " << e << '\n';
+		cout << "Inputs: " << words[2] << " " << words[3] << '\n';
+
+		exit(0);
+	}
+
+	return make_pair(maxArg,maxVal);
+}
+
 
 SmartVector RepresentationUDP::Get_Policy(const SmartVector& state) const
 {
@@ -225,6 +282,40 @@ void RepresentationUDP::Set_Value(const SmartVector& state, const SmartVector& a
 	int len = udpsocket.ReadSocket(rxBuffer,65535);
 	//cout<<"UDP Receiver: "<<len<<" Data:"<<rxBuffer<<endl;
 }
+
+void RepresentationUDP::Set_Values(const SmartVector& state, const SmartVector& action, vector<double> values)
+{
+	// Sending packet:
+	// ex: setvalue,value,<val>,state,state.el[0],state.el[1],...,state.el[n],action,action.el[0],..action.el[1]
+	// ex: setvalue,valuestate,2,3,action,3
+
+	string data;
+	data+="command,setvalues,";
+	data+="values,";
+
+	for(unsigned int i=0; i<values.size(); i++)
+	{
+		data+=to_string(values[i]) + " ";
+
+	}
+	data+=",";
+	data+="state,";
+	data+=Vector_ToString(state);
+	data+=",";
+	data+="action,";
+	data+=Vector_ToString(action);
+
+	udpsocket.WriteSocket((unsigned char*)data.c_str(),data.size());
+
+
+	// Return packet:
+	// ex: OK,setvalue
+
+	unsigned char rxBuffer[65535];
+	int len = udpsocket.ReadSocket(rxBuffer,65535);
+	//cout<<"UDP Receiver: "<<len<<" Data:"<<rxBuffer<<endl;
+}
+
 
 SmartVector RepresentationUDP::Initial_State(const SmartVector& state, double fitnessValue, bool& isDone) const
 {

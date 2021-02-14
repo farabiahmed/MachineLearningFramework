@@ -29,6 +29,7 @@ public:
 	bool ComparePosition(const SmartVector& state1, const SmartVector& state2) const;
 
 	double Get_Reward(const SmartVector& currentState, const SmartVector& action, const SmartVector& nextState);
+	virtual vector<double> Get_Rewards();
 
 	vector<pair<SmartVector,double>> Get_Transition_Probability(const SmartVector& currentState, const SmartVector& action);
 
@@ -53,6 +54,8 @@ private:
 	unsigned number_of_agents;
 
 	const int DIMENSION_FOR_AGENT;
+
+	vector<double> rewards;
 
 };
 

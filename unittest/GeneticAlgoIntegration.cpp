@@ -27,7 +27,7 @@ using namespace std;
 
 // All Possible States and Actions
 vector<SmartVector> States;
-vector<SmartVector> Actions;
+const vector<SmartVector>& Actions;
 
 SmartVector generate_random_state()
 {

@@ -12,6 +12,8 @@ MultiDeliveryDrone::MultiDeliveryDrone(const ConfigParser& cfg)
  DIMENSION_FOR_AGENT(DeliveryDrone::TotalNumberOfStates)// x,y,fuel,packet,delivery
 {
 	number_of_agents = cfg.GetValueOfKey<int>("NUMBER_OF_AGENTS");
+
+	rewards = vector<double>(number_of_agents);
 }
 
 MultiDeliveryDrone::~MultiDeliveryDrone()
@@ -141,10 +143,16 @@ double MultiDeliveryDrone::Get_Reward(const SmartVector& currentState, const Sma
 	vector<SmartVector> nextStates = SmartVector::Split(nextState,number_of_agents);
 
 	for (unsigned i = 0; i < number_of_agents; ++i) {
-		reward += DeliveryDrone::Get_Reward(currentStates[i], actions[i], nextStates[i]);
+		rewards[i] = DeliveryDrone::Get_Reward(currentStates[i], actions[i], nextStates[i]);
+		reward += rewards[i];
 	}
 
 	return reward/(double)number_of_agents;
+}
+
+vector<double> MultiDeliveryDrone::Get_Rewards()
+{
+	return rewards;
 }
 
 //FIXED: Fix to multiagent case for n>2

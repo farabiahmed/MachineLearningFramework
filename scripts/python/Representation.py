@@ -4,6 +4,9 @@ class Representation(metaclass=ABCMeta):
     @abstractmethod
     def Get_Greedy_Pair(self,state):
         raise NotImplementedError()
+    
+    def Get_Greedy_Pairs(self,state):
+        raise NotImplementedError()
 
     @abstractmethod
     def Get_Value(self,state,action):
@@ -11,6 +14,9 @@ class Representation(metaclass=ABCMeta):
 
     @abstractmethod
     def Set_Value(self,state,action,value):
+        raise NotImplementedError()
+    
+    def Set_Values(self,state,action,value):
         raise NotImplementedError()
 
     @abstractmethod

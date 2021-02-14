@@ -45,12 +45,12 @@ def Init(param_numberofagent, param_state_dim):
     
     # Get all permutations 
     packagePermutations = list(itertools.permutations(packageIds))
-        #print("packagePermutations:")
-        #print([str(x) for x in packagePermutations])
-        # ['(0, 1, 2)', '(0, 2, 1)', '(1, 0, 2)', '(1, 2, 0)', '(2, 0, 1)', '(2, 1, 0)']
-    
+    # print("packagePermutations Len(", len(packagePermutations), ") :", packagePermutations)
+
     # initialize dictionary to store key-value of state-fitness
     dictStateFitness = {}
+
+    #print("\nInitialized (DeliveryDroneHelper)...")
 
 
 def Process(state, fitnessValue):
@@ -66,24 +66,27 @@ def Process(state, fitnessValue):
     # remove first element
     packagePermutations.pop(0)
 
+    if(fitnessValue>0.9):
+        packagePermutations.clear()
+
     if len(packagePermutations)==0:
         done=True
 
-        print("Dictionary:", dictStateFitness)
+        #print("\nDictionary:", dictStateFitness)
 
         # https://www.w3resource.com/python-exercises/dictionary/python-data-type-dictionary-exercise-1.php
         dictStateFitness_sorted = sorted(dictStateFitness.items(), key=operator.itemgetter(1),reverse=True)
-        print('Dictionary in descending order by value : ',dictStateFitness_sorted)
+        #print('\nDictionary in descending order by value : ',dictStateFitness_sorted)
 
-        state = dictStateFitness_sorted[0][0]
+        _state = dictStateFitness_sorted[0][0]
         fitness = dictStateFitness_sorted[0][1]
-        print("The chosen state:", state, " fitness:", fitness)
+        #print("\nThe chosen state:", _state, " fitness:", fitness)
                 
     else:
         done=False
-        state = SwitchPackages(state, packagePermutations[0])
+        _state = SwitchPackages(state, packagePermutations[0])
 
-    return done, state
+    return done, _state
 
 
 #for x in packagePermutations:

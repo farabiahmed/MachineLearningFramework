@@ -32,11 +32,15 @@ public:
 
 	pair<int,double> Get_Greedy_Pair(const SmartVector& state) const;
 
+	pair<vector<int>,vector<double>> Get_Greedy_Pairs(const SmartVector& state) const override;
+
 	SmartVector Get_Policy(const SmartVector& state) const;
 
 	double Get_Value(const SmartVector& state, const SmartVector& action) const;
 
 	void Set_Value(const SmartVector& state, const SmartVector& action, double value);
+
+	void Set_Values(const SmartVector& state, const SmartVector& action, vector<double> values);
 
 	void Add_Experience(const SmartVector& state, const SmartVector& action, const SmartVector& nextState, const double& reward, const int status);
 

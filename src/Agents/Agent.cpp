@@ -109,14 +109,22 @@ pair<unsigned,double> Agent::Simulate()
 
 	state = environment->Get_Random_State();
 	
+	// provide log to console.
+	cout<<" Init: [";
+	for (int i = 0; i < state.dimension; ++i) {
+		cout<<setw(2)<<(int)state.elements[i]<<" ";
+	}
+	cout<<"] ";
+
 	while(!initialStateDone)	
 	{
 		fitnessValue = FitnessValue(state).second;
-		state = valueFunction->Initial_State(state, fitnessValue, initialStateDone);		
+
+		state = valueFunction->Initial_State(state, fitnessValue, initialStateDone);
 	}
 
 	// provide log to console.
-	cout<<" Init: [";
+	cout<<" Chosen: [";
 	for (int i = 0; i < state.dimension; ++i) {
 		cout<<setw(2)<<(int)state.elements[i]<<" ";
 	}
@@ -125,7 +133,7 @@ pair<unsigned,double> Agent::Simulate()
 	return FitnessValue(state);
 }
 
-pair<unsigned,double> Agent::FitnessValue(SmartVector& state)
+pair<unsigned,double> Agent::FitnessValue(SmartVector state)
 {
 	// Hold the reward that we will return.
 	double reward=0;

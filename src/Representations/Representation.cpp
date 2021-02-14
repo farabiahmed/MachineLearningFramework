@@ -37,7 +37,7 @@ void Representation::Get_Report(string filePath, string fileName)
 
 		if( ! (blocked_state || terminal_state) )
 		{
-			vector<SmartVector> actions = environment->Get_Action_List(states[i]);
+			const vector<SmartVector>& actions = environment->Get_Action_List(states[i]);
 
 			for (unsigned a = 0; a < actions.size(); ++a)
 			{

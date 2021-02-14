@@ -306,7 +306,7 @@ SmartVector TrajectoryBasedValueIteration::Epsilon_Greedy_Policy(const SmartVect
 	SmartVector action;
 
 	// Store all available actions to use in exploration.
-	vector<SmartVector> actions = environment->Get_Action_List(state);
+	const vector<SmartVector>& actions = environment->Get_Action_List(state);
 
 	// Create an instance for discrete probabilities
 	vector<double> probabilities;
