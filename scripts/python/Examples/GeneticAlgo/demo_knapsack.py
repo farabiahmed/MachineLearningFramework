@@ -1,4 +1,10 @@
-import genetic_algorithm
+import time
+from genetic_algorithm import Genome, Population, run_evaluation
+from collections import namedtuple
+from functools import partial
+from custom_random import choices
+
+Thing = namedtuple('Thing', ['name', 'value', 'weight'])
 
 things = [
     Thing('Laptop', 500, 2200),
@@ -15,6 +21,10 @@ more_things = [
     Thing('Phone', 500, 200),
     Thing('Baseball Cap', 100, 70),
 ] + things
+
+# Genetic representation of a solution
+def generate_genome(length: int) -> Genome:
+    return choices([0,1], k=length)
 
 # Function to generate new solutions
 def generate_population(size: int, genome_length: int) -> Population:
@@ -41,12 +51,14 @@ def fitness(genome: Genome, things: [Thing], weight_limit: int) -> int:
 def genome_to_things(genome: Genome, things: [Thing]) -> [Thing]:
     result = []
     weight = 0
+    value = 0
     for i, thing in enumerate(things):
         if genome[i] == 1:
             result+=[thing.name]
             weight+=thing.weight
+            value+=thing.value
 
-    return result, weight
+    return result, weight, value
     
 start = time.time()
 population, generations = run_evaluation(
@@ -61,6 +73,7 @@ population, generations = run_evaluation(
 )
 end = time.time()
 
-print(f"number of generations: {generations}")
-print(f"time: {end - start}")
-print(f"best solution: {genome_to_things(population[0], more_things)}")
+print("number of generations: " + str(generations))
+print("time: " + str(end - start))
+print("best solution: " + str(genome_to_things(population[0], more_things)))
+print("population[0]: " + str(population[0]))

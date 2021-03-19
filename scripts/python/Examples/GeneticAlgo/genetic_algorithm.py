@@ -1,13 +1,12 @@
 import numpy as np
 from matplotlib.pyplot import *
-from random import choices, randint, randrange, random
+from random import randint, randrange, random
 from typing import List, Callable, Tuple
-from collections import namedtuple
 from functools import partial
+from custom_random import choices
 
 Genome = List[int]
 Population = List[Genome]
-Thing = namedtuple('Thing', ['name', 'value', 'weight'])
 
 # Seperation of concerns for a better architecture, sperate the problem and algorithm, generalize the work done here.
 FitnessFunc = Callable[[Genome], int]  # gets the genome and returns the fitness value to make the correct choice.
@@ -15,10 +14,6 @@ PopulateFunc = Callable[[], Population] # takes nothing but spits out new soluti
 SelectionFunc = Callable[[Population, FitnessFunc], Tuple[Genome, Genome]] # takes population and fitnessfunc to select two solutions to be the parents of our next solution
 CrossoverFunc = Callable[[Genome, Genome],Tuple[Genome, Genome]]
 MutationFunc = Callable[[Genome], Genome]
-
-# Genetic representation of a solution
-def generate_genome(length: int) -> Genome:
-    return choices([0,1], k=length)
 
 # Selection Function: a select function to select the solutions to generate the next generation.
 # the selected solutions will be parents of the next generation

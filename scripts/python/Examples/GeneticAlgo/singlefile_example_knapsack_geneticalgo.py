@@ -102,6 +102,7 @@ def run_evaluation(
     mutation_func: MutationFunc = mutation,
     generation_limit: int = 100
 ) -> Tuple[Population, int]:
+
     population = populate_func()
 
     for i in range(generation_limit):
@@ -149,12 +150,14 @@ end = time.time()
 def genome_to_things(genome: Genome, things: [Thing]) -> [Thing]:
     result = []
     weight = 0
+    value = 0
     for i, thing in enumerate(things):
         if genome[i] == 1:
             result+=[thing.name]
             weight+=thing.weight
+            value+=thing.value
 
-    return result, weight
+    return result, weight, value
 
 print("number of generations: " + str(generations))
 print("time: " + str(end - start))
