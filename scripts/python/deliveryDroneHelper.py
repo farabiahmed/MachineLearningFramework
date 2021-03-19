@@ -28,10 +28,6 @@ def SwitchPackages(state, packageOrder):
 
 def RandomPacketSwitch(state):
     return SwitchPackages(state, choices(packagePermutations)[0])
-
-def GetFitnessValue(state):
-    fitness = state[3]
-    return fitness;
     
 def Init(param_numberofagent, param_state_dim):
 

@@ -16,7 +16,7 @@ from Memory.Memory_SumTree import Memory_SumTree
 from Memory import Memory_UniformRandom
 import time
 import datetime
-
+import copy 
 from Representation import Representation
 
 class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation):
@@ -67,7 +67,7 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
         self.modelId = modelId
         self.logfolder = logfolder
 
-        self.update_target_interval = 10000
+        self.update_target_interval = 5000
         self.experience_counter = 0
 
         # Create session and graphs
@@ -76,6 +76,8 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
 
         self.graph_predict = tf.Graph()
         self.session_predict = tf.Session(graph=self.graph_predict)
+
+        self.counterForwardProp = 0
 
         with self.graph_train.as_default():
             with self.session_train.as_default():
@@ -177,9 +179,11 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
     def Update_target(self):
         print('Updating Target Network')
 
+        model_weights = None
         with self.graph_train.as_default():
             with self.session_train.as_default():
                 model_weights = self.model.get_weights()
+                print(model_weights)
 
         with self.graph_predict.as_default():
             with self.session_predict.as_default():
@@ -252,10 +256,13 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
             self.mutex.acquire(1)
             # Prediction of the model
             with tf.device('/cpu:0'):
-                with self.graph_predict.as_default():
-                    with self.session_predict.as_default():
-                        hypothesis = self.model_target.predict(input)
-
+                #with self.graph_predict.as_default():
+                with self.graph_train.as_default():
+                    #with self.session_predict.as_default():
+                    with self.session_train.as_default():
+                        #hypothesis = self.model_target.predict(input)
+                        hypothesis = self.model.predict(input)
+                        #hypothesis = np.random.rand(1,5)
             self.mutex.release()
 
             values = np.asarray(hypothesis).reshape(self.output_unit)
@@ -285,7 +292,7 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
         state = self.Convert_State_To_Input(state)
 
         # Update label
-        values = self.ForwardPass(state)
+        values = copy.deepcopy(self.ForwardPass(state))
         index = self.Get_Action_Index(action)
 
         # Calculate error for Prioritized Experience Replay
@@ -324,11 +331,13 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
                 batchSamplesX.append(X)
                 batchSamplesY.append(Y)
 
+            self.mutex.acquire(1)
             with tf.device('/gpu:0'):
                 with self.graph_train.as_default():
                     with self.session_train.as_default():
                         self.model.fit(np.array(batchSamplesX), np.array(batchSamplesY), epochs=self.trainPass, batch_size= self.batchsize, verbose=0)
-
+            self.mutex.release()
+            
             if not self.trainingepochtotal % self.update_target_interval:
                 self.Update_target()
 
@@ -380,6 +389,10 @@ class DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid(Representation)
 
             self.model.save("log/" + self.logfolder+"/"+currentTime + "/model_" + self.modelId + ".h5")
             self.model.save_weights("log/"+self.logfolder+"/"+currentTime+"/model_weight_"+self.modelId+".h5")
+
+            self.model.save("log/" + self.logfolder + "/model_" + self.modelId + ".h5")
+            self.model.save_weights("log/"+self.logfolder+"/model_weight_"+self.modelId+".h5")
+
             print("###############################")
             print("Model saved: " + "log/" + self.logfolder+"/"+currentTime)
             print("###############################")

@@ -45,7 +45,7 @@ class GeneticDistributer(Representation):
                 experiencebuffer    = experiencebuffer,
                 statePreprocessType = 'Vector',
                 modelId             = modelId,
-                logfolder           = logfolder+"/singlemodel",
+                logfolder           = logfolder,
                 agent_model         = agent_model
                 )
 
@@ -109,6 +109,7 @@ class GeneticDistributer(Representation):
         return combinedValue
 
     def Set_Value(self,state,action,value):
+        self.representation.Set_Value(state, action, float(value))
         return
 
     def Set_Values(self,state,action,value):

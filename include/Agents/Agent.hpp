@@ -64,7 +64,7 @@ protected:
 	pair<unsigned,double> Simulate(void); 		///< Simulates the agent from an random initial point through
 												///< calculated last policy.
 
-	pair<unsigned,double> FitnessValue(SmartVector state);
+	pair<unsigned,double> FitnessValue(SmartVector state, vector<SmartVector>& actions);
 
 	vector< pair<int,vector<double>> > rewards_cumulative;	///< Stores the rewards that collected during
 															///< each iteration. Then printed out to csv file

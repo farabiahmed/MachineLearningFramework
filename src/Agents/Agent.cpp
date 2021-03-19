@@ -106,6 +106,7 @@ pair<unsigned,double> Agent::Simulate()
 	SmartVector state;
 	bool initialStateDone = false;
 	double fitnessValue = 0.0;
+	vector<SmartVector> actions;
 
 	state = environment->Get_Random_State();
 	
@@ -118,7 +119,7 @@ pair<unsigned,double> Agent::Simulate()
 
 	while(!initialStateDone)	
 	{
-		fitnessValue = FitnessValue(state).second;
+		fitnessValue = FitnessValue(state, actions).second;
 
 		state = valueFunction->Initial_State(state, fitnessValue, initialStateDone);
 	}
@@ -130,10 +131,26 @@ pair<unsigned,double> Agent::Simulate()
 	}
 	cout<<"] ";
 
-	return FitnessValue(state);
+	actions.clear();
+	pair<unsigned,double> ret = FitnessValue(state, actions);
+
+	// provide log to console.
+	cout<<" Actions: ";
+	for (unsigned int i = 0; i < actions.size(); ++i) {
+
+		cout<< i;
+		cout<<":[";
+		for (int j = 0; j < actions[i].dimension; ++j) {
+			cout<<setw(2)<<(int)actions[i].elements[j]<<" ";
+		}
+		cout<<"] ";
+	}
+	cout<<" ";
+
+	return ret;
 }
 
-pair<unsigned,double> Agent::FitnessValue(SmartVector state)
+pair<unsigned,double> Agent::FitnessValue(SmartVector state, vector<SmartVector>& actions)
 {
 	// Hold the reward that we will return.
 	double reward=0;
@@ -179,6 +196,9 @@ pair<unsigned,double> Agent::FitnessValue(SmartVector state)
 
 		// Increase total number of movement to be blocked in a loop in case of a bad policy.
 		number_of_movement++;
+
+		// Hold the actions to printout later
+		actions.push_back(action);
 	}
 
 	return make_pair(number_of_movement,reward);

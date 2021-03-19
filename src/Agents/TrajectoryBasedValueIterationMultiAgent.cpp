@@ -169,8 +169,14 @@ bool TrajectoryBasedValueIterationMultiAgent::Start_Execution()
 				numberof_processedtrajectorysteps++;
 
 				// Update Value
-				//valueFunction->Set_Value(state,action,Q_plus);
 				valueFunction->Set_Values(state,action,Q_pluses);
+
+				vector<SmartVector> stateMini = SmartVector::Split(state,countofAgents);
+				vector<SmartVector> actionMini = SmartVector::Split(action,countofAgents);
+
+				for (int j = 0; j < countofAgents; ++j) {
+					valueFunction->Set_Value(stateMini[j],actionMini[j],Q_pluses[j]);
+				}
 
 				/*
 				cout<<" Q_pluses: [";
