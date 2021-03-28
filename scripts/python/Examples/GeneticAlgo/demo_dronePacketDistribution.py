@@ -9,7 +9,7 @@ from typing import Tuple
 from random import randint, randrange, random
 from itertools import chain 
 
-numberofagent = 10
+numberofagent = 15
 packageIds = []
 factorialTable = [] # holds all factorials for efficiency
 
@@ -115,6 +115,4 @@ end = time.time()
 
 print("number of generations: " + str(generations))
 print("time: " + str(end - start))
-# print("population[0]: " + str(population[0]) + " " + str(fitness(population[0])))
-
 [print(str(population[i]) + " " + str(fitness(population[i]))) for i in range(len(population))]

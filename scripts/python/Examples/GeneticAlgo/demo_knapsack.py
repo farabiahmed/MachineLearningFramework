@@ -34,7 +34,7 @@ def generate_population(size: int, genome_length: int) -> Population:
 
 
 # Fitness function
-def fitness(genome: Genome, things: [Thing], weight_limit: int) -> int:
+def fitness(genome: Genome, things: [Thing], weight_limit: int) -> float:
     if len(genome) != len(things):
         raise ValueError("genome and things must be of the same length")
 
