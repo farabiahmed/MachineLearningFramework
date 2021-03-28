@@ -3,6 +3,8 @@ from genetic_algorithm import Genome, Population, run_evaluation
 from collections import namedtuple
 from functools import partial
 from custom_random import choices
+from typing import Tuple
+from random import randint, randrange, random
 
 Thing = namedtuple('Thing', ['name', 'value', 'weight'])
 
@@ -48,17 +50,30 @@ def fitness(genome: Genome, things: [Thing], weight_limit: int) -> int:
                 return 0
     return value
 
+# In order to get a new solution for our next generation
+# takes two genomes as parameters, and returns two genomes as output
+def single_point_crossover(a: Genome, b: Genome) -> Tuple[Genome, Genome]:
+    if len(a) != len(b):
+        raise ValueError("Genomes a and b must be of same length")
+
+    length = len(a)
+    if length < 2:
+        return a,b
+
+    p = randint(1, length-1)
+    return a[0:p]+b[p:], b[0:p]+a[p:] 
+
 def genome_to_things(genome: Genome, things: [Thing]) -> [Thing]:
-    result = []
+    names = []
     weight = 0
     value = 0
     for i, thing in enumerate(things):
         if genome[i] == 1:
-            result+=[thing.name]
+            names+=[thing.name]
             weight+=thing.weight
             value+=thing.value
 
-    return result, weight, value
+    return names, weight, value
     
 start = time.time()
 population, generations = run_evaluation(
@@ -68,6 +83,7 @@ population, generations = run_evaluation(
     fitness_func=partial(
         fitness, things=more_things, weight_limit=3000
     ),
+    crossover_func=single_point_crossover,
     fitness_limit=1310, #740
     generation_limit=100
 )
