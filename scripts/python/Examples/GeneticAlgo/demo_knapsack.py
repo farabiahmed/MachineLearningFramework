@@ -1,5 +1,5 @@
 import time
-from genetic_algorithm import Genome, Population, run_evaluation
+from genetic_algorithm_naive import Genome, Population, run_evaluation
 from collections import namedtuple
 from functools import partial
 from custom_random import choices

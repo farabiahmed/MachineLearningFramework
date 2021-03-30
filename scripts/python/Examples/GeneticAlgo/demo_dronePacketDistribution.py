@@ -1,5 +1,5 @@
 import time
-from genetic_algorithm import Genome, Population, run_evaluation
+from genetic_algorithm import Genome, Population, init, process
 from collections import namedtuple
 from functools import partial
 from custom_random import choices
@@ -93,24 +93,33 @@ def ordered_crossover(mum: Genome, dad: Genome) -> Tuple[Genome, Genome]:
          alice[i] = dad[current_dad_position]
          bob[i] = mum[current_mum_position]
     #
-    print(alice, bob)
+    # print(alice, bob)
     # # Return twins
     return alice, bob
+
+def calculateFitness(population:Population):
+    return [fitness(p) for p in population]
 
 factorialTable = [math.factorial(i) for i in range(numberofagent+1)]
 packageIds = list(range(numberofagent))
 
 start = time.time()
-population, generations = run_evaluation(
-    populate_func=partial(
+population = init(
+    _populate_func=partial(
         generate_population, size=10, genome_length=numberofagent
     ),
-    crossover_func=ordered_crossover,
-    fitness_func=fitness,
-    fitness_limit=-1,
-    generation_limit=100,
-    representation_type="permutation"
+    _crossover_func=ordered_crossover,
+    _fitness_limit=-1,
+    _generation_limit=20,
+    _representation_type="permutation"
 )
+
+isDone = False
+ 
+while isDone == False:
+    fitnessvals = calculateFitness(population)
+    population, generations, isDone = process(fitnessvals)
+
 end = time.time()
 
 print("number of generations: " + str(generations))
