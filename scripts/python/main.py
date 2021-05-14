@@ -3,7 +3,6 @@ import _thread
 import time
 import datetime as dt
 import numpy as np
-import tensorflow
 from Representation_Keras_MultiAgent_TensorInput import Representation_Keras_MultiAgent_TensorInput
 from DeepQNetwork import DeepQNetwork
 from DeepQNetwork_PrioritizedReplay import DeepQNetwork_PrioritizedReplay
@@ -20,7 +19,7 @@ from Representation import Representation
 from command_parser import command_parser, config_parser
 import signal
 import sys
-
+import tensorflow
 
 #rep = Representation_Tabular([4,12,12])
 #rep = Representation_Tensorflow(4,0.1)

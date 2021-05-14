@@ -5,9 +5,11 @@ import numpy as np
 import tensorflow as tf
 from DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid import DeepQNetwork_PrioritizedReplay_Target_LearnerThread_Hybrid
 #from GeneticAlgorithmForDroneDelivery import GeneticAlgorithmForDroneDelivery
-import GeneticAlgorithmForDroneDelivery as GA
-import deliveryDroneHelper as droneHelper
+# import GeneticAlgorithmForDroneDelivery as GA
+import deliveryDronePacketDistributionHelperForFullSearch as droneHelperSearch
+import demo_dronePacketDistribution as dronePacketDistributionWithGeneticAlgo
 import datetime
+import collections
 
 class GeneticDistributer(Representation):
 
@@ -49,7 +51,9 @@ class GeneticDistributer(Representation):
                 agent_model         = agent_model
                 )
 
-        droneHelper.Init(self.numberofagent, self.state_dim)
+        droneHelperSearch.Init(self.numberofagent, self.state_dim)
+        self.population_ = []
+        self.memTrace = collections.deque(20*"0",20)
 
     def Get_Action_Index(self, action):
 
@@ -128,6 +132,9 @@ class GeneticDistributer(Representation):
 
     # i = 0
     isDone = True
+    stateOriginal = []
+    fitnessValues = []
+    populationIndex = 0
 
     def Initial_State(self,state, value):                
         
@@ -136,21 +143,46 @@ class GeneticDistributer(Representation):
         if self.algo_mode=="static":
             self.isDone = True
             newState = state
+
         elif self.algo_mode=="random":
             self.isDone = True
-            newState = droneHelper.RandomPacketSwitch(state.tolist())
+            newState = droneHelperSearch.RandomPacketSwitch(state.tolist())
+
         elif self.algo_mode=="search":
             if self.isDone:
-                droneHelper.Init(self.numberofagent, self.state_dim)
+                droneHelperSearch.Init(self.numberofagent, self.state_dim)
             
-            self.isDone, newState = droneHelper.Process(state.tolist(), value)
+            self.isDone, newState = droneHelperSearch.Process(state.tolist(), value)
+
         elif self.algo_mode=="genetic":
-            self.isDone = True
-            newState = state
+
+            if self.isDone:
+                self.stateOriginal = state
+                self.population_, self.isDone = dronePacketDistributionWithGeneticAlgo.init(self.numberofagent)
+                self.fitnessValues = []
+                self.populationIndex = 0
+            else:
+                # Collect the fitness values for the population
+                self.fitnessValues.append(value)             
+
+            if self.populationIndex < len(self.population_):
+                newState = droneHelperSearch.SwitchPackages(self.stateOriginal, self.population_[self.populationIndex])
+                self.populationIndex+=1                  
+                return newState, self.isDone
+            else:       
+                self.population_, generations, self.isDone = dronePacketDistributionWithGeneticAlgo.process(self.fitnessValues)  
+                self.fitnessValues = sorted(self.fitnessValues, reverse=True)              
+                if self.isDone is True:
+                    print("number of generations: " + str(generations))
+                    [print(str(self.population_[i]) + " " + str(self.fitnessValues[i])) for i in range(0,2)]
+                self.fitnessValues = []
+                self.populationIndex = 0
+                newState = droneHelperSearch.SwitchPackages(self.stateOriginal, self.population_[self.populationIndex])                            
+                return newState, self.isDone
+
         else:
             self.isDone = True
             newState = state
-
 
                 # print('Initial_State: ', state, " Fitness:", value)
 
