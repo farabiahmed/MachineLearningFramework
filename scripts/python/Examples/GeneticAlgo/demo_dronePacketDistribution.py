@@ -1,5 +1,6 @@
 import time
-from genetic_algorithm import Genome, Population, init, process
+#from genetic_algorithm import Genome, Population
+import genetic_algorithm as algo
 from collections import namedtuple
 from functools import partial
 from custom_random import choices
@@ -9,11 +10,12 @@ from typing import Tuple
 from random import randint, randrange, random
 from itertools import chain 
 
-numberofagent = 15
+numberofagent = 10
 packageIds = []
 factorialTable = [] # holds all factorials for efficiency
+isDone = False
 
-def getNthPermutation( pIndex, inList, outList=[] ):
+def getNthPermutation( permIndex, inList, outList=[] ):
     """ get :pIndex: permutation of :inList:
     
     :warn: permutations are sorted in lexicographical order starting from 0, i.e.:
@@ -22,6 +24,12 @@ def getNthPermutation( pIndex, inList, outList=[] ):
     :param list inList: initial list of elements
     :param list outList: result list
     """
+    global factorialTable
+
+    print(permIndex)
+
+    pIndex = permIndex
+
     ## permutation index too big
     if pIndex >= factorialTable[len(inList)]: return []
     ## no more elements to use
@@ -43,26 +51,26 @@ def getNthPermutation( pIndex, inList, outList=[] ):
         return getNthPermutation( reminder, inList, outList )
 
 # Genetic representation of a solution
-def generate_genome(length: int) -> Genome:
+def generate_genome(length: int) -> algo.Genome:
 
     global packageIds, numberofagent, factorialTable
-    randomPermutationIndex = randint(0, factorialTable[numberofagent-1])
+    randomPermutationIndex = randint(0, factorialTable[numberofagent])
     packetOrder = getNthPermutation(randomPermutationIndex, packageIds.copy(), [])
 
     return packetOrder
 
 # Function to generate new solutions
-def generate_population(size: int, genome_length: int) -> Population:
+def generate_population(size: int, genome_length: int) -> algo.Population:
     return [generate_genome(genome_length) for _ in range(size)]
 
 # Fitness function
-def fitness(genome: Genome) -> int:    
+def fitness(genome: algo.Genome) -> int:    
     target_genome = list(range(len(genome)))
     diff = [abs(a - b) for a, b in zip(genome, target_genome)]
     fitness = -sum(diff)
     return fitness
 
-def ordered_crossover(mum: Genome, dad: Genome) -> Tuple[Genome, Genome]:
+def ordered_crossover(mum: algo.Genome, dad: algo.Genome) -> Tuple[algo.Genome, algo.Genome]:
     """Implements ordered crossover"""
 
     size = len(mum)
@@ -97,31 +105,44 @@ def ordered_crossover(mum: Genome, dad: Genome) -> Tuple[Genome, Genome]:
     # # Return twins
     return alice, bob
 
-def calculateFitness(population:Population):
+def calculateFitness(population:algo.Population):
     return [fitness(p) for p in population]
 
-factorialTable = [math.factorial(i) for i in range(numberofagent+1)]
-packageIds = list(range(numberofagent))
 
-start = time.time()
-population = init(
-    _populate_func=partial(
-        generate_population, size=10, genome_length=numberofagent
-    ),
-    _crossover_func=ordered_crossover,
-    _fitness_limit=-1,
-    _generation_limit=20,
-    _representation_type="permutation"
-)
+def init(_numberofagent):
 
-isDone = False
- 
+    global factorialTable, isDone, packageIds, numberofagent
+
+    numberofagent = _numberofagent
+
+    factorialTable = [math.factorial(i) for i in range(numberofagent+1)]
+    packageIds = list(range(numberofagent))
+
+    population = algo.init(
+        _populate_func=partial(
+            generate_population, size=10, genome_length=numberofagent
+        ),
+        _crossover_func=ordered_crossover,
+        _fitness_limit=-1,
+        _generation_limit=20,
+        _representation_type="permutation"
+    )
+
+    isDone = False
+    return population, isDone
+
+def process(fitnessvals):
+    population, generations, isDone = algo.process(fitnessvals)
+
+    return population, isDone
+
+
+population,isDone = init(12)
+fitnessVals = []
+
 while isDone == False:
-    fitnessvals = calculateFitness(population)
-    population, generations, isDone = process(fitnessvals)
-
-end = time.time()
+    f = calculateFitness(population)
+    population, generations, isDone = algo.process(f)
 
 print("number of generations: " + str(generations))
-print("time: " + str(end - start))
 [print(str(population[i]) + " " + str(fitness(population[i]))) for i in range(len(population))]
